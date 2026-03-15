@@ -11,6 +11,7 @@ boolean IsA386;
 int dirangle[9] ={0,ANGLES/8,2*ANGLES/8,3*ANGLES/8,4*ANGLES/8,5*ANGLES/8,6*ANGLES/8,7*ANGLES/8,ANGLES};
 fixed focallength;
 unsigned screenofs;
+unsigned		cgascreenofs;
 int viewwidth;
 int viewheight;
 int centerx;
@@ -752,14 +753,6 @@ void InitGame (void)
 
 
 //
-// HOLDING DOWN 'M' KEY?
-//
-#ifndef SPEARDEMO
-	if (Keyboard[sc_M])
-	  DoJukebox();
-	else
-#endif
-//
 // draw intro screen stuff
 //
 	if (!virtualreality)
@@ -941,10 +934,6 @@ void    DemoLoop (void)
 
 	StartCPMusic(INTROSONG);
 
-#ifndef JAPAN
-	if (!NoWait)
-		PG13 ();
-#endif
 	if (!NoWait)
 		CSLOGOAnim ();
 		VW_FadeOut ();

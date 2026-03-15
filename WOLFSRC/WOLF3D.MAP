@@ -804,7 +804,6 @@ Detailed map of segments
  3A39:9D4E       _displayofs
  0CFC:0E00 idle  _DoActor
  048F:03E9 idle  _DoChecksum
- 048F:1041 idle  _DoJukebox
  1320:07B9 idle  _DoorClosing
  3A39:D85C       _doornum
  3A39:86BA       _doorobjlist
@@ -845,7 +844,6 @@ Detailed map of segments
  0EBC:0D02 idle  _DrawPlayerWeapon
  0BC6:0ADB       _DrawPlayScreen
  0EBC:0AEF idle  _DrawScaleds
- 1201:0411       _DrawScore
  06A5:0C70 idle  _DrawSoundMenu
  044B:0034 idle  _DrawSpans
  06A5:3BF0       _DrawStripes
@@ -1192,7 +1190,6 @@ Detailed map of segments
  3A39:ECBC       _pcSound
  3A39:EABA       _pcSoundLookup
  3A39:EFA9       _pelpan
- 0A85:03CC       _PG13
  3A39:9E90       _picdelay
  3A39:9EEA       _pickquick
  3A39:9E92       _picnum
@@ -2340,7 +2337,6 @@ Detailed map of segments
  048F:0F21 idle  _FinishSignon
  048F:0FBA       _MS_CheckParm
  048F:1020 idle  _InitDigiMap
- 048F:1041 idle  _DoJukebox
  048F:122A idle  _InitGame
  048F:13BC       _SetViewSize
  048F:1442       _ShowViewSize
@@ -2434,7 +2430,6 @@ Detailed map of segments
  06A5:3C30       _CheckForEpisodes
  0A85:0004       _ClearSplitVWB
  0A85:0031       _Victory
- 0A85:03CC       _PG13
  0A85:046A       _Write
  0A85:056F idle  _BJ_Breathe
  0A85:05D1       _LevelCompleted
@@ -2540,7 +2535,6 @@ Detailed map of segments
  1201:03C2       _DrawLevel
  1201:03DB       _DrawLives
  1201:03F3 idle  _GiveExtraMan
- 1201:0411       _DrawScore
  1201:042B       _GivePoints
  1201:0468       _DrawWeapon
  1201:047F       _DrawKeys

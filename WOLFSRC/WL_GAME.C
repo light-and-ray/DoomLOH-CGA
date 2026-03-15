@@ -902,7 +902,6 @@ void DrawPlayScreen (void)
 	DrawAmmo ();
 	DrawKeys ();
 	DrawWeapon ();
-	DrawScore ();
 
 #ifndef WITH_VGA
 	VW_UpdateScreen();

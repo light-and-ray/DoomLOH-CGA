@@ -312,6 +312,80 @@ void  FarScalePost (void)				// just so other files can call
 	ScalePost ();
 }
 
+int CheckHighBits (int value)
+{
+   if ((value & 0x40) && (value & 0x80))
+      { return 0; }
+   else
+      {
+   if (value & 0x80)
+     { return 1; }
+   else
+     { return 0; }
+      }
+}
+
+int CheckAdjacentTile (int x, int y)
+{
+   if ((y-1 >= 0) && (tilemap[x][y-1] & 0x80)
+   || (y+1 <= 63) && (tilemap[x][y+1] & 0x80)
+   || (x-1 >= 0) && (tilemap[x-1][y] & 0x80)
+   || (x+1 <= 63) && (tilemap[x+1][y] & 0x80))
+    return 1;
+   else
+    return 0;
+}
+byte   far patchedwall[PMPageSize];
+int      lastpatchnum;
+#define FIRSTPATCHOBJ    2
+#define NUMPATCHES       20
+#define PATCHSTART       DOORWALL-NUMPATCHES*2
+
+unsigned GetPatchNum(void)
+{
+   unsigned spot;
+
+   spot = MAPSPOT(xtile,ytile,2);
+   if (spot < FIRSTPATCHOBJ || spot >= FIRSTPATCHOBJ+NUMPATCHES )
+      return 0;
+   else
+      return spot;
+}
+
+boolean ApplyPatch(int wallpic)
+{
+      byte   far *scan;
+      int    pixel;
+      unsigned spot;
+
+   spot = GetPatchNum();
+   if (spot > 0 && wallpic < DOORWALL)
+   {
+      lastpatchnum = spot;
+      spot -= FIRSTPATCHOBJ;
+      spot = spot * 2 + (lastside?1:0);
+	 scan = PM_GetPage(wallpic);
+	 for (pixel=0; pixel<PMPageSize; pixel++,scan++)
+	  patchedwall[pixel] = *scan;
+	 scan = PM_GetPage(PATCHSTART+spot);
+	 for (pixel=0; pixel<PMPageSize; pixel++,scan++)
+	  if (*scan < 255)
+	     patchedwall[pixel] = *scan;
+      return true;
+   }
+   lastpatchnum = 0;
+   return false;
+}
+
+
+void AssignWall(int wallpic)
+{
+   if (ApplyPatch (wallpic))
+      *( ((unsigned *)&postsource)+1) = (unsigned)(memptr)patchedwall;
+   else
+      *( ((unsigned *)&postsource)+1) = (unsigned)PM_GetPage(wallpic);
+}
+
 
 /*
 ====================
@@ -1145,18 +1219,17 @@ void DrawPlayerWeapon (void)
 
 		if (shapenum == SPR_CHAINSAWREADY){shapenum+=(frameon>>3)%2; SD_PlaySound (CHAINSAWIDLESND);}
 		if (shapenum == SPR_HELLORB_READY)shapenum+=(frameon>>3)%4;
-		if (shapenum == SPR_SHOTGUNRLD1)SimpleScaleShape(viewwidth/2-30,shapenum,weaponviewheight);
-//		SimpleScaleShape(viewwidth/2,shapenum,152);
-		else if (shapenum == SPR_SHOTGUNRLD2)SimpleScaleShape(viewwidth/2-40,shapenum,weaponviewheight+1);
-		else if (shapenum == SPR_SHOTGUNRLD3)SimpleScaleShape(viewwidth/2-50,shapenum,weaponviewheight+1);
+		if (shapenum == SPR_SHOTGUNRLD1)SimpleScaleShape(viewwidth/2-30,shapenum,viewheight+1);
+		else if (shapenum == SPR_SHOTGUNRLD2)SimpleScaleShape(viewwidth/2-40,shapenum,viewheight+1);
+		else if (shapenum == SPR_SHOTGUNRLD3)SimpleScaleShape(viewwidth/2-50,shapenum,viewheight+1);
 		else if (gamestate.weapon==wp_hellorb)
-			SimpleScaleShape(viewwidth-80+gamestate.bobber2,shapenum,weaponviewheight+1+gamestate.bobber);
+			SimpleScaleShape(viewwidth-80+gamestate.bobber2,shapenum,viewheight+1+gamestate.bobber);
 		else
-			SimpleScaleShape(viewwidth/2-20+gamestate.bobber2,shapenum,weaponviewheight+1+gamestate.bobber+gamestate.weapchange);
+			SimpleScaleShape(viewwidth/2-20+gamestate.bobber2,shapenum,viewheight+1+gamestate.bobber+gamestate.weapchange);
 	}
 
-	if (!timedemo && (demorecord || demoplayback))
-		SimpleScaleShape(viewwidth/2,SPR_DEMO,weaponviewheight);
+	if (demorecord || demoplayback)
+		SimpleScaleShape(viewwidth/2,SPR_DEMO,viewheight+1);
 }
 
 

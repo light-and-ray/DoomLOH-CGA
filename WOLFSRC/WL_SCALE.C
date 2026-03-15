@@ -905,82 +905,188 @@ void ScaleShape (int xcenter, int shapenum, unsigned height)
 // VGA version
 void SimpleScaleShape (int xcenter, int shapenum, unsigned height)
 {
-	t_compshape   _seg *shape;
-	unsigned scale,pixheight;
-	unsigned starty,endy;
-	unsigned far *cmdptr;
-	unsigned far *cline;
-	unsigned far *line;
-	int actx,newstart,i,upperedge;
-	int scrstarty,screndy,j,lpix,rpix,pixcnt,ycnt;
-	byte mask,col;
-	byte far *vmem;
+	t_compshape	_seg *shape;
+	t_compscale _seg *comptable;
+	unsigned	scale,srcx,stopx,tempx;
+	int			t;
+	unsigned	far *cmdptr;
+	boolean		leftvis,rightvis;
 
-	shape=PM_GetSpritePage(shapenum);
+	backbufferseg = FP_SEG(cgabackbuffer);
 
-	scale=height>>1;                 // low three bits are fractional
-	if(!scale || scale>maxscale) return;   // too close or far away
+	shape = PM_GetSpritePage (shapenum);
 
-	pixheight=scale;
-	actx=xcenter-scale;
-	upperedge=viewheight/2-scale;
+	scale = height>>1;
+	comptable = scaledirectory[scale];
 
-	*(((unsigned *)&cline)+1)=(unsigned)shape;		// seg of shape
-	cmdptr=shape->dataofs;
-	*(((unsigned *)&vmem)+1)=0xa000;
+	*(((unsigned *)&linescale)+1)=(unsigned)comptable;	// seg of far call
+	*(((unsigned *)&linecmds)+1)=(unsigned)shape;		// seg of shape
 
-	for(i=shape->leftpix,pixcnt=i*pixheight,rpix=(pixcnt>>6)+actx;i<=shape->rightpix;i++,cmdptr++)
+//
+// scale to the left (from pixel 31 to shape->leftpix)
+//
+	srcx = 32;
+	slinex = xcenter;
+	stopx = shape->leftpix;
+	cmdptr = &shape->dataofs[31-stopx];
+
+	while ( --srcx >=stopx )
 	{
-		lpix=rpix;
-		if(lpix>=viewwidth) break;
-		pixcnt+=pixheight;
-		rpix=(pixcnt>>6)+actx;
-		if(lpix!=rpix && rpix>0)
-		{
-			if(lpix<0) lpix=0;
-			if(rpix>viewwidth) rpix=viewwidth,i=shape->rightpix+1;
-			(unsigned)cline=*cmdptr;
-			while(lpix<rpix)
-			{
-				mask=1<<(lpix&3);
-				VGAMAPMASK(mask);
-				line=cline;
-				while(*line)
-				{
-					starty=(*(line+2))>>1;
-					endy=(*line)>>1;
-					newstart=(*(line+1));
-					j=starty;
-					ycnt=j*pixheight;
-					screndy=(ycnt>>6)+upperedge;
-					if(screndy<0) (unsigned)vmem=bufferofs+(lpix>>2);
-					else (unsigned)vmem=bufferofs+screndy*80+(lpix>>2);
-					for(;j<endy;j++)
-					{
-						scrstarty=screndy;
-						ycnt+=pixheight;
-						screndy=(ycnt>>6)+upperedge;
-						if(scrstarty!=screndy && screndy>0)
-						{
-							col=((byte _seg *)shape)[newstart+j];
-							if(scrstarty<0) scrstarty=0;
-							if(screndy>viewheight) screndy=viewheight,j=endy;
+		(unsigned)linecmds = *cmdptr--;
+		if ( !(slinewidth = comptable->width[srcx]) )
+			continue;
 
-							while(scrstarty<screndy)
-							{
-								*vmem=col;
-								vmem+=80;
-								scrstarty++;
-							}
-						}
-					}
-					line+=3;
-				}
-				lpix++;
-			}
+		slinex -= slinewidth;
+		ScaleLine ();
+	}
+
+
+//
+// scale to the right
+//
+	slinex = xcenter;
+	stopx = shape->rightpix;
+	if (shape->leftpix<31)
+	{
+		srcx = 31;
+		cmdptr = &shape->dataofs[32-shape->leftpix];
+	}
+	else
+	{
+		srcx = shape->leftpix-1;
+		cmdptr = &shape->dataofs[0];
+	}
+	slinewidth = 0;
+
+	while ( ++srcx <= stopx )
+	{
+		(unsigned)linecmds = *cmdptr++;
+		if ( !(slinewidth = comptable->width[srcx]) )
+			continue;
+
+		ScaleLine ();
+		slinex+=slinewidth;
+	}
+}
+
+#else // CGA version
+void SimpleScaleShape (int xcenter, int shapenum, unsigned height)
+{
+	t_compshape	_seg *shape;
+	t_compscale _seg *comptable;
+	unsigned	scale,srcx,stopx,tempx;
+	int			t;
+	unsigned	far *cmdptr;
+	boolean		leftvis,rightvis;
+
+	shape = PM_GetSpritePage (shapenum);
+
+	scale = height>>1;
+	comptable = scaledirectory[scale];
+
+	*(((unsigned *)&linescale)+1)=(unsigned)comptable;	// seg of far call
+	*(((unsigned *)&linecmds)+1)=(unsigned)shape;		// seg of shape
+
+//
+// scale to the left (from pixel 31 to shape->leftpix)
+//
+	srcx = 32;
+	slinex = xcenter;
+	stopx = shape->leftpix;
+	cmdptr = &shape->dataofs[31-stopx];
+
+	while ( --srcx >=stopx )
+	{
+		(unsigned)linecmds = *cmdptr--;
+		if ( !(slinewidth = comptable->width[srcx]) )
+			continue;
+
+		while(slinewidth--)
+		{
+			slinex--;
+			if(!(slinex & 0x3))
+				ScaleLine ();
+		}
+	}
+
+
+//
+// scale to the right
+//
+	slinex = xcenter;
+	stopx = shape->rightpix;
+	if (shape->leftpix<31)
+	{
+		srcx = 31;
+		cmdptr = &shape->dataofs[32-shape->leftpix];
+	}
+	else
+	{
+		srcx = shape->leftpix-1;
+		cmdptr = &shape->dataofs[0];
+	}
+	slinewidth = 0;
+
+	while ( ++srcx <= stopx )
+	{
+		(unsigned)linecmds = *cmdptr++;
+		if ( !(slinewidth = comptable->width[srcx]) )
+			continue;
+
+		while(slinewidth--)
+		{
+			if(!(slinex & 0x3))
+				ScaleLine ();
+			slinex++;
 		}
 	}
 }
+#endif
+
+
+
+//
+// bit mask tables for drawing scaled strips up to eight pixels wide
+//
+// down here so the STUPID inline assembler doesn't get confused!
+//
+
+
+byte	mapmasks1[4][8] = {
+{1 ,3 ,7 ,15,15,15,15,15},
+{2 ,6 ,14,14,14,14,14,14},
+{4 ,12,12,12,12,12,12,12},
+{8 ,8 ,8 ,8 ,8 ,8 ,8 ,8} };
+
+byte	mapmasks2[4][8] = {
+{0 ,0 ,0 ,0 ,1 ,3 ,7 ,15},
+{0 ,0 ,0 ,1 ,3 ,7 ,15,15},
+{0 ,0 ,1 ,3 ,7 ,15,15,15},
+{0 ,1 ,3 ,7 ,15,15,15,15} };
+
+byte	mapmasks3[4][8] = {
+{0 ,0 ,0 ,0 ,0 ,0 ,0 ,0},
+{0 ,0 ,0 ,0 ,0 ,0 ,0 ,1},
+{0 ,0 ,0 ,0 ,0 ,0 ,1 ,3},
+{0 ,0 ,0 ,0 ,0 ,1 ,3 ,7} };
+
+
+unsigned	wordmasks[8][8] = {
+{0x0080,0x00c0,0x00e0,0x00f0,0x00f8,0x00fc,0x00fe,0x00ff},
+{0x0040,0x0060,0x0070,0x0078,0x007c,0x007e,0x007f,0x807f},
+{0x0020,0x0030,0x0038,0x003c,0x003e,0x003f,0x803f,0xc03f},
+{0x0010,0x0018,0x001c,0x001e,0x001f,0x801f,0xc01f,0xe01f},
+{0x0008,0x000c,0x000e,0x000f,0x800f,0xc00f,0xe00f,0xf00f},
+{0x0004,0x0006,0x0007,0x8007,0xc007,0xe007,0xf007,0xf807},
+{0x0002,0x0003,0x8003,0xc003,0xe003,0xf003,0xf803,0xfc03},
+{0x0001,0x8001,0xc001,0xe001,0xf001,0xf801,0xfc01,0xfe01} };
+
+int			slinex,slinewidth;
+unsigned	far *linecmds;
+long		linescale;
+unsigned	maskword;
+
+
 
 #ifdef FL_DIRSOUTH  // use directional 3d sprites ?
 
@@ -1009,8 +1115,7 @@ void Scale3DShaper (int x1,int x2,int shapenum,unsigned height1,unsigned height2
 	height=(((fixed)height1)<<12)+2048;
 	dheight=(((fixed)height2-(fixed)height1)<<12)/(fixed)dx;
 
-	// Get length/address of pixeldata	backbufferseg = FP_SEG(cgabackbuffer);
-
+	// Get length/address of pixeldata
 	shape = PM_GetSpritePage (shapenum);
 
 	scale1 = height1>>3; // low three bits are fractional
@@ -1162,99 +1267,24 @@ void Scale3DShape(statobj_t *ob)
       ny1 = gyt+gxt1;
 		ny2 = gyt+gxt2;
 	}
-	else
-	{
-		srcx = shape->leftpix-1;
-		cmdptr = &shape->dataofs[0];
-	}
-	slinewidth = 0;
-
-	while ( ++srcx <= stopx )
-	{
-		(unsigned)linecmds = *cmdptr++;
-		if ( !(slinewidth = comptable->width[srcx]) )
-			continue;
-
-		ScaleLine ();
-		slinex+=slinewidth;
-	}
-}
-
-#else // CGA version
-void SimpleScaleShape (int xcenter, int shapenum, unsigned height)
-{
-	t_compshape	_seg *shape;
-	t_compscale _seg *comptable;
-	unsigned	scale,srcx,stopx,tempx;
-	int			t;
-	unsigned	far *cmdptr;
-	boolean		leftvis,rightvis;
-
-	shape = PM_GetSpritePage (shapenum);
-
-	scale = height>>1;
-	comptable = scaledirectory[scale];
-
-	*(((unsigned *)&linescale)+1)=(unsigned)comptable;	// seg of far call
-	*(((unsigned *)&linecmds)+1)=(unsigned)shape;		// seg of shape
+   else
+   {
+      fixed gy1,gy2,gx,gyt1,gyt2,gxt;
+//
+// translate point to view centered coordinates
+//
+      gy1 = (((long)ob->tiley) << TILESHIFT)+0x8000-playy-0x8000L-1024;
+      gy2 = gy1+0x10000L+2048;
+      gx = (((long)ob->tilex) << TILESHIFT)+diradd-playx;
 
 //
-// scale to the left (from pixel 31 to shape->leftpix)
+// calculate newx
 //
-	srcx = 32;
-	slinex = xcenter;
-	stopx = shape->leftpix;
-	cmdptr = &shape->dataofs[31-stopx];
-
-	while ( --srcx >=stopx )
-	{
-		(unsigned)linecmds = *cmdptr--;
-		if ( !(slinewidth = comptable->width[srcx]) )
-			continue;
-
-		while(slinewidth--)
-		{
-			slinex--;
-			if(!(slinex & 0x3))
-				ScaleLine ();
-		}
-	}
-
-
-//
-// scale to the right
-//
-	slinex = xcenter;
-	stopx = shape->rightpix;
-	if (shape->leftpix<31)
-	{
-		srcx = 31;
-		cmdptr = &shape->dataofs[32-shape->leftpix];
-	}
-	else
-	{
-		srcx = shape->leftpix-1;
-		cmdptr = &shape->dataofs[0];
-	}
-	slinewidth = 0;
-
-	while ( ++srcx <= stopx )
-	{
-		(unsigned)linecmds = *cmdptr++;
-		if ( !(slinewidth = comptable->width[srcx]) )
-			continue;
-
-		while(slinewidth--)
-		{
-			if(!(slinex & 0x3))
-				ScaleLine ();
-			slinex++;
-		}
-	}
-}
-#endif
-
-
+		gxt = FixedByFrac(gx,viewcos);
+      gyt1 = FixedByFrac(gy1,viewsin);
+      gyt2 = FixedByFrac(gy2,viewsin);
+      nx1 = gxt-gyt1-0x2000;
+      nx2 = gxt-gyt2-0x2000;
 
 //
 // calculate newy
@@ -1301,3 +1331,4 @@ void SimpleScaleShape (int xcenter, int shapenum, unsigned height)
 }
 
 #endif         // #ifdef FL_DIRSOUTH
+
