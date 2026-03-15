@@ -8,7 +8,7 @@
 #define	EMSPageSizeSeg	(EMSPageSize >> 4)
 #define	EMSPageSizeKB	(EMSPageSize >> 10)
 #define	EMSFrameCount	4
-#define	PMPageSize		4096
+#define	PMPageSize		16384
 #define	PMPageSizeSeg	(PMPageSize >> 4)
 #define	PMPageSizeKB	(PMPageSize >> 10)
 #define	PMEMSSubPage	(EMSPageSize / PMPageSize)

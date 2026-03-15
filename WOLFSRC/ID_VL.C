@@ -47,26 +47,6 @@ void VL_WaitVBL (int vbls);
 
 //===========================================================================
 
-
-/*
-=======================
-=
-= VL_Startup
-=
-=======================
-*/
-
-#if 0
-void	VL_Startup (void)
-{
-	if ( !MS_CheckParm ("HIDDENCARD") && VL_VideoID () != 5)
-		MS_Quit ("You need a VGA graphics card to run this!");
-
-	asm	cld;				// all string instructions assume forward
-}
-
-#endif
-
 /*
 =======================
 =
@@ -82,7 +62,7 @@ void	VL_Startup (void)
 	int i,videocard;
 
 	return;
-	
+
 	asm	cld;
 
 	videocard = VL_VideoID ();
@@ -94,8 +74,7 @@ void	VL_Startup (void)
 		}
 
 	if (videocard != 5)
-Quit ("Improper video card!  If you really have a VGA card that I am not \n"
-	  "detecting, use the -HIDDENCARD command line parameter!");
+Quit ("No VGA Card!");
 
 }
 
@@ -149,7 +128,7 @@ void	VL_SetTextMode (void)
 		// text mode CRTC register values
 		static byte textModeCRTC[] = { 0x61, 0x50, 0x52, 0x0f, 0x19, 0x06, 0x19, 0x19, 0x02, 0x0d, 0x0b, 0x0c };
 		int i;
-		
+
 		outportb(0x03BF, 0x3);
 
 		for (i = 0; i < sizeof(textModeCRTC); i++)
@@ -304,7 +283,7 @@ void VL_SetLineWidth (unsigned width)
 		ylookup[i]=offset;
 		offset += linewidth;
 	}
-	
+
 	offset = 0;
 	if(cgamode == HERCULES720_MODE)
 	{
@@ -558,7 +537,7 @@ void VL_FadeOut (int start, int end, int red, int green, int blue, int steps)
 // final color
 //
 	VL_FillPalette (red,green,blue);
-	
+
 #else
 	if(screenfaded)
 	{
@@ -570,25 +549,25 @@ void VL_FadeOut (int start, int end, int red, int green, int blue, int steps)
 		asm mov dx,0x3d9
 		asm mov al,0x7
 		asm out dx,al
-		
+
 		VL_WaitVBL(5);
-		
+
 		asm mov dx,0x3d9
 		asm mov al,0x8
 		asm out dx,al
-		
+
 		VL_WaitVBL(5);
 
 		asm mov dx,0x3d9
 		asm mov al,0x0
 		asm out dx,al
 		break;
-		
+
 		case CGA_MODE5:
 		asm mov dx,0x3d9
 		asm mov al,0x20
 		asm out dx,al
-		
+
 		// EGA / VGA need to explicitly set colours
 		asm mov ax, 0x1000
 		asm mov bx, 0x0402
@@ -597,9 +576,9 @@ void VL_FadeOut (int start, int end, int red, int green, int blue, int steps)
 		asm int 0x10
 		asm mov bx, 0x0703
 		asm int 0x10
-		
+
 		VL_WaitVBL(5);
-		
+
 		asm mov dx,0x3d8
 		asm mov al,0x6
 		asm out dx,al
@@ -613,21 +592,21 @@ void VL_FadeOut (int start, int end, int red, int green, int blue, int steps)
 		asm mov bx, 0x0001
 		asm int 0x10
 		break;
-		
+
 		default:
 		_fmemset(MK_FP(0xb800, 0), 0, 0x2000);
 		VL_WaitVBL(5);
 		_fmemset(MK_FP(0xba00, 0), 0, 0x2000);
 		VL_WaitVBL(5);
 		break;
-		
+
 		case CGA_INVERSE_MONO:
 		_fmemset(MK_FP(0xb800, 0), 0xff, 0x2000);
 		VL_WaitVBL(5);
 		_fmemset(MK_FP(0xba00, 0), 0xff, 0x2000);
 		VL_WaitVBL(5);
 		break;
-		
+
 		case HERCULES640_MODE:
 		case HERCULES720_MODE:
 		{
@@ -687,7 +666,7 @@ void VL_FadeIn (int start, int end, byte far *palette, int steps)
 // final color
 //
 	VL_SetPalette (palette);
-	
+
 #else
 	if(!screenfaded)
 	{
@@ -699,20 +678,20 @@ void VL_FadeIn (int start, int end, byte far *palette, int steps)
 		asm mov dx,0x3d9
 		asm mov al,0x8
 		asm out dx,al
-		
+
 		VL_WaitVBL(5);
-		
+
 		asm mov dx,0x3d9
 		asm mov al,0x7
 		asm out dx,al
-		
+
 		VL_WaitVBL(5);
 
 		asm mov dx,0x3d9
 		asm mov al,0xf
 		asm out dx,al
 		break;
-		
+
 		case CGA_MODE5:
 		asm mov dx,0x3d9
 		asm mov al,0x20
@@ -720,7 +699,7 @@ void VL_FadeIn (int start, int end, byte far *palette, int steps)
 		asm mov dx,0x3d8
 		asm mov al,0xe
 		asm out dx,al
-		
+
 		// EGA / VGA need to explicitly set colours
 		asm mov ax, 0x1000
 		asm mov bx, 0x0402
@@ -729,13 +708,13 @@ void VL_FadeIn (int start, int end, byte far *palette, int steps)
 		asm int 0x10
 		asm mov bx, 0x0701
 		asm int 0x10
-		
+
 		VL_WaitVBL(5);
-		
+
 		asm mov dx,0x3d9
 		asm mov al,0x30
 		asm out dx,al
-		
+
 		// EGA / VGA need to explicitly set colours
 		asm mov ax, 0x1000
 		asm mov bx, 0x3c02
@@ -745,7 +724,7 @@ void VL_FadeIn (int start, int end, byte far *palette, int steps)
 		asm mov bx, 0x3b01
 		asm int 0x10
 		break;
-		
+
 		default:
 		break;
 	}
@@ -881,7 +860,7 @@ void VL_Hlin (unsigned x, unsigned y, unsigned width, unsigned color)
 	byte	far *dest;
 	byte mask;
 	byte colorwrite = (byte) color;
-	
+
 	if(cgamode == HERCULES720_MODE || cgamode == HERCULES640_MODE)
 	{
 		dest = MK_FP(activebackbufferseg,yinterlacelookup[y]+(x>>2) + bufferofs);
@@ -890,7 +869,7 @@ void VL_Hlin (unsigned x, unsigned y, unsigned width, unsigned color)
 	{
 		dest = MK_FP(cgabackbufferseg,ylookup[y]+(x>>2));
 	}
-	
+
 	mask = 0x3 << ((3 - (x & 3)) << 1);
 	while(mask && width)
 	{
@@ -898,14 +877,14 @@ void VL_Hlin (unsigned x, unsigned y, unsigned width, unsigned color)
 		mask >>= 2;
 		width--;
 	}
-	
+
 	dest++;
 	while(width > 4)
 	{
 		*dest++ = colorwrite;
 		width -= 4;
 	}
-	
+
 	mask = 0xc0;
 	while(width)
 	{
@@ -913,7 +892,7 @@ void VL_Hlin (unsigned x, unsigned y, unsigned width, unsigned color)
 		mask >>= 2;
 		width--;
 	}
-		
+
 #endif
 }
 
@@ -946,11 +925,11 @@ void VL_Vlin (int x, int y, int height, int color)
 #else
 	byte	far *dest;
 	byte writemask, andmask;
-	
+
 	writemask = 0xc0 >> ((x & 3) << 1);
 	andmask = writemask ^ 0xff;
 	writemask &= (byte) color;
-	
+
 	if(cgamode == HERCULES720_MODE || cgamode == HERCULES640_MODE)
 	{
 		x >>= 2;
@@ -972,7 +951,7 @@ void VL_Vlin (int x, int y, int height, int color)
 			dest += linewidth;
 		}
 	}
-	
+
 #endif
 }
 
@@ -996,7 +975,7 @@ void VL_Bar (int x, int y, int width, int height, int color)
 	int		midbytes,linedelta;
 	int		color2;
 	int		halfheight;
-	
+
 	leftmask = leftmasks[x&3];
 	rightmask = rightmasks[(x+width-1)&3];
 	midbytes = ((x+width+3)>>2) - (x>>2) - 2;
@@ -1042,7 +1021,7 @@ void VL_Bar (int x, int y, int width, int height, int color)
 
 	colorodd = (byte)(color >> 8);
 	coloreven = (byte)(color);
-	
+
 	while(height--)
 	{
 		if(cgamode == HERCULES720_MODE || cgamode == HERCULES640_MODE)
@@ -1055,7 +1034,7 @@ void VL_Bar (int x, int y, int width, int height, int color)
 		}
 		colorwrite = (y & 1) ? colorodd : coloreven;
 		pixels = width;
-		
+
 		mask = 0x3 << ((3 - (x & 3)) << 1);
 		while(mask && pixels)
 		{
@@ -1063,14 +1042,14 @@ void VL_Bar (int x, int y, int width, int height, int color)
 			mask >>= 2;
 			pixels--;
 		}
-		
+
 		dest++;
 		while(pixels > 4)
 		{
 			*dest++ = colorwrite;
 			pixels -= 4;
 		}
-		
+
 		mask = 0xc0;
 		while(pixels)
 		{
@@ -1078,7 +1057,7 @@ void VL_Bar (int x, int y, int width, int height, int color)
 			mask >>= 2;
 			pixels--;
 		}
-		
+
 		y++;
 	}
 #endif
@@ -1159,7 +1138,9 @@ void VL_MemToScreen (byte far *source, int width, int height, int x, int y)
 
 		screen = dest;
 		for (y=0;y<height;y++,screen+=linewidth,source+=width)
-			_fmemcpy (screen,source,width);
+			for (x=0;x<width;x++)
+				if ((byte)(*(source+x)) != 255)
+			_fmemcpy (screen+x,source+x,1);
 	}
 #else
 	width>>=2;
@@ -1171,7 +1152,7 @@ void VL_MemToScreen (byte far *source, int width, int height, int x, int y)
 #if 1
 		unsigned seg = activebackbufferseg;
 		x >>= 2;
-		
+
 		while(height--)
 		{
 			screen = MK_FP(seg,yinterlacelookup[y++]+x+bufferofs);
@@ -1181,7 +1162,7 @@ void VL_MemToScreen (byte far *source, int width, int height, int x, int y)
 #else
 		unsigned seg = activebackbufferseg;
 		unsigned offset = ylookup[y >> 2]+(x>>2) + bufferofs;
-		
+
 		for (y=0;y<height;y+=4)
 		{
 			screen = MK_FP(seg, offset);
@@ -1199,7 +1180,7 @@ void VL_MemToScreen (byte far *source, int width, int height, int x, int y)
 			screen = MK_FP(seg + 0x600, offset);
 			_fmemcpy (screen,source,width);
 			source+=width;
-			
+
 			offset += linewidth;
 		}
 		#endif
@@ -1210,7 +1191,7 @@ void VL_MemToScreen (byte far *source, int width, int height, int x, int y)
 		for (y=0;y<height;y++,screen+=linewidth,source+=width)
 			_fmemcpy (screen,source,width);
 	}
-	
+
 	//VL_BlitCGA();
 #endif
 }
@@ -1253,7 +1234,7 @@ void VL_MaskedToScreen (byte far *source, int width, int height, int x, int y)
 			_fmemcpy (screen,source,width);
 	}
 #else
-	
+
 	if(cgamode == HERCULES720_MODE || cgamode == HERCULES640_MODE) return;
 
 	width>>=2;
@@ -1317,60 +1298,12 @@ asm	mov	ds,ax
 }
 
 
-//===========================================================================
-
-#if 0
-
-/*
-=================
-=
-= VL_ScreenToScreen
-=
-=================
-*/
-
-void VL_ScreenToScreen (unsigned source, unsigned dest,int width, int height)
-{
-	VGAWRITEMODE(1);
-	VGAMAPMASK(15);
-
-asm	mov	si,[source]
-asm	mov	di,[dest]
-asm	mov	ax,[width]
-asm	mov	bx,[linewidth]
-asm	sub	bx,ax
-asm	mov	dx,[height]
-asm	mov	cx,SCREENSEG
-asm	mov	ds,cx
-asm	mov	es,cx
-
-drawline:
-asm	mov	cx,ax
-asm	rep movsb
-asm	add	si,bx
-asm	add	di,bx
-asm	dec	dx
-asm	jnz	drawline
-
-asm	mov	ax,ss
-asm	mov	ds,ax
-
-	VGAWRITEMODE(0);
-}
-
-
-#endif
-
-/*
-=============================================================================
+/*/===========================================================================
 
 						STRING OUTPUT ROUTINES
 
 =============================================================================
 */
-
-
-
 
 /*
 ===================
@@ -1510,11 +1443,11 @@ void VL_SetCGAMode(void)
 		asm out dx, al
 		VL_SetLineWidth (40);
 		break;
-		
+
 		case CGA_MODE5:
 		asm mov ax, 0x0005
 		asm int 0x10
-		
+
 		// EGA / VGA need to explicitly set bright palette with red
 		asm mov ax, 0x1000
 		asm mov bx, 0x3c02
@@ -1525,13 +1458,13 @@ void VL_SetCGAMode(void)
 		asm int 0x10
 		VL_SetLineWidth (40);
 		break;
-		
+
 		case CGA_MODE4:
 		asm mov ax, 0x0004
 		asm int 0x10
 		VL_SetLineWidth (40);
 		break;
-		
+
 		case CGA_INVERSE_MONO:
 		asm mov ax, 0x0006
 		asm int 0x10
@@ -1542,13 +1475,13 @@ void VL_SetCGAMode(void)
 		asm int 0x10
 		VL_SetLineWidth (40);
 		break;
-		
+
 		case TANDY_MODE:
 		asm mov ax, 0x0008
 		asm int 0x10
 		VL_SetLineWidth (40);
 		break;
-		
+
 		case HERCULES720_MODE:
 		{
 			// graphics mode CRTC register values
@@ -1565,7 +1498,7 @@ void VL_SetCGAMode(void)
 
 			outportb(0x03B8, 0x0a);
 			VL_SetLineWidth (45);
-			
+
 			_fmemset(MK_FP(0xb000, 0), 0, 0x8000);
 			_fmemset(MK_FP(0xb800, 0), 0, 0x8000);
 			activebackbufferseg = 0xb800;
@@ -1588,7 +1521,7 @@ void VL_SetCGAMode(void)
 
 			outportb(0x03B8, 0x0a);
 			VL_SetLineWidth (40);
-			
+
 			_fmemset(MK_FP(0xb000, 0), 0, 0x8000);
 			_fmemset(MK_FP(0xb800, 0), 0, 0x8000);
 			activebackbufferseg = 0xb800;
@@ -1596,7 +1529,7 @@ void VL_SetCGAMode(void)
 		}
 		break;
 	}
-	
+
 	MM_GetPtr (&cgabackbuffer,0x8000);
 	cgabackbufferseg = FP_SEG(cgabackbuffer);
 
@@ -1604,7 +1537,7 @@ void VL_SetCGAMode(void)
 	{
 		activebackbufferseg = cgabackbufferseg;
 	}
-	
+
 	_fmemset(cgabackbuffer, 0, 0x8000);
 }
 
@@ -1626,7 +1559,7 @@ void VL_PageFlip(boolean copyonflip)
 				outportb(0x03B8, 0x8a);
 				activebackbufferseg = 0xb000;
 			}
-			
+
 			if(copyonflip)
 			{
 				if(cgamode == HERCULES640_MODE)
@@ -1649,12 +1582,12 @@ void VL_BlitCGA(void)
 	asm mov dx, 100
 	asm mov si, 0
 	asm mov di, 0
-	
-	asm mov bx, 80	
-	
+
+	asm mov bx, 80
+
 	asm push ds
 	asm mov ds, [cgabackbufferseg]
-	
+
 blitlines:
 	asm mov cx, 0xb800
 	asm mov es, cx
@@ -1666,13 +1599,13 @@ blitlines:
 
 	asm mov cx, 0xba00
 	asm mov es, cx
-	
+
 	asm mov cx, bx
 	asm rep movsb
-		
+
 	asm dec dx
 	asm jnz blitlines
-	
+
 	asm pop ds
 	#endif
 }
@@ -1684,25 +1617,25 @@ void VL_TintColor(byte color)
 		case CGA_COMPOSITE_MODE:
 		if(!color)
 			color = 0xf;
-		
+
 		asm mov dx, 0x3d9
 		asm mov al, [color]
 		asm out dx, al
 		break;
-		
+
 		case CGA_MODE5:
 		asm mov dx, 0x3d9
 		asm mov al, [color]
 		asm or al, 0x30
 		asm out dx, al
-		
+
 		// EGA / VGA
 		asm mov ax, 0x1000
 		asm mov bl, 0
 		asm mov bh, [color]
 		asm int 0x10
 		break;
-		
+
 		case CGA_MODE4:
 		case TANDY_MODE:
 		color |= 0x10;
@@ -1711,7 +1644,7 @@ void VL_TintColor(byte color)
 		asm mov bl, [color]
 		asm int 0x10
 		break;
-		
+
 		default:
 		break;
 	}

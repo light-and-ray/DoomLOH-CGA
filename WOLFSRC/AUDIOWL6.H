@@ -1,151 +1,122 @@
-/////////////////////////////////////////////////
-//
-// MUSE Header for .WL6
-// Created Tue Jul 14 15:04:53 1992
-//
-/////////////////////////////////////////////////
-
-#define NUMSOUNDS		87
-#define NUMSNDCHUNKS		288
-
 //
 // Sound names & indexes
 //
 typedef enum {
-		HITWALLSND,              // 0
-		SELECTWPNSND,            // 1
-		SELECTITEMSND,           // 2
-		HEARTBEATSND,            // 3
-		MOVEGUN2SND,             // 4
-		MOVEGUN1SND,             // 5
-		NOWAYSND,                // 6
-		NAZIHITPLAYERSND,        // 7
-		SCHABBSTHROWSND,         // 8
-		PLAYERDEATHSND,          // 9
-		DOGDEATHSND,             // 10
-		ATKGATLINGSND,           // 11
-		GETKEYSND,               // 12
-		NOITEMSND,               // 13
-		WALK1SND,                // 14
-		WALK2SND,                // 15
-		TAKEDAMAGESND,           // 16
-		GAMEOVERSND,             // 17
-		OPENDOORSND,             // 18
-		CLOSEDOORSND,            // 19
-		DONOTHINGSND,            // 20
-		HALTSND,                 // 21
-		DEATHSCREAM2SND,         // 22
-		ATKKNIFESND,             // 23
-		ATKPISTOLSND,            // 24
-		DEATHSCREAM3SND,         // 25
-		ATKMACHINEGUNSND,        // 26
-		HITENEMYSND,             // 27
-		SHOOTDOORSND,            // 28
-		DEATHSCREAM1SND,         // 29
-		GETMACHINESND,           // 30
-		GETAMMOSND,              // 31
-		SHOOTSND,                // 32
-		HEALTH1SND,              // 33
-		HEALTH2SND,              // 34
-		BONUS1SND,               // 35
-		BONUS2SND,               // 36
-		BONUS3SND,               // 37
-		GETGATLINGSND,           // 38
-		ESCPRESSEDSND,           // 39
-		LEVELDONESND,            // 40
-		DOGBARKSND,              // 41
-		ENDBONUS1SND,            // 42
-		ENDBONUS2SND,            // 43
-		BONUS1UPSND,             // 44
-		BONUS4SND,               // 45
-		PUSHWALLSND,             // 46
-		NOBONUSSND,              // 47
-		PERCENT100SND,           // 48
-		BOSSACTIVESND,           // 49
-		MUTTISND,                // 50
-		SCHUTZADSND,             // 51
-		AHHHGSND,                // 52
-		DIESND,                  // 53
-		EVASND,                  // 54
-		GUTENTAGSND,             // 55
-		LEBENSND,                // 56
-		SCHEISTSND,              // 57
-		NAZIFIRESND,             // 58
-		BOSSFIRESND,             // 59
-		SSFIRESND,               // 60
-		SLURPIESND,              // 61
-		TOT_HUNDSND,             // 62
-		MEINGOTTSND,             // 63
-		SCHABBSHASND,            // 64
-		HITLERHASND,             // 65
-		SPIONSND,                // 66
-		NEINSOVASSND,            // 67
-		DOGATTACKSND,            // 68
-		FLAMETHROWERSND,         // 69
-		MECHSTEPSND,             // 70
-		GOOBSSND,                // 71
-		YEAHSND,                 // 72
-		DEATHSCREAM4SND,         // 73
-		DEATHSCREAM5SND,         // 74
-		DEATHSCREAM6SND,         // 75
-		DEATHSCREAM7SND,         // 76
-		DEATHSCREAM8SND,         // 77
-		DEATHSCREAM9SND,         // 78
-		DONNERSND,               // 79
-		EINESND,                 // 80
-		ERLAUBENSND,             // 81
-		KEINSND,                 // 82
-		MEINSND,                 // 83
-		ROSESND,                 // 84
-		MISSILEFIRESND,          // 85
-		MISSILEHITSND,           // 86
-		LASTSOUND
-	     } soundnames;
+	BARRELBOOMSND,			 // 0
+	ATKBFGSND,			 // 1
+	GROWLSND,			 // 2
+	MUTDIE1SND,			 // 3
+	MUTDIE2SND,			 // 4
+	MUTSEE1SND,			 // 5
+	MUTSEE2SND,			 // 6
+	BOSSDIESND,			 // 7
+	BOSSSEESND,			 // 8
+	CACODIESND,			 // 9
+	CACOSEESND,			 // 10
+	CYBERDIESND,			 // 11
+	CYBERSEESND,			 // 12
+	PAINSND,			 // 13
+	DOORCLOSESND,			 // 14
+	DOOROPENSND,			 // 15
+	IMPFIRESND,			 // 16
+	IMPFIREBOOMSND,			 // 17
+	BONUSITEMUPSND,			 // 18
+	ITEMUPSND,			 // 19
+	NOWAYSND,			 // 20
+	PISTOLFIRESND,			 // 21
+	PLASMAGUNFIRESND,			 // 22
+	PLAYERDIESND,			 // 23
+	PLAYERPAINSND,			 // 24
+	SHOTGUYDIE1SND,			 // 25
+	SHOTGUYDIE2SND,			 // 26
+	SHOTGUYDIE3SND,			 // 27
+	SHOTGUYPAINSND,			 // 28
+	SHOTGUYSEE1SND,			 // 29
+	SHOTGUYSEE2SND,			 // 30
+	SHOTGUYSEE3SND,			 // 31
+	FISTPUNCHSND,			 // 32
+	RLAUNCHERFIRESND,			 // 33
+	RLAUNCHERBOOM1SND,			 // 34
+	CHAINSAWFIRESND,			 // 35
+	CHAINSAWIDLESND,			 // 36
+	DEMONFIRESND,			 // 37
+	DEMONDIESND,			 // 38
+	DEMONSEESND,			 // 39
+	SHOTGUNFIRESND,			 // 40
+	SPIDERDIESND,			 // 41
+	SPIDERSEESND,			 // 42
+	SWITCH1SND,			 // 43
+	SWITCH2SND,			 // 44
+	TELEPORTSND,			 // 45
+	WEAPONPICKUPSND,			 // 46
+	DSHOTGUNFIRESND,			 // 47
+	DSOPENSND,			 // 48
+	DSLOADSND,			 // 49
+	DSCLOSESND,			 // 50
+	MOVEUPDOWNSND,			 // 51
+	WTFSND,				 // 52
+	SLOPSND,		         // 53
+	DMACTSND,		         // 54
+	RISINGSND,			 // 55
+	DTHKNTSEESND,                    // 56
+	DTHKNTDIESND,                    // 57
+	MANATKSND,                       // 58
+	MANDIESND,                       // 59
+	MANSEESND,                       // 60
+	MANPAINSND,                      // 61
+	PAINDIESND,                      // 62
+	PAINPAINSND,                     // 63
+	PAINSEESND,                      // 64
+	REVATKSND,                       // 65
+	REVDIESND,                       // 66
+	REVPUNCHSND,                     // 67
+	REVSEESND,                       // 68
+	REVSWINGSND,                     // 69
+	VILEATKSND,                      // 70
+	VILEDIESND,                      // 71
+	VILESEESND,                      // 72
+	VILEPAINSND,                     // 73
+	SOULATKSND,                      // 74
+	TELE2SND,                        // 75
+	LASTSOUND
+	 } soundnames;
 
-//
-// Base offsets
-//
-#define STARTPCSOUNDS		0
-#define STARTADLIBSOUNDS	87
-#define STARTDIGISOUNDS		174
-#define STARTMUSIC		261
-
-//
 // Music names & indexes
-//
 typedef enum {
-		CORNER_MUS,              // 0
-		DUNGEON_MUS,             // 1
-		WARMARCH_MUS,            // 2
-		GETTHEM_MUS,             // 3
-		HEADACHE_MUS,            // 4
-		HITLWLTZ_MUS,            // 5
-		INTROCW3_MUS,            // 6
-		NAZI_NOR_MUS,            // 7
-		NAZI_OMI_MUS,            // 8
-		POW_MUS,                 // 9
-		SALUTE_MUS,              // 10
-		SEARCHN_MUS,             // 11
-		SUSPENSE_MUS,            // 12
-		VICTORS_MUS,             // 13
-		WONDERIN_MUS,            // 14
-		FUNKYOU_MUS,             // 15
-		ENDLEVEL_MUS,            // 16
-		GOINGAFT_MUS,            // 17
-		PREGNANT_MUS,            // 18
-		ULTIMATE_MUS,            // 19
-		NAZI_RAP_MUS,            // 20
-		ZEROHOUR_MUS,            // 21
-		TWELFTH_MUS,             // 22
-		ROSTER_MUS,              // 23
-		URAHERO_MUS,             // 24
-		VICMARCH_MUS,            // 25
-		PACMAN_MUS,              // 26
-		LASTMUSIC
-	     } musicnames;
+	D_TITLE_MUS,			 // 0
+	D_BETWEEN_MUS,			 // 1
+	D_DDTBLU_MUS,			 // 2
+	D_DEAD_MUS,			 // 3
+	D_E1M2_MUS,			 // 4
+	D_E1M3_MUS,			 // 5
+	D_E1M4_MUS,			 // 6
+	D_E1M9_MUS,			 // 7
+	D_E2M1_MUS,			 // 8
+	D_E2M2_MUS,			 // 9
+	D_E2M6_MUS,			 // 10
+	D_E2M8_MUS,			 // 11
+	D_E3M1_MUS,			 // 12
+	D_E3M2_MUS,			 // 13
+	D_E3M3_MUS,			 // 14
+	D_IN_CIT_MUS,			 // 15
+	D_READ_M_MUS,			 // 16
+	D_RUNNIN_MUS,			 // 17
+	D_SHAWN_MUS,			 // 18
+	D_STALKS_MUS,			 // 19
+	D_VICTOR_MUS,			 // 20
+	DESCENT_MUS,			 // 21
+	D_QUADM_MUS,			 // 22
+	D_MMENU_MUS,			 // 23
+	D_UNDERW_MUS,			 // 24
+	LASTMUSIC
+	} musicnames;
 
-/////////////////////////////////////////////////
-//
-// Thanks for playing with MUSE!
-//
-/////////////////////////////////////////////////
+// Base offsets
+
+#define NUMSOUNDS           LASTSOUND
+#define NUMSNDCHUNKS        NUMSOUNDS*3+LASTMUSIC
+
+#define STARTPCSOUNDS       0
+#define STARTADLIBSOUNDS    NUMSOUNDS
+#define STARTDIGISOUNDS     NUMSOUNDS*2
+#define STARTMUSIC          NUMSOUNDS*3

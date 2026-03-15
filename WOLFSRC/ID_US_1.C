@@ -43,8 +43,8 @@
 //	Internal variables
 #define	ConfigVersion	1
 
-static	char		*ParmStrings[] = {"TEDLEVEL","NOWAIT"},
-					*ParmStrings2[] = {"COMP","NOCOMP"};
+static	char		*ParmStrings[] = {"NOWAIT"};
+
 static	boolean		US_Started;
 
 		boolean		Button0,Button1,
@@ -57,13 +57,13 @@ static	boolean		US_Started;
 		SaveGame	Games[MaxSaveGames];
 		HighScore	Scores[MaxScores] =
 					{
-						{"id software-'92",10000,1},
-						{"Adrian Carmack",10000,1},
-						{"John Carmack",10000,1},
-						{"Kevin Cloud",10000,1},
-						{"Tom Hall",10000,1},
-						{"John Romero",10000,1},
-						{"Jay Wilbur",10000,1},
+		    {"Crack Software",70000,9},
+		    {"Little Cherub",60000,8},
+		    {"Metal Overlord",50000,7},
+		    {"Lozer_42",40000,6},
+		    {"Executor",30000,5},
+		    {"Havoc",20000,4},
+		    {"Tricob",10000,3},
 					};
 
 //	Internal routines
@@ -149,8 +149,8 @@ oh_kill_me:
 	abortprogram = s;
 	ShutdownId();
 	fprintf(stderr,"Terminal Error: %s\n",s);
-	if (tedlevel)
-		fprintf(stderr,"You launched from TED. I suggest that you reboot...\n");
+      //	if (tedlevel)
+      //		fprintf(stderr,"TED\n");
 
 	return(ABORT);
 #undef	IGNORE
@@ -177,7 +177,7 @@ US_Startup(void)
 	harderr(USL_HardError);	// Install the fatal error handler
 
 	US_InitRndT(true);		// Initialize the random number generator
-	
+
 	for (i = 1;i < _argc;i++)
 	{
 		switch (US_CheckParm(_argv[i],ParmStrings2))
@@ -190,6 +190,7 @@ US_Startup(void)
 			break;
 		}
 	}
+	*/
 
 	// Check for TED launching here
 	for (i = 1;i < _argc;i++)
@@ -198,12 +199,12 @@ US_Startup(void)
 		switch(n)
 		{
 		 case 0:
-		   tedlevelnum = atoi(_argv[i + 1]);
+	      /*		 tedlevelnum = atoi(_argv[i + 1]);
 		   if (tedlevelnum >= 0)
-		     tedlevel = true;
+				 tedlevel = true;
 		   break;
 
-		 case 1:
+		 case 1:   */
 		   NoWait = true;
 		   break;
 		}
@@ -387,8 +388,7 @@ US_PrintCentered(char far *s)
 //		advances to the next line. Newlines are not supported.
 //
 ///////////////////////////////////////////////////////////////////////////
-void
-US_CPrintLine(char far *s)
+void US_CPrintLine(char far *s)
 {
 	word	w,h;
 

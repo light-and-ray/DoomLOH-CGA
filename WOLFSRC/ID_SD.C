@@ -32,14 +32,12 @@
 
 #include <dos.h>
 
-#ifdef	_MUSE_      // Will be defined in ID_Types.h
-#include "ID_SD.h"
-#else
 #include "ID_HEADS.H"
-#endif
 #pragma	hdrstop
 #pragma	warn	-pia
 
+#undef PMPageSize
+#define PMPageSize 4096
 #ifdef	nil
 #undef	nil
 #endif
@@ -179,7 +177,6 @@ static	word			sqMode,sqFadeStep;
 static void
 SDL_SetTimer0(word speed)
 {
-#ifndef TPROF	// If using Borland's profiling, don't screw with the timer
 asm	pushf
 asm	cli
 
@@ -193,9 +190,6 @@ asm	cli
 		TimerDivisor = speed;
 
 asm	popf
-#else
-	TimerDivisor = 0x10000;
-#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -255,11 +249,8 @@ SDL_SetTimerSpeed(void)
 //		requests from the SoundBlaster to cease
 //
 ///////////////////////////////////////////////////////////////////////////
-#ifdef	_MUSE_
-void
-#else
+
 static void
-#endif
 SDL_SBStopSample(void)
 {
 	byte	is;
@@ -375,11 +366,8 @@ SDL_SBService(void)
 //		DMA to play the sound
 //
 ///////////////////////////////////////////////////////////////////////////
-#ifdef	_MUSE_
-void
-#else
+
 static void
-#endif
 SDL_SBPlaySample(byte huge *data,longword len)
 {
 	longword	used;
@@ -554,7 +542,7 @@ SDL_StartSB(void)
 
 	sbIntVec = sbIntVectors[sbInterrupt];
 	if (sbIntVec < 0)
-		Quit("SDL_StartSB: Illegal or unsupported interrupt number for SoundBlaster");
+		Quit("SDL_StartSB: Bad SB interrupt");
 
 	sbOldIntHand = getvect(sbIntVec);	// Get old interrupt handler
 	setvect(sbIntVec,SDL_SBService);	// Set mine
@@ -629,11 +617,9 @@ SDL_ShutSB(void)
 //	SDL_SSStopSample() - Stops a sample playing on the Sound Source
 //
 ///////////////////////////////////////////////////////////////////////////
-#ifdef	_MUSE_
-void
-#else
+
 static void
-#endif
+
 SDL_SSStopSample(void)
 {
 asm	pushf
@@ -694,11 +680,8 @@ done:;
 //	SDL_SSPlaySample() - Plays the specified sample on the Sound Source
 //
 ///////////////////////////////////////////////////////////////////////////
-#ifdef	_MUSE_
-void
-#else
+
 static void
-#endif
 SDL_SSPlaySample(byte huge *data,longword len)
 {
 asm	pushf
@@ -822,11 +805,8 @@ SDL_DetectSoundSource(void)
 //	SDL_PCPlaySample() - Plays the specified sample on the PC speaker
 //
 ///////////////////////////////////////////////////////////////////////////
-#ifdef	_MUSE_
-void
-#else
+
 static void
-#endif
 SDL_PCPlaySample(byte huge *data,longword len)
 {
 asm	pushf
@@ -845,11 +825,8 @@ asm	popf
 //	SDL_PCStopSample() - Stops a sample playing on the PC speaker
 //
 ///////////////////////////////////////////////////////////////////////////
-#ifdef	_MUSE_
-void
-#else
+
 static void
-#endif
 SDL_PCStopSample(void)
 {
 asm	pushf
@@ -871,11 +848,8 @@ asm	popf
 //	SDL_PCPlaySound() - Plays the specified sound on the PC speaker
 //
 ///////////////////////////////////////////////////////////////////////////
-#ifdef	_MUSE_
-void
-#else
+
 static void
-#endif
 SDL_PCPlaySound(PCSound far *sound)
 {
 asm	pushf
@@ -893,11 +867,8 @@ asm	popf
 //	SDL_PCStopSound() - Stops the current sound playing on the PC Speaker
 //
 ///////////////////////////////////////////////////////////////////////////
-#ifdef	_MUSE_
-void
-#else
+
 static void
-#endif
 SDL_PCStopSound(void)
 {
 asm	pushf
@@ -911,62 +882,6 @@ asm	out	0x61,al
 
 asm	popf
 }
-
-#if 0
-///////////////////////////////////////////////////////////////////////////
-//
-//	SDL_PCService() - Handles playing the next sample in a PC sound
-//
-///////////////////////////////////////////////////////////////////////////
-static void
-SDL_PCService(void)
-{
-	byte	s;
-	word	t;
-
-	if (pcSound)
-	{
-		s = *pcSound++;
-		if (s != pcLastSample)
-		{
-		asm	pushf
-		asm	cli
-
-			pcLastSample = s;
-			if (s)					// We have a frequency!
-			{
-				t = pcSoundLookup[s];
-			asm	mov	bx,[t]
-
-			asm	mov	al,0xb6			// Write to channel 2 (speaker) timer
-			asm	out	43h,al
-			asm	mov	al,bl
-			asm	out	42h,al			// Low byte
-			asm	mov	al,bh
-			asm	out	42h,al			// High byte
-
-			asm	in	al,0x61			// Turn the speaker & gate on
-			asm	or	al,3
-			asm	out	0x61,al
-			}
-			else					// Time for some silence
-			{
-			asm	in	al,0x61		  	// Turn the speaker & gate off
-			asm	and	al,0xfc			// ~3
-			asm	out	0x61,al
-			}
-
-		asm	popf
-		}
-
-		if (!(--pcLengthLeft))
-		{
-			SDL_PCStopSound();
-			SDL_SoundFinished();
-		}
-	}
-}
-#endif
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -996,30 +911,8 @@ SDL_LoadDigiSegment(word page)
 {
 	memptr	addr;
 
-#if 0	// for debugging
-asm	mov	dx,STATUS_REGISTER_1
-asm	in	al,dx
-asm	mov	dx,ATR_INDEX
-asm	mov	al,ATR_OVERSCAN
-asm	out	dx,al
-asm	mov	al,10	// bright green
-asm	out	dx,al
-#endif
-
 	addr = PM_GetSoundPage(page);
 	PM_SetPageLock(PMSoundStart + page,pml_Locked);
-
-#if 0	// for debugging
-asm	mov	dx,STATUS_REGISTER_1
-asm	in	al,dx
-asm	mov	dx,ATR_INDEX
-asm	mov	al,ATR_OVERSCAN
-asm	out	dx,al
-asm	mov	al,3	// blue
-asm	out	dx,al
-asm	mov	al,0x20	// normal
-asm	out	dx,al
-#endif
 
 	return(addr);
 }
@@ -1330,62 +1223,14 @@ asm	in	al,dx
 asm	in	al,dx
 }
 
-#if 0
-///////////////////////////////////////////////////////////////////////////
-//
-//	SDL_SetInstrument() - Puts an instrument into a generator
-//
-///////////////////////////////////////////////////////////////////////////
-static void
-SDL_SetInstrument(int track,int which,Instrument far *inst,boolean percussive)
-{
-	byte		c,m;
-
-	if (percussive)
-	{
-		c = pcarriers[which];
-		m = pmodifiers[which];
-	}
-	else
-	{
-		c = carriers[which];
-		m = modifiers[which];
-	}
-
-	tracks[track - 1]->inst = *inst;
-	tracks[track - 1]->percussive = percussive;
-
-	alOut(m + alChar,inst->mChar);
-	alOut(m + alScale,inst->mScale);
-	alOut(m + alAttack,inst->mAttack);
-	alOut(m + alSus,inst->mSus);
-	alOut(m + alWave,inst->mWave);
-
-	// Most percussive instruments only use one cell
-	if (c != 0xff)
-	{
-		alOut(c + alChar,inst->cChar);
-		alOut(c + alScale,inst->cScale);
-		alOut(c + alAttack,inst->cAttack);
-		alOut(c + alSus,inst->cSus);
-		alOut(c + alWave,inst->cWave);
-	}
-
-	alOut(which + alFeedCon,inst->nConn);	// DEBUG - I think this is right
-}
-#endif
-
 ///////////////////////////////////////////////////////////////////////////
 //
 //	SDL_ALStopSound() - Turns off any sound effects playing through the
 //		AdLib card
 //
 ///////////////////////////////////////////////////////////////////////////
-#ifdef	_MUSE_
-void
-#else
+
 static void
-#endif
 SDL_ALStopSound(void)
 {
 asm	pushf
@@ -1425,11 +1270,8 @@ SDL_AlSetFXInst(Instrument far *inst)
 //	SDL_ALPlaySound() - Plays the specified sound on the AdLib card
 //
 ///////////////////////////////////////////////////////////////////////////
-#ifdef	_MUSE_
-void
-#else
+
 static void
-#endif
 SDL_ALPlaySound(AdLibSound far *sound)
 {
 	Instrument	far *inst;
@@ -1459,69 +1301,6 @@ asm	cli
 
 asm	popf
 }
-
-#if 0
-///////////////////////////////////////////////////////////////////////////
-//
-// 	SDL_ALSoundService() - Plays the next sample out through the AdLib card
-//
-///////////////////////////////////////////////////////////////////////////
-//static void
-void
-SDL_ALSoundService(void)
-{
-	byte	s;
-
-	if (alSound)
-	{
-		s = *alSound++;
-		if (!s)
-			alOut(alFreqH + 0,0);
-		else
-		{
-			alOut(alFreqL + 0,s);
-			alOut(alFreqH + 0,alBlock);
-		}
-
-		if (!(--alLengthLeft))
-		{
-			(long)alSound = 0;
-			alOut(alFreqH + 0,0);
-			SDL_SoundFinished();
-		}
-	}
-}
-#endif
-
-#if 0
-void
-SDL_ALService(void)
-{
-	byte	a,v;
-	word	w;
-
-	if (!sqActive)
-		return;
-
-	while (sqHackLen && (sqHackTime <= alTimeCount))
-	{
-		w = *sqHackPtr++;
-		sqHackTime = alTimeCount + *sqHackPtr++;
-	asm	mov	dx,[w]
-	asm	mov	[a],dl
-	asm	mov	[v],dh
-		alOut(a,v);
-		sqHackLen -= 4;
-	}
-	alTimeCount++;
-	if (!sqHackLen)
-	{
-		sqHackPtr = (word far *)sqHack;
-		sqHackLen = sqHackSeqLen;
-		alTimeCount = sqHackTime = 0;
-	}
-}
-#endif
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -1592,15 +1371,12 @@ SDL_DetectAdLib(void)
 	status1 = readstat();
 	alOut(2,0xff);	// Set timer 1
 	alOut(4,0x21);	// Start timer 1
-#if 0
-	SDL_Delay(TimerDelay100);
-#else
+
 asm	mov	dx,0x388
 asm	mov	cx,100
 usecloop:
 asm	in	al,dx
 asm	loop usecloop
-#endif
 
 	status2 = readstat();
 	alOut(4,0x60);
@@ -1619,100 +1395,6 @@ asm	loop usecloop
 	else
 		return(false);
 }
-
-#if 0
-///////////////////////////////////////////////////////////////////////////
-//
-//	SDL_t0Service() - My timer 0 ISR which handles the different timings and
-//		dispatches to whatever other routines are appropriate
-//
-///////////////////////////////////////////////////////////////////////////
-static void interrupt
-SDL_t0Service(void)
-{
-static	word	count = 1;
-
-#if 1	// for debugging
-asm	mov	dx,STATUS_REGISTER_1
-asm	in	al,dx
-asm	mov	dx,ATR_INDEX
-asm	mov	al,ATR_OVERSCAN
-asm	out	dx,al
-asm	mov	al,4	// red
-asm	out	dx,al
-#endif
-
-	HackCount++;
-
-	if ((MusicMode == smm_AdLib) || (DigiMode == sds_SoundSource))
-	{
-		SDL_ALService();
-		SDL_SSService();
-//		if (!(++count & 7))
-		if (!(++count % 10))
-		{
-			LocalTime++;
-			TimeCount++;
-			if (SoundUserHook)
-				SoundUserHook();
-		}
-//		if (!(count & 3))
-		if (!(count % 5))
-		{
-			switch (SoundMode)
-			{
-			case sdm_PC:
-				SDL_PCService();
-				break;
-			case sdm_AdLib:
-				SDL_ALSoundService();
-				break;
-			}
-		}
-	}
-	else
-	{
-		if (!(++count & 1))
-		{
-			LocalTime++;
-			TimeCount++;
-			if (SoundUserHook)
-				SoundUserHook();
-		}
-		switch (SoundMode)
-		{
-		case sdm_PC:
-			SDL_PCService();
-			break;
-		case sdm_AdLib:
-			SDL_ALSoundService();
-			break;
-		}
-	}
-
-asm	mov	ax,[WORD PTR TimerCount]
-asm	add	ax,[WORD PTR TimerDivisor]
-asm	mov	[WORD PTR TimerCount],ax
-asm	jnc	myack
-	t0OldService();			// If we overflow a word, time to call old int handler
-asm	jmp	olddone
-myack:;
-	outportb(0x20,0x20);	// Ack the interrupt
-olddone:;
-
-#if 1	// for debugging
-asm	mov	dx,STATUS_REGISTER_1
-asm	in	al,dx
-asm	mov	dx,ATR_INDEX
-asm	mov	al,ATR_OVERSCAN
-asm	out	dx,al
-asm	mov	al,3	// blue
-asm	out	dx,al
-asm	mov	al,0x20	// normal
-asm	out	dx,al
-#endif
-}
-#endif
 
 ////////////////////////////////////////////////////////////////////////////
 //
@@ -1778,7 +1460,6 @@ SD_SetSoundMode(SDMode mode)
 
 	SD_StopSound();
 
-#ifndef	_MUSE_
 	if ((mode == sdm_AdLib) && !AdLibPresent)
 		mode = sdm_PC;
 
@@ -1802,17 +1483,14 @@ SD_SetSoundMode(SDMode mode)
 		}
 		break;
 	}
-#else
-	result = true;
-#endif
 
 	if (result && (mode != SoundMode))
 	{
 		SDL_ShutDevice();
 		SoundMode = mode;
-#ifndef	_MUSE_
+
 		SoundTable = (word *)(&audiosegs[tableoffset]);
-#endif
+
 		SDL_StartDevice();
 	}
 
@@ -1879,7 +1557,7 @@ SD_Startup(void)
 	alNoCheck = false;
 	sbNoCheck = false;
 	sbNoProCheck = false;
-#ifndef	_MUSE_
+
 	for (i = 1;i < _argc;i++)
 	{
 		switch (US_CheckParm(_argv[i],ParmStrings))
@@ -1899,7 +1577,7 @@ SD_Startup(void)
 		case 4:						// Tandy Sound Source handling
 			ssIsTandy = true;
 			break;
-		case 5:						// Sound Source present at LPT1
+		case 5:				// Sound Source present at LPT1
 			ssPort = 1;
 			ssNoCheck = SoundSourcePresent = true;
 			break;
@@ -1913,7 +1591,6 @@ SD_Startup(void)
 			break;
 		}
 	}
-#endif
 
 	SoundUserHook = 0;
 
@@ -1954,7 +1631,7 @@ SD_Startup(void)
 						)
 							port = (temp - 0x200) >> 4;
 						else
-							Quit("SD_Startup: Unsupported address value in BLASTER");
+							Quit("SD_Startup: Bad address");
 						break;
 					case 'I':
 						temp = strtol(env + 1,&env,10);
@@ -1969,14 +1646,14 @@ SD_Startup(void)
 							sbIntVec = sbIntVectors[sbInterrupt];
 						}
 						else
-							Quit("SD_Startup: Unsupported interrupt value in BLASTER");
+							Quit("SD_Startup: Bad IRQ");
 						break;
 					case 'D':
 						temp = strtol(env + 1,&env,10);
 						if ((temp == 0) || (temp == 1) || (temp == 3))
 							SDL_SBSetDMA(temp);
 						else
-							Quit("SD_Startup: Unsupported DMA value in BLASTER");
+							Quit("SD_Startup: Bad DMA");
 						break;
 					default:
 						while (isspace(*env))

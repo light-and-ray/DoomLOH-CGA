@@ -81,17 +81,11 @@ void VW_UpdateScreen (void);
 //
 
 void VWB_DrawTile8 (int x, int y, int tile);
-void VWB_DrawTile8M (int x, int y, int tile);
-void VWB_DrawTile16 (int x, int y, int tile);
-void VWB_DrawTile16M (int x, int y, int tile);
 void VWB_DrawPic (int x, int y, int chunknum);
-void VWB_DrawMPic(int x, int y, int chunknum);
 void VWB_Bar (int x, int y, int width, int height, int color);
 void VWB_DrawPicDirectToScreen (int x, int y, int chunknum);
 
 void VWB_DrawPropString	 (char far *string);
-void VWB_DrawMPropString (char far *string);
-void VWB_DrawSprite (int x, int y, int chunknum);
 void VWB_Plot (int x, int y, int color);
 void VWB_Hlin (int x1, int x2, int y, int color);
 void VWB_Vlin (int y1, int y2, int x, int color);
@@ -143,7 +137,7 @@ boolean 	FizzleFade (unsigned source, unsigned dest,
 	unsigned width,unsigned height, unsigned frames,boolean abortable);
 
 
-#define NUMLATCHPICS	100
+#define NUMLATCHPICS    100
 extern	unsigned	latchpics[NUMLATCHPICS];
 extern	unsigned freelatch;
 

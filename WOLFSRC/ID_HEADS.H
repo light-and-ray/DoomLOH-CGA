@@ -24,40 +24,11 @@ extern	char		far signon;
 
 #define	introscn	signon
 
-#ifdef JAPAN
-#ifdef JAPDEMO
-#include "FOREIGN\JAPAN\GFXV_WJ1.H"
-#else
-#include "FOREIGN\JAPAN\GFXV_WJ6.H"
-#endif
-#include "AUDIOWL6.H"
-#include "MAPSWL6.H"
-#else
 
-#ifndef SPEAR
-
-#ifdef UPLOAD
-#include "GFXV_APO.H"
-#else
 #include "GFXV_WL6.H"
 #endif
 #include "AUDIOWL6.H"
-#include "MAPSWL6.H"
 
-#else
-
-#ifndef SPEARDEMO
-#include "GFXV_SOD.H"
-#include "AUDIOSOD.H"
-#include "MAPSSOD.H"
-#else
-#include "GFXV_SDM.H"
-#include "AUDIOSDM.H"
-#include "MAPSSDM.H"
-#endif
-
-#endif
-#endif
 //-----------------
 
 

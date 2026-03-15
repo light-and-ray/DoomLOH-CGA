@@ -99,7 +99,7 @@ void VW_DrawPropString (char far *string)
 	int		width,step,height,i;
 	byte	far *source, far *dest, far *origdest;
 	byte	ch,mask;
-	
+
 	int y;
 	byte far *srcptr;
 	byte far *destptr;
@@ -110,7 +110,7 @@ void VW_DrawPropString (char far *string)
 	mask = 1<<(px&3);
 
 	pixmask = 0xc0 >> ((px & 3) << 1);
-	
+
 	if(cgamode == HERCULES720_MODE || cgamode == HERCULES640_MODE)
 	{
 		while ((ch = *string++)!=0)
@@ -273,11 +273,11 @@ void VL_MungePic (byte far *source, unsigned width, unsigned height)
 	byte		_seg *temp, far *dest, far *srcline;
 
 	//return;
-	
+
 	size = width*height;
 
 	if (width&3)
-		MS_Quit ("VL_MungePic: Not divisable by 4!");
+		MS_Quit ("VL_MungePic: !");
 
 //
 // copy the pic to a temp buffer
@@ -317,13 +317,6 @@ void	VW_MeasurePropString (char far *string, word *width, word *height)
 {
 	VWL_MeasureString(string,width,height,(fontstruct _seg *)grsegs[STARTFONT+fontnumber]);
 }
-
-void	VW_MeasureMPropString  (char far *string, word *width, word *height)
-{
-	VWL_MeasureString(string,width,height,(fontstruct _seg *)grsegs[STARTFONTM+fontnumber]);
-}
-
-
 
 /*
 =============================================================================
@@ -430,12 +423,12 @@ void VWB_DrawPicDirectToScreen (int x, int y, int chunknum)
 	byte far *buffer;
 	unsigned off;
 	byte far* source = grsegs[chunknum];
-	
+
 	if(cgamode == HERCULES720_MODE)
 	{
 		width = pictable[picnum].width >> 2;
 		height = pictable[picnum].height;
-		
+
 		while(height--)
 		{
 			off = yinterlacelookup[y++]+x+bufferofs;
@@ -448,7 +441,7 @@ void VWB_DrawPicDirectToScreen (int x, int y, int chunknum)
 	{
 		width = pictable[picnum].width >> 2;
 		height = pictable[picnum].height;
-		
+
 		while(height--)
 		{
 			off = yinterlacelookup[y++]+x+bufferofs;
@@ -464,13 +457,13 @@ void VWB_DrawPicDirectToScreen (int x, int y, int chunknum)
 		width = pictable[picnum].width >> 2;
 		height = pictable[picnum].height;
 		halfheight = height >> 1;
-		
+
 		off = ylookup[y >> 1]+x;
 
 		evenlines = MK_FP(0xb800, off);
 		oddlines = MK_FP(0xba00, off);
 		buffer = MK_FP(cgabackbufferseg, ylookup[y]+x);
-			
+
 		while(halfheight--)
 		{
 			_fmemcpy (evenlines,source,width);
@@ -589,7 +582,7 @@ void LoadLatchMem (void)
 	byte	far *src;
 	unsigned	destoff;
 
-#ifdef WITH_VGA	
+#ifdef WITH_VGA
 //
 // tile 8s
 //
@@ -605,24 +598,6 @@ void LoadLatchMem (void)
 		destoff +=16;
 	}
 	UNCACHEGRCHUNK (STARTTILE8);
-
-#if 0	// ran out of latch space!
-//
-// tile 16s
-//
-	src = (byte _seg *)grsegs[STARTTILE16];
-	latchpics[1] = destoff;
-
-	for (i=0;i<NUMTILE16;i++)
-	{
-		CA_CacheGrChunk (STARTTILE16+i);
-		src = (byte _seg *)grsegs[STARTTILE16+i];
-		VL_MemToLatch (src,16,16,destoff);
-		destoff+=64;
-		if (src)
-			UNCACHEGRCHUNK (STARTTILE16+i);
-	}
-#endif
 
 //
 // pics
@@ -642,7 +617,7 @@ void LoadLatchMem (void)
 	}
 
 	EGAMAPMASK(15);
-	
+
 #else
 //
 // pics
@@ -751,7 +726,7 @@ noxor:
 	} while (1);
 #else
 	TimeCount=frame=0;
-	
+
 	switch(cgamode)
 	{
 		case CGA_MODE5:
@@ -768,7 +743,7 @@ noxor:
 		fizzlecolor = 0xf;
 		break;
 	}
-	
+
 	do	// while (1)
 	{
 		if (abortable && IN_CheckAck () )
@@ -812,7 +787,7 @@ noxor:
 			{
 				ptr = MK_FP(0xb800, drawofs);
 			}
-			
+
 			if(x & 1)
 			{
 				*ptr = (*ptr & 0x0f) | (fizzlecolor << 4);
@@ -821,7 +796,7 @@ noxor:
 			{
 				*ptr = (*ptr & 0xf0) | fizzlecolor;
 			}
-		
+
 			if (rndval == 1)		// entire sequence has been completed
 				return false;
 		}

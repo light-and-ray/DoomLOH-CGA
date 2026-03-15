@@ -1,8 +1,8 @@
 // ID_CA.H
 //===========================================================================
 
-#define NUMMAPS		60
-#define MAPPLANES	2
+#define NUMMAPS		41
+#define MAPPLANES	5
 
 #define UNCACHEGRCHUNK(chunk)	{MM_FreePtr(&grsegs[chunk]);grneeded[chunk]&=~ca_levelbit;}
 
@@ -10,8 +10,8 @@
 
 typedef	struct
 {
-	long		planestart[3];
-	unsigned	planelength[3];
+	long		planestart[MAPPLANES];
+	unsigned	planelength[MAPPLANES];
 	unsigned	width,height;
 	char		name[16];
 } maptype;
@@ -33,7 +33,7 @@ extern	byte		ca_levelbit,ca_levelnum;
 
 extern	char		*titleptr[8];
 
-extern	int			profilehandle,debughandle;
+extern	int			profilehandle;
 
 extern	char		extension[5],
 			gheadname[10],
@@ -62,8 +62,6 @@ void CAL_ShiftSprite (unsigned segment,unsigned source,unsigned dest,
 
 //===========================================================================
 
-void CA_OpenDebug (void);
-void CA_CloseDebug (void);
 boolean CA_FarRead (int handle, byte far *dest, long length);
 boolean CA_FarWrite (int handle, byte far *source, long length);
 boolean CA_ReadFile (char *filename, memptr *ptr);

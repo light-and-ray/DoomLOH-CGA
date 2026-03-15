@@ -1,65 +1,28 @@
 //
 // WL_MENU.H
 //
-#ifdef SPEAR
+#define BORDCOLOR	0x6a
+#define BORD2COLOR	0x6f
+#define DEACTIVE	0x6d
+#define BKGDCOLOR	0x6b
 
-#define BORDCOLOR	0x99
-#define BORD2COLOR	0x93
-#define DEACTIVE	0x9b
-#define BKGDCOLOR	0x9d
-//#define STRIPE		0x9c
+#define MenuFadeOut()	VL_FadeOut(0,255,0,0,0,0)
 
-#define MenuFadeOut()	VL_FadeOut(0,255,0,0,51,10)
-
-#else
-
-#ifdef WITH_VGA
 #define BORDCOLOR	0x29
 #define BORD2COLOR	0x23
 #define DEACTIVE	0x2b
 #define BKGDCOLOR	0x2d
 #define STRIPE		0x2c
-#define VIEWPORTBORDER 127
-#define PG13BG		0x82
-#define BACKCOLOR		0x11
-#define VIEWPORTHIGHLIGHT 125
-#else
-#define BORDCOLOR	menucolors[cgamode].bordcolor
-#define BORD2COLOR	menucolors[cgamode].bordcolor2
-#define DEACTIVE	(0x33cc)
-#define BKGDCOLOR	menucolors[cgamode].bkgdcolor
-#define STRIPE		menucolors[cgamode].stripe
-#define VIEWPORTBORDER	menucolors[cgamode].viewportborder
-#define VIEWPORTHIGHLIGHT	menucolors[cgamode].viewporthighlight
-#define PG13BG	menucolors[cgamode].pg13bg
-#define BACKCOLOR		menucolors[cgamode].backcolor
-
-#endif
 
 #define MenuFadeOut()	VL_FadeOut(0,255,43,0,0,10)
 
 #endif
 
-#ifdef WITH_VGA
-#define READCOLOR    0x4a
-#define READHCOLOR    0x47
-#define VIEWCOLOR    0x7f
-#define TEXTCOLOR    0x17	
-#define HIGHLIGHT    0x13
-#else
-#define READCOLOR	menucolors[cgamode].readcolor
-#define READHCOLOR	menucolors[cgamode].readhcolor
-#define VIEWCOLOR	menucolors[cgamode].viewcolor
-#define TEXTCOLOR	menucolors[cgamode].textcolor
-#define HIGHLIGHT	menucolors[cgamode].highlight
-#define SIGNONFILL	menucolors[cgamode].signonfill
-#define _READCOLOR    0xffff
-#define _READHCOLOR    0xffff
-#define _VIEWCOLOR    0xffff
-#define _TEXTCOLOR    0xffff
-#define _HIGHLIGHT    0xffff
-#endif
-
+#define READCOLOR	0x4a
+#define READHCOLOR	0x47
+#define VIEWCOLOR	0x7f
+#define TEXTCOLOR	0x17
+#define HIGHLIGHT	0x13
 #define MenuFadeIn()	VL_FadeIn(0,255,&gamepal,10)
 
 typedef struct {
@@ -77,17 +40,12 @@ typedef struct {
 		unsigned pg13bg;
 		unsigned backcolor;
 		unsigned signonfill;
-	} MenuColors; 
-	
+	} MenuColors;
+
 extern MenuColors far menucolors[];
 
-#define MENUSONG	WONDERIN_MUS
-
-#ifndef SPEAR
-#define INTROSONG	NAZI_NOR_MUS
-#else
-#define INTROSONG	XTOWER2_MUS
-#endif
+#define MENUSONG	D_MMENU_MUS
+#define INTROSONG	D_TITLE_MUS
 
 #define SENSITIVE	60
 #define CENTER		SENSITIVE*2
@@ -95,16 +53,12 @@ extern MenuColors far menucolors[];
 #define MENU_X	76
 #define MENU_Y	55
 #define MENU_W	178
-#ifndef SPEAR
 #define MENU_H	13*10+6
-#else
-#define MENU_H	13*9+6
-#endif
 
 #define SM_X	48
 #define SM_W	250
 
-#define SM_Y1	20
+#define SM_Y1	21
 #define SM_H1	4*13-7
 #define SM_Y2	SM_Y1+5*13
 #define SM_H2	4*13-7
@@ -116,7 +70,7 @@ extern MenuColors far menucolors[];
 #define CTL_W	284
 #define CTL_H	13*7-7
 
-#define LSM_X	85
+#define LSM_X	67
 #define LSM_Y	55
 #define LSM_W	175
 #define LSM_H	10*13+10
@@ -180,15 +134,11 @@ int  Confirm(char far *string);
 void Message(char far *string);
 void CheckPause(void);
 void ShootSnd(void);
-void CheckSecretMissions(void);
-void BossKey(void);
 
 void DrawGun(CP_iteminfo *item_i,CP_itemtype far *items,int x,int *y,int which,int basey,void (*routine)(int w));
-void DrawHalfStep(int x,int y);
 void EraseGun(CP_iteminfo *item_i,CP_itemtype far *items,int x,int y,int which);
 void SetTextColor(CP_itemtype far *items,int hlight);
 void DrawMenuGun(CP_iteminfo *iteminfo);
-void DrawStripes(int y);
 
 void DefineMouseBtns(void);
 void DefineJoyBtns(void);
@@ -197,6 +147,7 @@ void DefineKeyMove(void);
 void EnterCtrlData(int index,CustomCtrls *cust,void (*DrawRtn)(int),void (*PrintRtn)(int),int type);
 
 void DrawMainMenu(void);
+void DrawOptionsMenu(void);
 void DrawSoundMenu(void);
 void DrawLoadSaveScreen(int loadsave);
 void DrawNewEpisode(void);
@@ -221,12 +172,13 @@ void DrawNewGameDiff(int w);
 void FixupCustom(int w);
 
 void CP_NewGame(void);
+void CP_Options(void);
 void CP_Sound(void);
 int  CP_LoadGame(int quick);
 int  CP_SaveGame(int quick);
 void CP_Control(void);
 void CP_ChangeView(void);
-void CP_ExitOptions(void);
+void CP_ReadThis(void);
 void CP_Quit(void);
 void CP_ViewScores(void);
 int  CP_EndGame(void);
@@ -239,26 +191,18 @@ void CheckForEpisodes(void);
 //
 // VARIABLES
 //
-extern int SaveGamesAvail[10],StartGame,SoundStatus;
-extern char SaveGameNames[10][32],SaveName[13];
+extern int SaveGamesAvail[6],StartGame,SoundStatus;
+extern char SaveGameNames[6][32],SaveName[13];
 
 enum {MOUSE,JOYSTICK,KEYBOARDBTNS,KEYBOARDMOVE};	// FOR INPUT TYPES
 
 enum
 {
 	newgame,
-	soundmenu,
-	control,
+	options,
 	loadgame,
 	savegame,
-	changeview,
-
-#ifndef GOODTIMES
-#ifndef SPEAR
 	readthis,
-#endif
-#endif
-
 	viewscores,
 	backtodemo,
 	quit
@@ -275,7 +219,6 @@ typedef struct {
 extern LRstruct LevelRatios[];
 
 void Write (int x,int y,char *string);
-void NonShareware(void);
 int GetYorN(int x,int y,int pic);
 
 

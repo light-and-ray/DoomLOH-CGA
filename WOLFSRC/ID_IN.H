@@ -65,6 +65,9 @@ typedef	byte		ScanCode;
 #define	sc_9			0x0a
 #define	sc_0			0x0b
 
+#define sc_Minus		0x0c
+#define sc_Equal		0x0d
+
 #define	sc_A			0x1e
 #define	sc_B			0x30
 #define	sc_C			0x2e
