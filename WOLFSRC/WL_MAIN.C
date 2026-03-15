@@ -981,13 +981,21 @@ char *nosprtxt[]={"nospr",nil};
 void main (void)
 {
 	int i;
-
+	TRACE();
+	return;
 	CheckForEpisodes();
+	TRACE();
 	Patch386 ();
+	TRACE();
 	InitGame ();
+	TRACE();
 	DemoLoop();
+	TRACE();
 	CA_LoadAllSounds();
+	TRACE();
 	ClearMemory();
+	TRACE();
 	PM_CheckMainMem();
+	TRACE();
 	Quit("Demo loop exited???");
 }

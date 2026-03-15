@@ -1694,3 +1694,8 @@ extern profilermarker_t profilermarkers[NUM_PROFILER_MARKERS];
 #define BEGIN_PROFILE(x)
 #define END_PROFILE(x)
 #endif
+
+
+#include <stdio.h>
+
+#define TRACE() (printf("File: %s, Line: %d\n", __FILE__, __LINE__), fflush(stdout))
