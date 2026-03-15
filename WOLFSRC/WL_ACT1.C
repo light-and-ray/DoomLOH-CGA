@@ -21,95 +21,98 @@ struct
 	stat_t	type;
 } statinfo[] =
 {
-{SPR_STAT_0},					// puddle          spr1v
-{SPR_STAT_1,block},				// Green Barrel    "
-{SPR_STAT_2,block},				// Table/chairs    "
-{SPR_STAT_3,block},				// Floor lamp      "
-{SPR_STAT_4},					// Chandelier      "
-{SPR_STAT_5,block},				// Hanged man      "
-{SPR_STAT_6,bo_alpo},			// Bad food        "
-{SPR_STAT_7,block},				// Red pillar      "
-//
-// NEW PAGE
-//
-{SPR_STAT_8,block},				// Tree            spr2v
-{SPR_STAT_9},					// Skeleton flat   "
-{SPR_STAT_10,block},			// Sink            " (SOD:gibs)
-{SPR_STAT_11,block},			// Potted plant    "
-{SPR_STAT_12,block},			// Urn             "
-{SPR_STAT_13,block},			// Bare table      "
-{SPR_STAT_14},					// Ceiling light   "
-#ifndef SPEAR
-{SPR_STAT_15},					// Kitchen stuff   "
-#else
-{SPR_STAT_15,block},			// Gibs!
-#endif
-//
-// NEW PAGE
-//
-{SPR_STAT_16,block},			// suit of armor   spr3v
-{SPR_STAT_17,block},			// Hanging cage    "
-{SPR_STAT_18,block},			// SkeletoninCage  "
-{SPR_STAT_19},					// Skeleton relax  "
-{SPR_STAT_20,bo_key1},			// Key 1           "
-{SPR_STAT_21,bo_key2},			// Key 2           "
-{SPR_STAT_22,block},			// stuff				(SOD:gibs)
-{SPR_STAT_23},					// stuff
-//
-// NEW PAGE
-//
-{SPR_STAT_24,bo_food}, 			// Good food       spr4v
-{SPR_STAT_25,bo_firstaid},		// First aid       "
-{SPR_STAT_26,bo_clip},			// Clip            "
-{SPR_STAT_27,bo_machinegun},	// Machine gun     "
-{SPR_STAT_28,bo_chaingun},		// Gatling gun     "
-{SPR_STAT_29,bo_cross},			// Cross           "
-{SPR_STAT_30,bo_chalice},		// Chalice         "
-{SPR_STAT_31,bo_bible},			// Bible           "
-//
-// NEW PAGE
-//
-{SPR_STAT_32,bo_crown},			// crown           spr5v
-{SPR_STAT_33,bo_fullheal},		// one up          "
-{SPR_STAT_34,bo_gibs},			// gibs            "
-{SPR_STAT_35,block},			// barrel          "
-{SPR_STAT_36,block},			// well            "
-{SPR_STAT_37,block},			// Empty well      "
-{SPR_STAT_38,bo_gibs},			// Gibs 2          "
-{SPR_STAT_39,block},			// flag				"
-//
-// NEW PAGE
-//
-#ifndef SPEAR
-{SPR_STAT_40,block},			// Call Apogee		spr7v
-#else
-{SPR_STAT_40},					// Red light
-#endif
-//
-// NEW PAGE
-//
-{SPR_STAT_41},					// junk            "
-{SPR_STAT_42},					// junk 		   "
-{SPR_STAT_43},					// junk            "
-#ifndef SPEAR
-{SPR_STAT_44},					// pots            "
-#else
-{SPR_STAT_44,block},			// Gibs!
-#endif
-{SPR_STAT_45,block},			// stove           " (SOD:gibs)
-{SPR_STAT_46,block},			// spears          " (SOD:gibs)
-{SPR_STAT_47},					// vines			"
-//
-// NEW PAGE
-//
-#ifdef SPEAR
-{SPR_STAT_48,block},			// marble pillar
-{SPR_STAT_49,bo_25clip},		// bonus 25 clip
-{SPR_STAT_50,block},			// truck
-{SPR_STAT_51,bo_spear},			// SPEAR OF DESTINY!
-#endif
+{SPR_STAT_0,bo_key1},
+{SPR_STAT_2,bo_key2},
+{SPR_STAT_4,bo_key3},
+{SPR_STAT_6,bo_ammo1},
+{SPR_STAT_7,bo_ammo1box},
+{SPR_STAT_8,bo_ammo2},
+{SPR_STAT_9,bo_ammo2box},
+{SPR_STAT_10,bo_ammo3},
+{SPR_STAT_11,bo_ammo3box},
+{SPR_STAT_12,bo_ammo4},
 
-{SPR_STAT_26,bo_clip2},			// Clip            "
+{SPR_STAT_13,bo_ammo4box},
+{SPR_STAT_14,bo_shotgun},
+{SPR_STAT_15,bo_supershotgun},
+{SPR_STAT_16,bo_chaingun},
+{SPR_STAT_17,bo_launcher},
+{SPR_STAT_18,bo_plasmagun},
+{SPR_STAT_19,bo_bfggun},
+{SPR_STAT_20,bo_chainsaw},
+{SPR_STAT_21,bo_armor},
+{SPR_STAT_23,bo_megaarmor},
+
+{SPR_STAT_25,bo_armor1},
+{SPR_STAT_29,bo_health1},
+{SPR_STAT_33,bo_medpack},
+{SPR_STAT_34,bo_healthkit},
+{SPR_STAT_35,bo_berserk},
+{SPR_STAT_36,bo_backpack},
+{SPR_STAT_37,bo_godmode},
+{SPR_STAT_41},
+{SPR_STAT_42,block},
+{SPR_STAT_43,block},
+
+{SPR_STAT_46,block},
+{SPR_STAT_47,block},
+{SPR_STAT_48,block},
+{SPR_STAT_49,block},
+{SPR_STAT_50,block},
+{SPR_STAT_51,block},
+{SPR_STAT_52},
+{SPR_STAT_53,block},
+{SPR_STAT_54,block},
+{SPR_STAT_58,bo_megasphere},
+
+{SPR_STAT2_0,bl_dir_south},
+{SPR_STAT2_0,bl_dir_east},
+{SPR_STAT2_1,bl_dir_south},
+{SPR_STAT2_1,bl_dir_east},
+{SPR_STAT2_2,bl_dir_south},
+{SPR_STAT2_2,bl_dir_east},
+{SPR_STAT3_0,block},
+{SPR_STAT3_2,block},
+{SPR_STAT3_5,block},
+{SPR_STAT3_8,block},
+
+{SPR_STAT3_10,block},
+{SPR_STAT3_14,block},
+{SPR_STAT3_18,block},
+{SPR_STAT3_22,block},
+{SPR_STAT3_26,block},
+{SPR_STAT3_30,block},
+{SPR_STAT3_34,block},
+{SPR_STAT3_38,bo_cloak},	// invisible self (uniform tutorial...)
+{SPR_STAT3_42,bo_goggles}, // turn off shading (shading can be 0=FOG)
+{SPR_STAT3_44,bo_soul}, // give 100 health & armor
+
+{SPR_STAT3_48},
+{SPR_STAT3_49,block},
+{SPR_STAT3_50,block},
+{SPR_STAT3_51,block},
+{SPR_STAT3_52,block},
+{SPR_STAT3_53,block},
+{SPR_STAT3_54,block},
+{SPR_STAT3_55},
+{SPR_STAT3_56},
+{SPR_STAT3_57},
+
+{SPR_STAT3_58},
+{SPR_STAT3_59},
+{SPR_STAT3_60},
+{SPR_STAT3_61,block},
+{SPR_STAT3_62,block},
+{SPR_STAT3_63,block},
+{SPR_STAT3_64,block},
+{SPR_EXIT},
+{SPR_TOILET,block},
+{SPR_BIOSUIT,bo_biosuit},
+
+{SPR_BJ_DEAD},
+{SPR_MUTANT_DEAD},
+{SPR_HELLORB,bo_hellorb},
+{SPR_STAT_6,bo_ammoused},
 {-1}							// terminator
 };
 
@@ -151,30 +154,79 @@ void SpawnStatic (int tilex, int tiley, int type)
 		laststatobj->flags = 0;
 		break;
 
-	case	bo_cross:
-	case	bo_chalice:
-	case	bo_bible:
-	case	bo_crown:
-	case	bo_fullheal:
+	case	bo_armor1:
+	case	bo_health1:
+	case	bo_berserk:
+	case	bo_backpack:
+	case	bo_godmode:
+	case	bo_megasphere:
+	case	bo_goggles:
+	case	bo_cloak:
+	case	bo_soul:
+	case	bo_biosuit:
 		if (!loadedgame)
-		  gamestate.treasuretotal++;
+			gamestate.treasuretotal++;
 
-	case	bo_firstaid:
 	case	bo_key1:
 	case	bo_key2:
 	case	bo_key3:
-	case	bo_key4:
-	case	bo_clip:
-	case	bo_25clip:
-	case	bo_machinegun:
+	case	bo_ammo1:
+	case    bo_ammoused:
+	case	bo_ammo1box:
+	case	bo_ammo2:
+	case	bo_ammo2box:
+	case	bo_ammo3:
+	case	bo_ammo3box:
+	case	bo_ammo4:
+	case	bo_ammo4box:
+	case	bo_shotgun:
+	case	bo_supershotgun:
 	case	bo_chaingun:
-	case	bo_food:
-	case	bo_alpo:
-	case	bo_gibs:
-	case	bo_spear:
+	case	bo_launcher:
+	case	bo_plasmagun:
+	case	bo_bfggun:
+	case	bo_chainsaw:
+	case	bo_megaarmor:
+	case	bo_armor:
+	case	bo_medpack:
+	case	bo_healthkit:
+	case	bo_hellorb:
 		laststatobj->flags = FL_BONUS;
 		laststatobj->itemnumber = statinfo[type].type;
 		break;
+	case bl_dir_south:
+   case bl_dir_south_fw:
+   case bl_dir_south_bw:
+      (unsigned)actorat[tilex][tiley] = 1; // consider it a blocking tile
+   case dir_south:
+   case dir_south_fw:
+   case dir_south_bw:
+      laststatobj->flags=FL_DIRSOUTH;
+      break;
+   case bl_dir_east:
+   case bl_dir_east_fw:
+   case bl_dir_east_bw:
+      (unsigned)actorat[tilex][tiley] = 1; // consider it a blocking tile
+   case dir_east:
+   case dir_east_fw:
+   case dir_east_bw:
+      laststatobj->flags=FL_DIREAST;
+      break;
+   }
+   switch(statinfo[type].type)
+   {
+      case dir_south_fw:
+      case bl_dir_south_fw:
+      case dir_east_fw:
+      case bl_dir_east_fw:
+         laststatobj->flags|=FL_DIRFORWARD;
+         break;
+      case dir_south_bw:
+      case bl_dir_south_bw:
+      case dir_east_bw:
+      case bl_dir_east_bw:
+         laststatobj->flags|=FL_DIRBACKWARD;
+         break;
 	}
 
 	laststatobj++;
@@ -472,7 +524,7 @@ void CloseDoor (int door)
 			+doorobjlist[door].tilex)-AREATILE;
 	if (areabyplayer[area])
 	{
-		PlaySoundLocTile(CLOSEDOORSND,doorobjlist[door].tilex,doorobjlist[door].tiley);	// JAB
+		PlaySoundLocTile(DOORCLOSESND,doorobjlist[door].tilex,doorobjlist[door].tiley);	// JAB
 	}
 
 	doorobjlist[door].action = dr_closing;
@@ -505,6 +557,18 @@ void OperateDoor (int door)
 		if ( ! (gamestate.keys & (1 << (lock-dr_lock1) ) ) )
 		{
 			SD_PlaySound (NOWAYSND);		// locked
+			switch (lock)
+	 {
+	    case dr_lock1:
+	       GetMessage("You need the yellow key.");
+	       break;
+	    case dr_lock2:
+	       GetMessage("You need the blue key.");
+	       break;
+	    case dr_lock3:
+		GetMessage("You need the red key.");
+		break;
+	 }
 			return;
 		}
 	}
@@ -583,7 +647,7 @@ void DoorOpening (int door)
 		ConnectAreas ();
 		if (areabyplayer[area1])
 		{
-			PlaySoundLocTile(OPENDOORSND,doorobjlist[door].tilex,doorobjlist[door].tiley);	// JAB
+			PlaySoundLocTile(DOOROPENSND,doorobjlist[door].tilex,doorobjlist[door].tiley);	// JAB
 		}
 	}
 
@@ -661,6 +725,8 @@ void DoorClosing (int door)
 		}
 		area1 -= AREATILE;
 		area2 -= AREATILE;
+		area1 &= 63;
+		area1 &= 63;
 		areaconnect[area1][area2]--;
 		areaconnect[area2][area1]--;
 
@@ -744,7 +810,7 @@ void PushWall (int checkx, int checky, int dir)
 	switch (dir)
 	{
 	case di_north:
-		if (actorat[checkx][checky-1])
+		if (actorat[checkx][checky-1] && (unsigned)actorat[checkx][checky-1] < 0xffff)
 		{
 			SD_PlaySound (NOWAYSND);
 			return;
@@ -754,7 +820,7 @@ void PushWall (int checkx, int checky, int dir)
 		break;
 
 	case di_east:
-		if (actorat[checkx+1][checky])
+		if (actorat[checkx+1][checky] && (unsigned)actorat[checkx+1][checky] < 0xffff)
 		{
 			SD_PlaySound (NOWAYSND);
 			return;
@@ -764,7 +830,7 @@ void PushWall (int checkx, int checky, int dir)
 		break;
 
 	case di_south:
-		if (actorat[checkx][checky+1])
+		if (actorat[checkx][checky+1] && (unsigned)actorat[checkx][checky+1] < 0xffff)
 		{
 			SD_PlaySound (NOWAYSND);
 			return;
@@ -774,7 +840,7 @@ void PushWall (int checkx, int checky, int dir)
 		break;
 
 	case di_west:
-		if (actorat[checkx-1][checky])
+		if (actorat[checkx-1][checky] && (unsigned)actorat[checkx-1][checky] < 0xffff)
 		{
 			SD_PlaySound (NOWAYSND);
 			return;
@@ -784,7 +850,6 @@ void PushWall (int checkx, int checky, int dir)
 		break;
 	}
 
-	gamestate.secretcount++;
 	pwallx = checkx;
 	pwally = checky;
 	pwalldir = dir;
@@ -793,10 +858,8 @@ void PushWall (int checkx, int checky, int dir)
 	tilemap[pwallx][pwally] |= 0xc0;
 	*(mapsegs[1]+farmapylookup[pwally]+pwallx) = 0;	// remove P tile info
 
-	SD_PlaySound (PUSHWALLSND);
+	SD_PlaySound (RISINGSND);
 }
-
-
 
 /*
 =================
@@ -815,7 +878,7 @@ void MovePWalls (void)
 
 	oldblock = pwallstate/128;
 
-	pwallstate += tics;
+	pwallstate += tics*4;
 
 	if (pwallstate/128 != oldblock)
 	{
@@ -826,13 +889,16 @@ void MovePWalls (void)
 		// the tile can now be walked into
 		//
 		tilemap[pwallx][pwally] = 0;
-		(unsigned)actorat[pwallx][pwally] = 0;
+		if (MAPSPOT(pwallx,pwally,1) == 107)
+			(unsigned)actorat[pwallx][pwally] = 0xffff;
+		else
+			(unsigned)actorat[pwallx][pwally] = 0;
 		*(mapsegs[0]+farmapylookup[pwally]+pwallx) = player->areanumber+AREATILE;
 
 		//
 		// see if it should be pushed farther
 		//
-		if (pwallstate>256)
+		if (pwallstate>384)
 		{
 		//
 		// the block has been pushed two tiles

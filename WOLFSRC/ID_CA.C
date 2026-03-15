@@ -39,6 +39,7 @@ typedef struct
 typedef struct
 {
 	unsigned	RLEWtag;
+	int		numplanes;
 	long		headeroffsets[100];
 	byte		tileinfo[];
 } mapfiletype;
@@ -63,7 +64,7 @@ void		_seg	*grsegs[NUMCHUNKS];
 byte		far	grneeded[NUMCHUNKS];
 byte		ca_levelbit,ca_levelnum;
 
-int			profilehandle,debughandle;
+int			profilehandle;
 
 char		audioname[13]="AUDIO.";
 
@@ -166,7 +167,7 @@ long GRFILEPOS(int c)
 = Opens a binary file with the handle "debughandle"
 =
 ============================
-*/
+
 
 void CA_OpenDebug (void)
 {
@@ -178,7 +179,7 @@ void CA_CloseDebug (void)
 {
 	close (debughandle);
 }
-
+*/
 
 
 /*
@@ -742,27 +743,6 @@ void CA_RLEWexpand (unsigned huge *source, unsigned huge *dest,long length,
 //
 // expand it
 //
-#if 0
-  do
-  {
-	value = *source++;
-	if (value != rlewtag)
-	//
-	// uncompressed
-	//
-	  *dest++=value;
-	else
-	{
-	//
-	// compressed string
-	//
-	  count = *source++;
-	  value = *source++;
-	  for (i=1;i<=count;i++)
-	*dest++ = value;
-	}
-  } while (dest<end);
-#endif
 
   end = dest + (length)/2;
   sourceseg = FP_SEG(source);
@@ -1053,18 +1033,18 @@ void CAL_SetupAudioFile (void)
 //
 // open the data file
 //
-#ifndef AUDIOHEADERLINKED
+// #ifndef AUDIOHEADERLINKED
 	strcpy(fname,afilename);
 	strcat(fname,extension);
 
 	if ((audiohandle = open(fname,
 		 O_RDONLY | O_BINARY, S_IREAD)) == -1)
 		CA_CannotOpen(fname);
-#else
-	if ((audiohandle = open("AUDIO."EXTENSION,
-		 O_RDONLY | O_BINARY, S_IREAD)) == -1)
-		Quit ("Can't open AUDIO."EXTENSION"!");
-#endif
+//#else
+//	if ((audiohandle = open("AUDIO."EXTENSION,
+//		 O_RDONLY | O_BINARY, S_IREAD)) == -1)
+//		Quit ("Can't open AUDIO."EXTENSION"!");
+//#endif
 }
 
 //==========================================================================
@@ -1218,7 +1198,7 @@ void CA_LoadAllSounds (void)
 		break;
 	case sdm_AdLib:
 		start = STARTADLIBSOUNDS;
-		break;
+		break;      
 	}
 
 	for (i=0;i<NUMSOUNDS;i++,start++)
@@ -1262,29 +1242,11 @@ void CAL_ExpandGrChunk (int chunk, byte far *source)
 {
 	long	expanded;
 
+	#define BLOCK 64
 
-	if (chunk >= STARTTILE8 && chunk < STARTEXTERNS)
-	{
-	//
-	// expanded sizes of tile8/16/32 are implicit
-	//
+	if (chunk == STARTTILE8)
+		expanded=BLOCK*NUMTILE8;
 
-#define BLOCK		64
-#define MASKBLOCK	128
-
-		if (chunk<STARTTILE8M)			// tile 8s are all in one chunk!
-			expanded = BLOCK*NUMTILE8;
-		else if (chunk<STARTTILE16)
-			expanded = MASKBLOCK*NUMTILE8M;
-		else if (chunk<STARTTILE16M)	// all other tiles are one/chunk
-			expanded = BLOCK*4;
-		else if (chunk<STARTTILE32)
-			expanded = MASKBLOCK*4;
-		else if (chunk<STARTTILE32M)
-			expanded = BLOCK*16;
-		else
-			expanded = MASKBLOCK*16;
-	}
 	else
 	{
 	//

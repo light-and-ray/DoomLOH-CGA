@@ -458,15 +458,7 @@ INL_ShutKbd(void)
 static boolean
 INL_StartMouse(void)
 {
-#if 0
-	if (getvect(MouseInt))
-	{
-		Mouse(MReset);
-		if (_AX == 0xffff)
-			return(true);
-	}
-	return(false);
-#endif
+
  union REGS regs;
  unsigned char far *vector;
 

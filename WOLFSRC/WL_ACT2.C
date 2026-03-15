@@ -1,265 +1,227 @@
 // WL_ACT2.C
 
+#include <math.h>
 #include "WL_DEF.H"
 #pragma hdrstop
 
-/*
-=============================================================================
-
-						 LOCAL CONSTANTS
-
-=============================================================================
-*/
-
 #define PROJECTILESIZE	0xc000l
 
-#define BJRUNSPEED	2048
-#define BJJUMPSPEED	680
-
-
-/*
-=============================================================================
-
-						 GLOBAL VARIABLES
-
-=============================================================================
-*/
-
-
-
-/*
-=============================================================================
-
-						 LOCAL VARIABLES
-
-=============================================================================
-*/
-
+#define BJROCKETSIZE	0x6000l
+#define BARRELEXPLSIZE 0x26000l
+#define BFGSPRAYSIZE   0x60000l
 
 dirtype dirtable[9] = {northwest,north,northeast,west,nodir,east,
 	southwest,south,southeast};
 
 int	starthitpoints[4][NUMENEMIES] =
 	 //
-	 // BABY MODE
+	 // SKILL 1
 	 //
 	 {
-	 {25,	// guards
-	  50,	// officer
-	  100,	// SS
-	  1,	// dogs
-	  850,	// Hans
-	  850,	// Schabbs
-	  200,	// fake hitler
-	  800,	// mecha hitler
-	  45,	// mutants
-	  25,	// ghosts
-	  25,	// ghosts
-	  25,	// ghosts
-	  25,	// ghosts
-
-	  850,	// Gretel
-	  850,	// Gift
-	  850,	// Fat
-	  5,	// en_spectre,
-	  1450,	// en_angel,
-	  850,	// en_trans,
-	  1050,	// en_uber,
-	  950,	// en_will,
-	  1250	// en_death
+	 {40,	// mutant
+	  140,	// chaingun guy
+	  210,	// cacodemon
+	  180,	// demons
+	  4000,	// Cyber Demon
+	  900,	// Spider Demon
+	  1000,	// Revenant
+	  70,	// shotgun guy
+	  80,   // imp
+	  200,	// pain elemental
+	  100,	// lost soul
+	  600,	// Mancubus
+	  80,	// Barrel
+	  1500,	// Boss
+	  650,	// Boss2
+	  1500, // Arch-Vile
 	  },
 	 //
-	 // DON'T HURT ME MODE
+	 // SKILL 2
 	 //
-	 {25,	// guards
-	  50,	// officer
-	  100,	// SS
-	  1,	// dogs
-	  950,	// Hans
-	  950,	// Schabbs
-	  300,	// fake hitler
-	  950,	// mecha hitler
-	  55,	// mutants
-	  25,	// ghosts
-	  25,	// ghosts
-	  25,	// ghosts
-	  25,	// ghosts
-
-	  950,	// Gretel
-	  950,	// Gift
-	  950,	// Fat
-	  10,	// en_spectre,
-	  1550,	// en_angel,
-	  950,	// en_trans,
-	  1150,	// en_uber,
-	  1050,	// en_will,
-	  1350	// en_death
+	 {40,	// mutant
+	  140,	// chaingun guy
+	  210,	// cacodemon
+	  180,	// demons
+	  4000,	// Cyber Demon
+	  900,	// Spider Demon
+	  1000,	// Revenant
+	  70,	// shotgun guy
+	  80,   // imp
+	  200,	// pain elemental
+	  100,	// lost soul
+	  600,	// Mancubus
+	  80,	// Barrel
+	  1500,	// Boss
+	  650,	// Boss2
+	  1500, // Arch-Vile
 	  },
 	 //
-	 // BRING 'EM ON MODE
+	 // SKILL 3
 	 //
-	 {25,	// guards
-	  50,	// officer
-	  100,	// SS
-	  1,	// dogs
-
-	  1050,	// Hans
-	  1550,	// Schabbs
-	  400,	// fake hitler
-	  1050,	// mecha hitler
-
-	  55,	// mutants
-	  25,	// ghosts
-	  25,	// ghosts
-	  25,	// ghosts
-	  25,	// ghosts
-
-	  1050,	// Gretel
-	  1050,	// Gift
-	  1050,	// Fat
-	  15,	// en_spectre,
-	  1650,	// en_angel,
-	  1050,	// en_trans,
-	  1250,	// en_uber,
-	  1150,	// en_will,
-	  1450	// en_death
+	 {40,	// mutant
+	  140,	// chaingun guy
+	  210,	// cacodemon
+	  180,	// demons
+	  4000,	// Cyber Demon
+	  900,	// Spider Demon
+	  1000,	// Revenant
+	  70,	// shotgun guy
+	  80,   // imp
+	  200,	// pain elemental
+	  100,	// lost soul
+	  600,	// Mancubus
+	  80,	// Barrel
+	  1500,	// Boss
+	  650,	// Boss2
+	  1500, // Arch-Vile
 	  },
 	 //
-	 // DEATH INCARNATE MODE
+	 // SKILL 4
 	 //
-	 {25,	// guards
-	  50,	// officer
-	  100,	// SS
-	  1,	// dogs
-
-	  1200,	// Hans
-	  2400,	// Schabbs
-	  500,	// fake hitler
-	  1200,	// mecha hitler
-
-	  65,	// mutants
-	  25,	// ghosts
-	  25,	// ghosts
-	  25,	// ghosts
-	  25,	// ghosts
-
-	  1200,	// Gretel
-	  1200,	// Gift
-	  1200,	// Fat
-	  25,	// en_spectre,
-	  2000,	// en_angel,
-	  1200,	// en_trans,
-	  1400,	// en_uber,
-	  1300,	// en_will,
-	  1600	// en_death
-	  }}
-	  ;
-
-void	A_StartDeathCam (objtype *ob);
-
+	 {40,	// mutant
+	  140,	// chaingun guy
+	  210,	// cacodemon
+	  180,	// demons
+	  4000,	// Cyber Demon
+	  900,	// Spider Demon
+	  1000,	// Revenant
+	  70,	// shotgun guy
+	  80,   // imp
+	  200,	// pain elemental
+	  100,	// lost soul
+	  600,	// Mancubus
+	  80,	// Barrel
+	  1500,	// Boss
+	  650,	// Boss2
+	  1500, // Arch-Vile
+	  }};
 
 void	T_Path (objtype *ob);
 void	T_Shoot (objtype *ob);
 void	T_Bite (objtype *ob);
-void	T_DogChase (objtype *ob);
+void	T_DemonChase (objtype *ob);
 void	T_Chase (objtype *ob);
 void	T_Projectile (objtype *ob);
 void	T_Stand (objtype *ob);
 
 void A_DeathScream (objtype *ob);
+void A_BarrelAttack (objtype *ob);
+void A_BFGSpray (objtype *ob);
 
 extern	statetype s_rocket;
-extern	statetype s_smoke1;
-extern	statetype s_smoke2;
-extern	statetype s_smoke3;
-extern	statetype s_smoke4;
 extern	statetype s_boom2;
 extern	statetype s_boom3;
 
-void A_Smoke (objtype *ob);
+statetype s_rocket	 	= {true,SPR_ROCKET_1,3,T_Projectile,NULL,&s_rocket};
 
-statetype s_rocket	 	= {true,SPR_ROCKET_1,3,T_Projectile,A_Smoke,&s_rocket};
-statetype s_smoke1	 	= {false,SPR_SMOKE_1,3,NULL,NULL,&s_smoke2};
-statetype s_smoke2	 	= {false,SPR_SMOKE_2,3,NULL,NULL,&s_smoke3};
-statetype s_smoke3	 	= {false,SPR_SMOKE_3,3,NULL,NULL,&s_smoke4};
-statetype s_smoke4	 	= {false,SPR_SMOKE_4,3,NULL,NULL,NULL};
-
-statetype s_boom1	 	= {false,SPR_BOOM_1,6,NULL,NULL,&s_boom2};
+statetype s_boom1	 	= {false,SPR_BOOM_1,6,NULL,A_BarrelAttack,&s_boom2};
 statetype s_boom2	 	= {false,SPR_BOOM_2,6,NULL,NULL,&s_boom3};
 statetype s_boom3	 	= {false,SPR_BOOM_3,6,NULL,NULL,NULL};
 
-#ifdef SPEAR
+extern	statetype s_plasma;
+extern	statetype s_plasma2;
+extern	statetype s_plasmaboom1;
+extern	statetype s_plasmaboom2;
+extern	statetype s_plasmaboom3;
+extern	statetype s_plasmaboom4;
 
-extern	statetype s_hrocket;
-extern	statetype s_hsmoke1;
-extern	statetype s_hsmoke2;
-extern	statetype s_hsmoke3;
-extern	statetype s_hsmoke4;
-extern	statetype s_hboom2;
-extern	statetype s_hboom3;
+statetype s_plasma	= {false,SPR_PLASMA_1,3,T_Projectile,NULL,&s_plasma2};
+statetype s_plasma2	= {false,SPR_PLASMA_2,3,T_Projectile,NULL,&s_plasma};
 
-void A_Smoke (objtype *ob);
+statetype s_plasmaboom1	= {false,SPR_PLASMA_BOOM1,6,NULL,NULL,&s_plasmaboom2};
+statetype s_plasmaboom2 = {false,SPR_PLASMA_BOOM2,6,NULL,NULL,&s_plasmaboom3};
+statetype s_plasmaboom3	= {false,SPR_PLASMA_BOOM3,6,NULL,NULL,&s_plasmaboom4};
+statetype s_plasmaboom4 = {false,SPR_PLASMA_BOOM4,6,NULL,NULL,NULL};
 
-statetype s_hrocket	 	= {true,SPR_HROCKET_1,3,T_Projectile,A_Smoke,&s_hrocket};
-statetype s_hsmoke1	 	= {false,SPR_HSMOKE_1,3,NULL,NULL,&s_hsmoke2};
-statetype s_hsmoke2	 	= {false,SPR_HSMOKE_2,3,NULL,NULL,&s_hsmoke3};
-statetype s_hsmoke3	 	= {false,SPR_HSMOKE_3,3,NULL,NULL,&s_hsmoke4};
-statetype s_hsmoke4	 	= {false,SPR_HSMOKE_4,3,NULL,NULL,NULL};
+extern	statetype s_bfg;
+extern	statetype s_bfg2;
+extern	statetype s_bfgboom1;
+extern	statetype s_bfgboom2;
+extern	statetype s_bfgboom3;
+extern	statetype s_bfgboom4;
+extern	statetype s_bfgboom5;
+extern	statetype s_bfgboom6;
 
-statetype s_hboom1	 	= {false,SPR_HBOOM_1,6,NULL,NULL,&s_hboom2};
-statetype s_hboom2	 	= {false,SPR_HBOOM_2,6,NULL,NULL,&s_hboom3};
-statetype s_hboom3	 	= {false,SPR_HBOOM_3,6,NULL,NULL,NULL};
+statetype s_bfg	= {false,SPR_BFG_1,3,T_Projectile,NULL,&s_bfg2};
+statetype s_bfg2	= {false,SPR_BFG_2,3,T_Projectile,NULL,&s_bfg};
 
-#endif
+statetype s_bfgboom1	= {false,SPR_BFG_BOOM1,6,NULL,A_BFGSpray,&s_bfgboom2};
+statetype s_bfgboom2	= {false,SPR_BFG_BOOM2,6,NULL,NULL,&s_bfgboom3};
+statetype s_bfgboom3	= {false,SPR_BFG_BOOM3,6,NULL,NULL,&s_bfgboom4};
+statetype s_bfgboom4	= {false,SPR_BFG_BOOM4,6,NULL,NULL,&s_bfgboom5};
+statetype s_bfgboom5	= {false,SPR_BFG_BOOM5,6,NULL,NULL,&s_bfgboom6};
+statetype s_bfgboom6	= {false,SPR_BFG_BOOM6,6,NULL,NULL,NULL};
 
-void	T_Schabb (objtype *ob);
-void	T_SchabbThrow (objtype *ob);
-void	T_Fake (objtype *ob);
-void	T_FakeFire (objtype *ob);
-void	T_Ghosts (objtype *ob);
+extern	statetype s_splat1;
+extern	statetype s_splat2;
+extern	statetype s_splat3;
+extern	statetype s_splat4;
+extern	statetype s_splat5;
+extern	statetype s_splat6;
+extern	statetype s_splat7;
+extern	statetype s_splat8;
+extern	statetype s_splat9;
 
+statetype s_splat1      = {false,SPR_SPLAT1,6,NULL,NULL,&s_splat2};
+statetype s_splat2      = {false,SPR_SPLAT2,6,NULL,NULL,&s_splat3};
+statetype s_splat3	= {false,SPR_SPLAT3,6,NULL,NULL,&s_splat4};
+statetype s_splat4	= {false,SPR_SPLAT4,6,NULL,NULL,&s_splat5};
+statetype s_splat5	= {false,SPR_SPLAT5,6,NULL,NULL,&s_splat6};
+statetype s_splat6	= {false,SPR_SPLAT6,6,NULL,NULL,&s_splat7};
+statetype s_splat7	= {false,SPR_SPLAT7,6,NULL,NULL,&s_splat8};
+statetype s_splat8	= {false,SPR_SPLAT8,6,NULL,NULL,&s_splat9};
+statetype s_splat9	= {false,SPR_SPLAT9,6,NULL,NULL,NULL};
+
+extern	statetype s_puff1;
+extern	statetype s_puff2;
+extern	statetype s_puff3;
+extern	statetype s_puff4;
+
+statetype s_puff1	= {false,SPR_PUFF1,6,NULL,NULL,&s_puff2};
+statetype s_puff2	= {false,SPR_PUFF2,6,NULL,NULL,&s_puff3};
+statetype s_puff3	= {false,SPR_PUFF3,6,NULL,NULL,&s_puff4};
+statetype s_puff4	= {false,SPR_PUFF4,6,NULL,NULL,NULL};
+
+extern	statetype s_bfgsplat1;
+extern	statetype s_bfgsplat2;
+extern	statetype s_bfgsplat3;
+extern	statetype s_bfgsplat4;
+
+statetype s_bfgsplat1	= {false,SPR_BFGSPLAT1,6,NULL,NULL,&s_bfgsplat2};
+statetype s_bfgsplat2	= {false,SPR_BFGSPLAT2,6,NULL,NULL,&s_bfgsplat3};
+statetype s_bfgsplat3	= {false,SPR_BFGSPLAT3,6,NULL,NULL,&s_bfgsplat4};
+statetype s_bfgsplat4	= {false,SPR_BFGSPLAT4,6,NULL,NULL,NULL};
+
+extern	statetype s_hellorb1;
+extern	statetype s_hellorb2;
+extern	statetype s_hellorb3;
+extern	statetype s_hellorb4;
+
+statetype s_hellorb1	= {false,SPR_HELLBALL1,6,T_Projectile,NULL,&s_hellorb2};
+statetype s_hellorb2	= {false,SPR_HELLBALL2,6,T_Projectile,NULL,&s_hellorb3};
+statetype s_hellorb3	= {false,SPR_HELLBALL3,6,T_Projectile,NULL,&s_hellorb4};
+statetype s_hellorb4	= {false,SPR_HELLBALL4,6,T_Projectile,NULL,&s_hellorb1};
+
+
+extern	statetype s_revball1;
+extern	statetype s_revball2;
+
+extern	statetype s_revballboom1;
+extern	statetype s_revballboom2;
+extern	statetype s_revballboom3;
+
+statetype s_revball1	= {true,SPR_REVBALL_1,6,T_Projectile,NULL,&s_revball2};
+statetype s_revball2	= {true,SPR_REVBALL2_1,6,T_Projectile,NULL,&s_revball1};
+
+statetype s_revballboom1	= {false,SPR_REVBALL_BOOM1,6,NULL,NULL,&s_revballboom2};
+statetype s_revballboom2	= {false,SPR_REVBALL_BOOM2,6,NULL,NULL,&s_revballboom3};
+statetype s_revballboom3	= {false,SPR_REVBALL_BOOM3,6,NULL,NULL,NULL};
+
+void T_Spider (objtype *ob);
 void A_Slurpie (objtype *ob);
-void A_HitlerMorph (objtype *ob);
+void A_ShootLostSoul (objtype *ob);
 void A_MechaSound (objtype *ob);
-
-/*
-=================
-=
-= A_Smoke
-=
-=================
-*/
-
-void A_Smoke (objtype *ob)
-{
-	GetNewActor ();
-#ifdef SPEAR
-	if (ob->obclass == hrocketobj)
-		new->state = &s_hsmoke1;
-	else
-#endif
-		new->state = &s_smoke1;
-	new->ticcount = 6;
-
-	new->tilex = ob->tilex;
-	new->tiley = ob->tiley;
-	new->x = ob->x;
-	new->y = ob->y;
-	new->obclass = inertobj;
-	new->active = true;
-
-	new->flags = FL_NEVERMARK;
-}
-
-
-/*
-===================
-=
-= ProjectileTryMove
-=
-= returns true if move ok
-===================
-*/
+void A_Barrel (objtype *ob);
 
 #define PROJSIZE	0x2000
 
@@ -275,9 +237,6 @@ boolean ProjectileTryMove (objtype *ob)
 	xh = (ob->x+PROJSIZE) >>TILESHIFT;
 	yh = (ob->y+PROJSIZE) >>TILESHIFT;
 
-//
-// check for solid walls
-//
 	for (y=yl;y<=yh;y++)
 		for (x=xl;x<=xh;x++)
 		{
@@ -289,21 +248,12 @@ boolean ProjectileTryMove (objtype *ob)
 	return true;
 }
 
-
-
-/*
-=================
-=
-= T_Projectile
-=
-=================
-*/
-
 void T_Projectile (objtype *ob)
 {
 	long	deltax,deltay;
 	int		damage;
 	long	speed;
+	objtype *check, *extracheck;
 
 	speed = (long)ob->speed*tics;
 
@@ -323,526 +273,1000 @@ void T_Projectile (objtype *ob)
 
 	if (!ProjectileTryMove (ob))
 	{
-		if (ob->obclass == rocketobj)
-		{
-			PlaySoundLocActor(MISSILEHITSND,ob);
-			ob->state = &s_boom1;
-		}
-#ifdef SPEAR
-		else if (ob->obclass == hrocketobj)
-		{
-			PlaySoundLocActor(MISSILEHITSND,ob);
-			ob->state = &s_hboom1;
-		}
-#endif
-		else
-			ob->state = NULL;		// mark for removal
-
-		return;
-	}
-
-	if (deltax < PROJECTILESIZE && deltay < PROJECTILESIZE)
-	{	// hit the player
 		switch (ob->obclass)
 		{
-		case needleobj:
-			damage = (US_RndT() >>3) + 20;
-			break;
+			case rocketobj:
+				ob->state = &s_boom1;
+				break;
+			case plasmaobj:
+				ob->state = &s_plasmaboom1;
+				break;
+			case bfgobj:
+				ob->state = &s_bfgboom1;
+				break;
+			case impballobj:
+				ob->state = &s_impballboom1;
+				break;
+			case bossballobj:
+				ob->state = &s_bossballboom1;
+				break;
+			case cacoballobj:
+				ob->state = &s_cacoballboom1;
+				break;
+			case fatballobj:
+				ob->state = &s_fatballboom1;
+				break;
+			case splasmaobj:
+				ob->state = &s_splasmaboom1;
+				break;
+			case revballobj:
+				ob->state = &s_revballboom1;
+				break;
+			default:
+				ob->state = NULL;
+				break;
+		}
+		return;
+	}
+	if (ob->obclass == rocketobj && ob->flags & FL_NONMARK && ob->flags & FL_BONUS)
+	{
+		check=objlist;
+		while (check)
+		{
+			if (check->flags & FL_SHOOTABLE)
+			{
+				deltax = LABS(ob->x - check->x);
+				deltay = LABS(ob->y - check->y);
+
+				if (deltax <BJROCKETSIZE && deltay < BJROCKETSIZE)
+				{
+					if (check->obclass != hellorbobj)
+					ob->state = &s_boom1;
+
+					DamageActor (check,150);
+					}
+				}
+				check = check->next;
+			}
+		}
+		else if (ob->obclass == plasmaobj && ob->flags & FL_NONMARK && ob->flags & FL_BONUS)
+		{
+			check = objlist;
+			while (check)
+			{
+				if (check->flags & FL_SHOOTABLE)
+				{
+					deltax = LABS(ob->x - check->x);
+					deltay = LABS(ob->y - check->y);
+
+					if (deltax < BJROCKETSIZE && deltay < BJROCKETSIZE)
+					{
+						if (check->obclass != bfgobj)
+						ob->state = &s_plasmaboom1;
+
+						DamageActor (check,25);
+					}
+				}
+				check = check->next;
+			}
+		}
+		else if (ob->obclass == bfgobj && ob->flags & FL_NONMARK && ob->flags & FL_BONUS)
+		{
+			check = objlist;
+			while (check)
+			{
+				if (check->flags & FL_SHOOTABLE)
+				{
+					deltax = LABS(ob->x - check->x);
+					deltay = LABS(ob->y - check->y);
+
+					if (deltax < BJROCKETSIZE && deltay < BJROCKETSIZE)
+					{
+						if (check->obclass != bfgobj)
+						ob->state = &s_bfgboom1;
+
+						DamageActor (check,500);
+					}
+				}
+				check = check->next;
+			}
+		}
+		if (ob->obclass == hellorbobj && ob->flags & FL_NONMARK && ob->flags & FL_BONUS)
+		{
+			check = objlist;
+			while (check)
+			{
+				if (check->flags & FL_SHOOTABLE)
+				{
+					deltax = LABS(ob->x - check->x);
+					deltay = LABS(ob->y - check->y);
+
+					if (deltax < BJROCKETSIZE && deltay < BJROCKETSIZE)
+					{
+						if (check->obclass != bfgobj)
+						ob->state = NULL;
+						DamageActor (check,25);
+					}
+				}
+				check = check->next;
+			}
+		}
+		else
+		{
+			{
+	if (deltax < PROJECTILESIZE && deltay < PROJECTILESIZE)
+	{
+		switch (ob->obclass)
+		{
 		case rocketobj:
-		case hrocketobj:
-		case sparkobj:
-			damage = (US_RndT() >>3) + 30;
+			damage = (US_RndT() >>3)+20;
 			break;
-		case fireobj:
-			damage = (US_RndT() >>3);
+		case bossballobj:
+			damage = (US_RndT() >>5);
+			break;
+		case fatballobj:
+			damage = (US_RndT() >>4)+10;
+			break;
+		case splasmaobj:
+		case impballobj:
+		case cacoballobj:
+			damage = (US_RndT() >>5)+10;
+			break;
+		case vilefireobj:
+			damage = (US_RndT() >>5)+40;
+			break;
+		case revballobj:
+			damage = (US_RndT() >>7)+12;
 			break;
 		}
 
 		TakeDamage (damage,ob);
-		ob->state = NULL;		// mark for removal
+		switch (ob->obclass)
+		{
+			case rocketobj:
+				ob->state = &s_boom1;
+				break;
+			case plasmaobj:
+				ob->state = &s_plasmaboom1;
+				break;
+			case bfgobj:
+				ob->state = &s_bfgboom1;
+				break;
+			case impballobj:
+				ob->state = &s_impballboom1;
+				break;
+			case bossballobj:
+				ob->state = &s_bossballboom1;
+				break;
+			case cacoballobj:
+				ob->state = &s_cacoballboom1;
+				break;
+			case fatballobj:
+				ob->state = &s_fatballboom1;
+				break;
+			case splasmaobj:
+				ob->state = &s_splasmaboom1;
+				break;
+			case revballobj:
+				ob->state = &s_revballboom1;
+				break;
+			default:
+				ob->state = NULL;
+				break;
+		}
 		return;
+		}
 	}
 
 	ob->tilex = ob->x >> TILESHIFT;
 	ob->tiley = ob->y >> TILESHIFT;
+	}
+}
+//
+// barrel
+//
+
+extern	statetype s_barrelstand;
+
+extern	statetype s_barreldie1;
+extern	statetype s_barreldie2;
+extern	statetype s_barreldie3;
+extern	statetype s_barreldie4;
+
+statetype s_barrelstand = {false,SPR_BARREL,0,NULL,NULL,&s_barrelstand};
+
+statetype s_barreldie1 = {false,SPR_BARREL2,10,NULL,NULL,&s_barreldie2};
+statetype s_barreldie2 = {false,SPR_BARRELBOOM1,10,NULL,A_Barrel,&s_barreldie3};
+statetype s_barreldie3 	= {false,SPR_BARRELBOOM2,10,NULL,A_BarrelAttack,&s_barreldie4};
+statetype s_barreldie4	= {false,SPR_BARRELBOOM3,10,NULL,NULL,NULL};
+
+#pragma argsused
+void A_Barrel (objtype *ob)
+{
+	if (!SD_SoundPlaying)
+	PlaySoundLocActor (BARRELBOOMSND,ob);
+}
+void SpawnBarrel (int tilex, int tiley)
+{
+	unsigned far *map,tile;
+
+	SpawnNewObj (tilex,tiley,&s_barrelstand);
+	new->obclass = barrelobj;
+	new->hitpoints = starthitpoints[gamestate.difficulty][en_barrel];
+	new->flags |= FL_SHOOTABLE|FL_AMBUSH;
 
 }
+int Damage (long dx,long dy,long range,int max)
+{
+	double ddx = (double) dx;
+	double ddy = (double) dy;
+	double drange = (double) range;
+	double dmax = (double) max;
+	double distance = sqrt (ddx*ddx+ddy*ddy);
 
+	if (distance>drange)
+	return 0;
+	else
+	return (int)(dmax-distance/drange*dmax);
+}
+void A_BarrelAttack(objtype *ob)
+{
+	long deltax, deltay;
+	objtype *extracheck;
+	int damage;
 
+	extracheck = objlist;
+	while (extracheck)
+	{
+		if (extracheck != ob && (extracheck->flags & FL_SHOOTABLE))
+		{
+			deltax = LABS(ob->x - extracheck->x);
+			deltay = LABS(ob->y - extracheck->y);
+			if (deltax < BARRELEXPLSIZE*2 && deltay < BARRELEXPLSIZE*2) {
+			damage = Damage (deltax, deltay, BARRELEXPLSIZE,300);
+			if (damage>0)
+			DamageActor (extracheck,damage);
+		}
+	}
+	extracheck = extracheck->next;
+}
+deltax=LABS(ob->x - player->x);
+deltay=LABS(ob->y - player->y);
+if (deltax < BARRELEXPLSIZE *2 && deltay < BARRELEXPLSIZE * 2) {
+damage = Damage (deltax, deltay, BARRELEXPLSIZE,300);
+if (damage > 0)
+TakeDamage (damage,ob);
+}
+}
+void A_BFGSpray(objtype *ob)
+{
+	long deltax, deltay;
+	objtype *extracheck;
+	int damage;
 
+	extracheck = objlist;
+	while (extracheck)
+	{
+		if (extracheck != ob && (extracheck->flags & FL_SHOOTABLE))
+		{
+			deltax = LABS(ob->x - extracheck->x);
+			deltay = LABS(ob->y - extracheck->y);
+			if (deltax < BARRELEXPLSIZE*2 && deltay < BFGSPRAYSIZE*2) {
+			damage = Damage (deltax, deltay, BFGSPRAYSIZE,300);
+			if (damage>0)
+			DamageActor (extracheck,damage);
+		}
+	}
+	extracheck = extracheck->next;
+	}
+}
 
-/*
-=============================================================================
+extern	statetype s_mutantstand;
 
-							GUARD
+extern	statetype s_mutantpath1;
+extern	statetype s_mutantpath1s;
+extern	statetype s_mutantpath2;
+extern	statetype s_mutantpath3;
+extern	statetype s_mutantpath3s;
+extern	statetype s_mutantpath4;
 
-=============================================================================
-*/
+extern	statetype s_mutantpain;
 
-//
-// guards
-//
+extern	statetype s_mutantshoot1;
+extern	statetype s_mutantshoot2;
+extern	statetype s_mutantshoot3;
 
-extern	statetype s_grdstand;
+extern	statetype s_mutantchase1;
+extern	statetype s_mutantchase1s;
+extern	statetype s_mutantchase2;
+extern	statetype s_mutantchase3;
+extern	statetype s_mutantchase3s;
+extern	statetype s_mutantchase4;
 
-extern	statetype s_grdpath1;
-extern	statetype s_grdpath1s;
-extern	statetype s_grdpath2;
-extern	statetype s_grdpath3;
-extern	statetype s_grdpath3s;
-extern	statetype s_grdpath4;
+extern	statetype s_mutantdie1;
+extern	statetype s_mutantdie2;
+extern	statetype s_mutantdie3;
+extern	statetype s_mutantdie4;
+extern	statetype s_mutantdie5;
 
-extern	statetype s_grdpain;
-extern	statetype s_grdpain1;
+extern	statetype s_mutantexpl1;
+extern	statetype s_mutantexpl2;
+extern	statetype s_mutantexpl3;
+extern	statetype s_mutantexpl4;
+extern	statetype s_mutantexpl5;
+extern	statetype s_mutantexpl6;
+extern	statetype s_mutantexpl7;
+extern	statetype s_mutantexpl8;
+extern	statetype s_mutantexpl9;
 
-extern	statetype s_grdgiveup;
+statetype s_mutantstand	= {true,SPR_MUTANT_W1_1,0,T_Stand,NULL,&s_mutantstand};
 
-extern	statetype s_grdshoot1;
-extern	statetype s_grdshoot2;
-extern	statetype s_grdshoot3;
-extern	statetype s_grdshoot4;
+statetype s_mutantpath1 	= {true,SPR_MUTANT_W1_1,20,T_Path,NULL,&s_mutantpath1s};
+statetype s_mutantpath1s 	= {true,SPR_MUTANT_W1_1,5,NULL,NULL,&s_mutantpath2};
+statetype s_mutantpath2 	= {true,SPR_MUTANT_W2_1,15,T_Path,NULL,&s_mutantpath3};
+statetype s_mutantpath3 	= {true,SPR_MUTANT_W3_1,20,T_Path,NULL,&s_mutantpath3s};
+statetype s_mutantpath3s 	= {true,SPR_MUTANT_W3_1,5,NULL,NULL,&s_mutantpath4};
+statetype s_mutantpath4 	= {true,SPR_MUTANT_W4_1,15,T_Path,NULL,&s_mutantpath1};
 
-extern	statetype s_grdchase1;
-extern	statetype s_grdchase1s;
-extern	statetype s_grdchase2;
-extern	statetype s_grdchase3;
-extern	statetype s_grdchase3s;
-extern	statetype s_grdchase4;
+statetype s_mutantpain 	= {true,SPR_MUTANT_PAIN_1,10,NULL,NULL,&s_mutantchase1};
 
-extern	statetype s_grddie1;
-extern	statetype s_grddie1d;
-extern	statetype s_grddie2;
-extern	statetype s_grddie3;
-extern	statetype s_grddie4;
+statetype s_mutantshoot1 	= {false,SPR_MUTANT_SHOOT_1,20,NULL,NULL,&s_mutantshoot2};
+statetype s_mutantshoot2 	= {false,SPR_MUTANT_SHOOT2_1,20,NULL,T_Shoot,&s_mutantshoot3};
+statetype s_mutantshoot3	= {false,SPR_MUTANT_SHOOT_1,20,NULL,NULL,&s_mutantchase1};
 
-statetype s_grdstand	= {true,SPR_GRD_S_1,0,T_Stand,NULL,&s_grdstand};
+statetype s_mutantchase1 	= {true,SPR_MUTANT_W1_1,10,T_Chase,NULL,&s_mutantchase1s};
+statetype s_mutantchase1s 	= {true,SPR_MUTANT_W1_1,3,NULL,NULL,&s_mutantchase2};
+statetype s_mutantchase2 	= {true,SPR_MUTANT_W2_1,8,T_Chase,NULL,&s_mutantchase3};
+statetype s_mutantchase3 	= {true,SPR_MUTANT_W3_1,10,T_Chase,NULL,&s_mutantchase3s};
+statetype s_mutantchase3s 	= {true,SPR_MUTANT_W3_1,3,NULL,NULL,&s_mutantchase4};
+statetype s_mutantchase4 	= {true,SPR_MUTANT_W4_1,8,T_Chase,NULL,&s_mutantchase1};
 
-statetype s_grdpath1 	= {true,SPR_GRD_W1_1,20,T_Path,NULL,&s_grdpath1s};
-statetype s_grdpath1s 	= {true,SPR_GRD_W1_1,5,NULL,NULL,&s_grdpath2};
-statetype s_grdpath2 	= {true,SPR_GRD_W2_1,15,T_Path,NULL,&s_grdpath3};
-statetype s_grdpath3 	= {true,SPR_GRD_W3_1,20,T_Path,NULL,&s_grdpath3s};
-statetype s_grdpath3s 	= {true,SPR_GRD_W3_1,5,NULL,NULL,&s_grdpath4};
-statetype s_grdpath4 	= {true,SPR_GRD_W4_1,15,T_Path,NULL,&s_grdpath1};
+statetype s_mutantdie1		= {false,SPR_MUTANT_DIE_1,15,NULL,A_DeathScream,&s_mutantdie2};
+statetype s_mutantdie2		= {false,SPR_MUTANT_DIE_2,15,NULL,NULL,&s_mutantdie3};
+statetype s_mutantdie3		= {false,SPR_MUTANT_DIE_3,15,NULL,NULL,&s_mutantdie4};
+statetype s_mutantdie4		= {false,SPR_MUTANT_DIE_4,15,NULL,NULL,&s_mutantdie5};
+statetype s_mutantdie5		= {false,SPR_MUTANT_DEAD,0,NULL,NULL,&s_mutantdie5};
 
-statetype s_grdpain 	= {2,SPR_GRD_PAIN_1,10,NULL,NULL,&s_grdchase1};
-statetype s_grdpain1 	= {2,SPR_GRD_PAIN_2,10,NULL,NULL,&s_grdchase1};
-
-statetype s_grdshoot1 	= {false,SPR_GRD_SHOOT1,20,NULL,NULL,&s_grdshoot2};
-statetype s_grdshoot2 	= {false,SPR_GRD_SHOOT2,20,NULL,T_Shoot,&s_grdshoot3};
-statetype s_grdshoot3 	= {false,SPR_GRD_SHOOT3,20,NULL,NULL,&s_grdchase1};
-
-statetype s_grdchase1 	= {true,SPR_GRD_W1_1,10,T_Chase,NULL,&s_grdchase1s};
-statetype s_grdchase1s 	= {true,SPR_GRD_W1_1,3,NULL,NULL,&s_grdchase2};
-statetype s_grdchase2 	= {true,SPR_GRD_W2_1,8,T_Chase,NULL,&s_grdchase3};
-statetype s_grdchase3 	= {true,SPR_GRD_W3_1,10,T_Chase,NULL,&s_grdchase3s};
-statetype s_grdchase3s 	= {true,SPR_GRD_W3_1,3,NULL,NULL,&s_grdchase4};
-statetype s_grdchase4 	= {true,SPR_GRD_W4_1,8,T_Chase,NULL,&s_grdchase1};
-
-statetype s_grddie1		= {false,SPR_GRD_DIE_1,15,NULL,A_DeathScream,&s_grddie2};
-statetype s_grddie2		= {false,SPR_GRD_DIE_2,15,NULL,NULL,&s_grddie3};
-statetype s_grddie3		= {false,SPR_GRD_DIE_3,15,NULL,NULL,&s_grddie4};
-statetype s_grddie4		= {false,SPR_GRD_DEAD,0,NULL,NULL,&s_grddie4};
-
-
-#ifndef SPEAR
-//
-// ghosts
-//
-extern	statetype s_blinkychase1;
-extern	statetype s_blinkychase2;
-extern	statetype s_inkychase1;
-extern	statetype s_inkychase2;
-extern	statetype s_pinkychase1;
-extern	statetype s_pinkychase2;
-extern	statetype s_clydechase1;
-extern	statetype s_clydechase2;
-
-statetype s_blinkychase1 	= {false,SPR_BLINKY_W1,10,T_Ghosts,NULL,&s_blinkychase2};
-statetype s_blinkychase2 	= {false,SPR_BLINKY_W2,10,T_Ghosts,NULL,&s_blinkychase1};
-
-statetype s_inkychase1 		= {false,SPR_INKY_W1,10,T_Ghosts,NULL,&s_inkychase2};
-statetype s_inkychase2 		= {false,SPR_INKY_W2,10,T_Ghosts,NULL,&s_inkychase1};
-
-statetype s_pinkychase1 	= {false,SPR_PINKY_W1,10,T_Ghosts,NULL,&s_pinkychase2};
-statetype s_pinkychase2 	= {false,SPR_PINKY_W2,10,T_Ghosts,NULL,&s_pinkychase1};
-
-statetype s_clydechase1 	= {false,SPR_CLYDE_W1,10,T_Ghosts,NULL,&s_clydechase2};
-statetype s_clydechase2 	= {false,SPR_CLYDE_W2,10,T_Ghosts,NULL,&s_clydechase1};
-#endif
-
-//
-// dogs
-//
-
-extern	statetype s_dogpath1;
-extern	statetype s_dogpath1s;
-extern	statetype s_dogpath2;
-extern	statetype s_dogpath3;
-extern	statetype s_dogpath3s;
-extern	statetype s_dogpath4;
-
-extern	statetype s_dogjump1;
-extern	statetype s_dogjump2;
-extern	statetype s_dogjump3;
-extern	statetype s_dogjump4;
-extern	statetype s_dogjump5;
-
-extern	statetype s_dogchase1;
-extern	statetype s_dogchase1s;
-extern	statetype s_dogchase2;
-extern	statetype s_dogchase3;
-extern	statetype s_dogchase3s;
-extern	statetype s_dogchase4;
-
-extern	statetype s_dogdie1;
-extern	statetype s_dogdie1d;
-extern	statetype s_dogdie2;
-extern	statetype s_dogdie3;
-extern	statetype s_dogdead;
-
-statetype s_dogpath1 	= {true,SPR_DOG_W1_1,20,T_Path,NULL,&s_dogpath1s};
-statetype s_dogpath1s 	= {true,SPR_DOG_W1_1,5,NULL,NULL,&s_dogpath2};
-statetype s_dogpath2 	= {true,SPR_DOG_W2_1,15,T_Path,NULL,&s_dogpath3};
-statetype s_dogpath3 	= {true,SPR_DOG_W3_1,20,T_Path,NULL,&s_dogpath3s};
-statetype s_dogpath3s 	= {true,SPR_DOG_W3_1,5,NULL,NULL,&s_dogpath4};
-statetype s_dogpath4 	= {true,SPR_DOG_W4_1,15,T_Path,NULL,&s_dogpath1};
-
-statetype s_dogjump1 	= {false,SPR_DOG_JUMP1,10,NULL,NULL,&s_dogjump2};
-statetype s_dogjump2 	= {false,SPR_DOG_JUMP2,10,NULL,T_Bite,&s_dogjump3};
-statetype s_dogjump3 	= {false,SPR_DOG_JUMP3,10,NULL,NULL,&s_dogjump4};
-statetype s_dogjump4 	= {false,SPR_DOG_JUMP1,10,NULL,NULL,&s_dogjump5};
-statetype s_dogjump5 	= {false,SPR_DOG_W1_1,10,NULL,NULL,&s_dogchase1};
-
-statetype s_dogchase1 	= {true,SPR_DOG_W1_1,10,T_DogChase,NULL,&s_dogchase1s};
-statetype s_dogchase1s 	= {true,SPR_DOG_W1_1,3,NULL,NULL,&s_dogchase2};
-statetype s_dogchase2 	= {true,SPR_DOG_W2_1,8,T_DogChase,NULL,&s_dogchase3};
-statetype s_dogchase3 	= {true,SPR_DOG_W3_1,10,T_DogChase,NULL,&s_dogchase3s};
-statetype s_dogchase3s 	= {true,SPR_DOG_W3_1,3,NULL,NULL,&s_dogchase4};
-statetype s_dogchase4 	= {true,SPR_DOG_W4_1,8,T_DogChase,NULL,&s_dogchase1};
-
-statetype s_dogdie1		= {false,SPR_DOG_DIE_1,15,NULL,A_DeathScream,&s_dogdie2};
-statetype s_dogdie2		= {false,SPR_DOG_DIE_2,15,NULL,NULL,&s_dogdie3};
-statetype s_dogdie3		= {false,SPR_DOG_DIE_3,15,NULL,NULL,&s_dogdead};
-statetype s_dogdead		= {false,SPR_DOG_DEAD,15,NULL,NULL,&s_dogdead};
+statetype s_mutantexpl1		= {false,SPR_MUTANT_DIE2_1,6,NULL,A_Slurpie,&s_mutantexpl2};
+statetype s_mutantexpl2		= {false,SPR_MUTANT_DIE2_2,6,NULL,NULL,&s_mutantexpl3};
+statetype s_mutantexpl3		= {false,SPR_MUTANT_DIE2_3,6,NULL,NULL,&s_mutantexpl4};
+statetype s_mutantexpl4		= {false,SPR_MUTANT_DIE2_4,6,NULL,NULL,&s_mutantexpl5};
+statetype s_mutantexpl5		= {false,SPR_MUTANT_DIE2_5,6,NULL,NULL,&s_mutantexpl6};
+statetype s_mutantexpl6		= {false,SPR_MUTANT_DIE2_6,6,NULL,NULL,&s_mutantexpl7};
+statetype s_mutantexpl7		= {false,SPR_MUTANT_DIE2_7,6,NULL,NULL,&s_mutantexpl8};
+statetype s_mutantexpl8		= {false,SPR_MUTANT_DIE2_8,6,NULL,NULL,&s_mutantexpl9};
+statetype s_mutantexpl9		= {false,SPR_MUTANT_DIE2_9,6,NULL,NULL,&s_mutantexpl9};
 
 
 //
-// officers
+// imp
+//
+void T_ImpBallThrow (objtype *ob);
+
+extern	statetype s_impstand;
+
+extern	statetype s_imppath1;
+extern	statetype s_imppath1s;
+extern	statetype s_imppath2;
+extern	statetype s_imppath3;
+extern	statetype s_imppath3s;
+extern	statetype s_imppath4;
+
+extern	statetype s_imppain;
+
+extern	statetype s_impshoot1;
+extern	statetype s_impshoot2;
+extern	statetype s_impshoot3;
+
+extern	statetype s_impchase1;
+extern	statetype s_impchase1s;
+extern	statetype s_impchase2;
+extern	statetype s_impchase3;
+extern	statetype s_impchase3s;
+extern	statetype s_impchase4;
+
+extern	statetype s_impdie1;
+extern	statetype s_impdie2;
+extern	statetype s_impdie3;
+extern	statetype s_impdie4;
+extern	statetype s_impdie5;
+
+extern	statetype s_impexpl1;
+extern	statetype s_impexpl2;
+extern	statetype s_impexpl3;
+extern	statetype s_impexpl4;
+extern	statetype s_impexpl5;
+extern	statetype s_impexpl6;
+extern	statetype s_impexpl7;
+extern	statetype s_impexpl8;
+
+statetype s_impstand	= {true,SPR_IMP_W1_1,0,T_Stand,NULL,&s_impstand};
+
+statetype s_imppath1	= {true,SPR_IMP_W1_1,20,T_Path,NULL,&s_imppath1s};
+statetype s_imppath1s	= {true,SPR_IMP_W1_1,5,NULL,NULL,&s_imppath2};
+statetype s_imppath2	= {true,SPR_IMP_W2_1,15,T_Path,NULL,&s_imppath3};
+statetype s_imppath3	= {true,SPR_IMP_W3_1,20,T_Path,NULL,&s_imppath3s};
+statetype s_imppath3s	= {true,SPR_IMP_W3_1,5,NULL,NULL,&s_imppath4};
+statetype s_imppath4	= {true,SPR_IMP_W4_1,15,T_Path,NULL,&s_imppath1};
+
+statetype s_imppain	= {true,SPR_IMP_PAIN_1,10,NULL,NULL,&s_impchase1};
+
+statetype s_impshoot1	= {false,SPR_IMP_SHOOT_1,20,NULL,NULL,&s_impshoot2};
+statetype s_impshoot2	= {false,SPR_IMP_SHOOT2_1,20,NULL,T_ImpBallThrow,&s_impshoot3};
+statetype s_impshoot3	= {false,SPR_IMP_SHOOT3_1,20,NULL,NULL,&s_impchase1};
+
+statetype s_impchase1	= {true,SPR_IMP_W1_1,10,T_Chase,NULL,&s_impchase1s};
+statetype s_impchase1s	= {true,SPR_IMP_W1_1,3,NULL,NULL,&s_impchase2};
+statetype s_impchase2	= {true,SPR_IMP_W2_1,8,T_Chase,NULL,&s_impchase3};
+statetype s_impchase3	= {true,SPR_IMP_W3_1,10,T_Chase,NULL,&s_impchase3s};
+statetype s_impchase3s	= {true,SPR_IMP_W3_1,3,NULL,NULL,&s_impchase4};
+statetype s_impchase4	= {true,SPR_IMP_W4_1,8,T_Chase,NULL,&s_impchase1};
+
+statetype s_impdie1	= {false,SPR_IMP_DIE_1,15,NULL,A_DeathScream,&s_impdie2};
+statetype s_impdie2	= {false,SPR_IMP_DIE_2,15,NULL,NULL,&s_impdie3};
+statetype s_impdie3	= {false,SPR_IMP_DIE_3,15,NULL,NULL,&s_impdie4};
+statetype s_impdie4	= {false,SPR_IMP_DIE_4,15,NULL,NULL,&s_impdie5};
+statetype s_impdie5	= {false,SPR_IMP_DEAD,0,NULL,NULL,&s_impdie5};
+
+statetype s_impexpl1	= {false,SPR_IMP_DIE2_1,15,NULL,A_Slurpie,&s_impexpl2};
+statetype s_impexpl2	= {false,SPR_IMP_DIE2_2,15,NULL,NULL,&s_impexpl3};
+statetype s_impexpl3	= {false,SPR_IMP_DIE2_3,15,NULL,NULL,&s_impexpl4};
+statetype s_impexpl4	= {false,SPR_IMP_DIE2_4,15,NULL,NULL,&s_impexpl5};
+statetype s_impexpl5    = {false,SPR_IMP_DIE2_5,15,NULL,NULL,&s_impexpl6};
+statetype s_impexpl6	= {false,SPR_IMP_DIE2_6,15,NULL,NULL,&s_impexpl7};
+statetype s_impexpl7    = {false,SPR_IMP_DIE2_7,15,NULL,NULL,&s_impexpl8};
+statetype s_impexpl8	= {false,SPR_IMP_DIE2_8,0,NULL,NULL,&s_impexpl8};
+
+extern	statetype s_impball1;
+extern	statetype s_impball2;
+extern	statetype s_impballboom1;
+extern	statetype s_impballboom2;
+extern	statetype s_impballboom3;
+
+statetype s_impball1	= {false,SPR_FIRE_1,6,T_Projectile,NULL,&s_impball2};
+statetype s_impball2	= {false,SPR_FIRE_2,6,T_Projectile,NULL,&s_impball1};
+
+statetype s_impballboom1	= {false,SPR_FIRE_BOOM1,6,NULL,NULL,&s_impballboom2};
+statetype s_impballboom2	= {false,SPR_FIRE_BOOM2,6,NULL,NULL,&s_impballboom3};
+statetype s_impballboom3	= {false,SPR_FIRE_BOOM3,6,NULL,NULL,NULL};
+
+void T_ImpBallThrow (objtype *ob)
+{
+	long	deltax,deltay;
+	float	angle;
+	int	iangle;
+
+	deltax = player->x - ob->x;
+	deltay = ob->y - player->y;
+	angle  = atan2 (deltay,deltax);
+	if (angle<0)
+		angle = M_PI*2+angle;
+	iangle = angle/(M_PI*2)*ANGLES;
+
+	GetNewActor();
+	new->state = &s_impball1;
+	new->ticcount = 1;
+
+	new->tilex = ob->tilex;
+	new->tiley = ob->tiley;
+	new->x = ob->x;
+	new->y = ob->y;
+	new->obclass = impballobj;
+	new->dir = nodir;
+	new->angle = iangle;
+	new->speed = 0x2000l;
+
+	new->flags = FL_NONMARK;
+	new->active = true;
+
+	PlaySoundLocActor (IMPFIRESND,new);
+}
+//
+// pain elemental
 //
 
-extern	statetype s_ofcstand;
+extern	statetype s_painstand;
 
-extern	statetype s_ofcpath1;
-extern	statetype s_ofcpath1s;
-extern	statetype s_ofcpath2;
-extern	statetype s_ofcpath3;
-extern	statetype s_ofcpath3s;
-extern	statetype s_ofcpath4;
+extern	statetype s_painpath1;
+extern	statetype s_painpath1s;
+extern	statetype s_painpath2;
+extern	statetype s_painpath3;
+extern	statetype s_painpath3s;
 
-extern	statetype s_ofcpain;
-extern	statetype s_ofcpain1;
+extern	statetype s_painpain;
 
-extern	statetype s_ofcgiveup;
+extern	statetype s_painshoot1;
+extern	statetype s_painshoot2;
+extern	statetype s_painshoot3;
 
-extern	statetype s_ofcshoot1;
-extern	statetype s_ofcshoot2;
-extern	statetype s_ofcshoot3;
-extern	statetype s_ofcshoot4;
+extern	statetype s_painchase1;
+extern	statetype s_painchase1s;
+extern	statetype s_painchase2;
+extern	statetype s_painchase3;
+extern	statetype s_painchase3s;
 
-extern	statetype s_ofcchase1;
-extern	statetype s_ofcchase1s;
-extern	statetype s_ofcchase2;
-extern	statetype s_ofcchase3;
-extern	statetype s_ofcchase3s;
-extern	statetype s_ofcchase4;
+extern	statetype s_paindie1;
+extern	statetype s_paindie2;
+extern	statetype s_paindie3;
+extern	statetype s_paindie4;
+extern	statetype s_paindie5;
 
-extern	statetype s_ofcdie1;
-extern	statetype s_ofcdie2;
-extern	statetype s_ofcdie3;
-extern	statetype s_ofcdie4;
-extern	statetype s_ofcdie5;
+statetype s_painstand	= {true,SPR_PAIN_W1_1,0,T_Stand,NULL,&s_painstand};
 
-statetype s_ofcstand	= {true,SPR_OFC_S_1,0,T_Stand,NULL,&s_ofcstand};
+statetype s_painpath1  	= {true,SPR_PAIN_W1_1,20,T_Path,NULL,&s_painpath1s};
+statetype s_painpath1s	= {true,SPR_PAIN_W1_1,5,NULL,NULL,&s_painpath2};
+statetype s_painpath2	= {true,SPR_PAIN_W2_1,15,T_Path,NULL,&s_painpath3};
+statetype s_painpath3	= {true,SPR_PAIN_W3_1,20,T_Path,NULL,&s_painpath3s};
+statetype s_painpath3s	= {true,SPR_PAIN_W3_1,5,NULL,NULL,&s_painpath1};
 
-statetype s_ofcpath1 	= {true,SPR_OFC_W1_1,20,T_Path,NULL,&s_ofcpath1s};
-statetype s_ofcpath1s 	= {true,SPR_OFC_W1_1,5,NULL,NULL,&s_ofcpath2};
-statetype s_ofcpath2 	= {true,SPR_OFC_W2_1,15,T_Path,NULL,&s_ofcpath3};
-statetype s_ofcpath3 	= {true,SPR_OFC_W3_1,20,T_Path,NULL,&s_ofcpath3s};
-statetype s_ofcpath3s 	= {true,SPR_OFC_W3_1,5,NULL,NULL,&s_ofcpath4};
-statetype s_ofcpath4 	= {true,SPR_OFC_W4_1,15,T_Path,NULL,&s_ofcpath1};
+statetype s_painpain	= {true,SPR_PAIN_PAIN_1,10,NULL,NULL,&s_painchase1};
 
-statetype s_ofcpain 	= {2,SPR_OFC_PAIN_1,10,NULL,NULL,&s_ofcchase1};
-statetype s_ofcpain1 	= {2,SPR_OFC_PAIN_2,10,NULL,NULL,&s_ofcchase1};
+statetype s_painshoot1	= {false,SPR_PAIN_SHOOT_1,20,NULL,NULL,&s_painshoot2};
+statetype s_painshoot2	= {false,SPR_PAIN_SHOOT2_1,20,NULL,A_ShootLostSoul,&s_painshoot3};
+statetype s_painshoot3	= {false,SPR_PAIN_SHOOT3_1,20,NULL,NULL,&s_painchase1};
 
-statetype s_ofcshoot1 	= {false,SPR_OFC_SHOOT1,6,NULL,NULL,&s_ofcshoot2};
-statetype s_ofcshoot2 	= {false,SPR_OFC_SHOOT2,20,NULL,T_Shoot,&s_ofcshoot3};
-statetype s_ofcshoot3 	= {false,SPR_OFC_SHOOT3,10,NULL,NULL,&s_ofcchase1};
+statetype s_painchase1	= {true,SPR_PAIN_W1_1,10,T_Chase,NULL,&s_painchase1s};
+statetype s_painchase1s	= {true,SPR_PAIN_W1_1,3,NULL,NULL,&s_painchase2};
+statetype s_painchase2	= {true,SPR_PAIN_W2_1,8,T_Chase,NULL,&s_painchase3};
+statetype s_painchase3	= {true,SPR_PAIN_W3_1,10,T_Chase,NULL,&s_painchase3s};
+statetype s_painchase3s	= {true,SPR_PAIN_W3_1,3,NULL,NULL,&s_painchase1};
 
-statetype s_ofcchase1 	= {true,SPR_OFC_W1_1,10,T_Chase,NULL,&s_ofcchase1s};
-statetype s_ofcchase1s 	= {true,SPR_OFC_W1_1,3,NULL,NULL,&s_ofcchase2};
-statetype s_ofcchase2 	= {true,SPR_OFC_W2_1,8,T_Chase,NULL,&s_ofcchase3};
-statetype s_ofcchase3 	= {true,SPR_OFC_W3_1,10,T_Chase,NULL,&s_ofcchase3s};
-statetype s_ofcchase3s 	= {true,SPR_OFC_W3_1,3,NULL,NULL,&s_ofcchase4};
-statetype s_ofcchase4 	= {true,SPR_OFC_W4_1,8,T_Chase,NULL,&s_ofcchase1};
+statetype s_paindie1	= {false,SPR_PAIN_DIE_1,15,NULL,A_DeathScream,&s_paindie2};
+statetype s_paindie2	= {false,SPR_PAIN_DIE_2,15,NULL,NULL,&s_paindie3};
+statetype s_paindie3	= {false,SPR_PAIN_DIE_3,15,NULL,A_ShootLostSoul,&s_paindie4};
+statetype s_paindie4	= {false,SPR_PAIN_DIE_4,15,NULL,NULL,&s_paindie5};
+statetype s_paindie5	= {false,SPR_PAIN_DIE_5,15,NULL,NULL,NULL};
 
-statetype s_ofcdie1		= {false,SPR_OFC_DIE_1,11,NULL,A_DeathScream,&s_ofcdie2};
-statetype s_ofcdie2		= {false,SPR_OFC_DIE_2,11,NULL,NULL,&s_ofcdie3};
-statetype s_ofcdie3		= {false,SPR_OFC_DIE_3,11,NULL,NULL,&s_ofcdie4};
-statetype s_ofcdie4		= {false,SPR_OFC_DIE_4,11,NULL,NULL,&s_ofcdie5};
-statetype s_ofcdie5		= {false,SPR_OFC_DEAD,0,NULL,NULL,&s_ofcdie5};
+void A_ShootLostSoul (objtype *ob)
+{
+	unsigned	far *map,tile,hitpoints[4]={100,130,160,190};
+
+	SpawnNewObj (ob->tilex,ob->tiley,&s_soulchase1);
+	new->speed = SPDPATROL*5;
+
+	new->x = ob->x;
+	new->y = ob->y;
+
+	new->distance = ob->distance;
+	new->dir = ob->dir;
+	new->flags = ob->flags | FL_SHOOTABLE;
+
+	new->obclass = soulobj;
+	new->hitpoints = hitpoints[gamestate.difficulty];
+}
+
+//
+// lost soul
+//
+extern	statetype s_soulstand;
+
+extern	statetype s_soulpath1;
+extern	statetype s_soulpath1s;
+extern	statetype s_soulpath2;
+
+extern	statetype s_soulpain;
+
+extern	statetype s_soulshoot1;
+extern	statetype s_soulshoot2;
+
+extern	statetype s_soulchase1;
+extern	statetype s_soulchase1s;
+extern	statetype s_soulchase2;
+
+extern	statetype s_souldie1;
+extern	statetype s_souldie2;
+extern	statetype s_souldie3;
+extern	statetype s_souldie4;
+extern	statetype s_souldie5;
+
+statetype s_soulstand	= {true,SPR_SOUL_W1_1,0,T_Stand,NULL,&s_soulstand};
+
+statetype s_soulpath1	= {true,SPR_SOUL_W1_1,20,T_Path,NULL,&s_soulpath1s};
+statetype s_soulpath1s	= {true,SPR_SOUL_W1_1,5,NULL,NULL,&s_soulpath2};
+statetype s_soulpath2	= {true,SPR_SOUL_W2_1,15,T_Path,NULL,&s_soulpath1};
+
+statetype s_soulpain	= {true,SPR_SOUL_PAIN_1,10,NULL,NULL,&s_soulchase1};
+
+statetype s_soulshoot1	= {false,SPR_SOUL_SHOOT_1,20,NULL,NULL,&s_soulshoot2};
+statetype s_soulshoot2	= {false,SPR_SOUL_SHOOT2_1,20,NULL,T_Bite,&s_soulchase1};
+
+statetype s_soulchase1	= {true,SPR_SOUL_W1_1,10,T_DemonChase,NULL,&s_soulchase1s};
+statetype s_soulchase1s	= {true,SPR_SOUL_W1_1,3,NULL,NULL,&s_soulchase2};
+statetype s_soulchase2	= {true,SPR_SOUL_W2_1,8,T_DemonChase,NULL,&s_soulchase1};
+
+statetype s_souldie1	= {false,SPR_SOUL_DIE_1,15,NULL,A_DeathScream,&s_souldie2};
+statetype s_souldie2	= {false,SPR_SOUL_DIE_2,15,NULL,NULL,&s_souldie3};
+statetype s_souldie3	= {false,SPR_SOUL_DIE_3,15,NULL,NULL,&s_souldie4};
+statetype s_souldie4	= {false,SPR_SOUL_DIE_4,15,NULL,NULL,&s_souldie5};
+statetype s_souldie5	= {false,SPR_SOUL_DIE_5,15,NULL,NULL,NULL};
+
+//
+// demon
+//
+
+extern	statetype s_demonpath1;
+extern	statetype s_demonpath1s;
+extern	statetype s_demonpath2;
+extern	statetype s_demonpath3;
+extern	statetype s_demonpath3s;
+extern	statetype s_demonpath4;
+
+extern	statetype s_demonjump1;
+extern	statetype s_demonjump2;
+extern	statetype s_demonjump3;
+extern	statetype s_demonjump4;
+extern	statetype s_demonjump5;
+
+extern	statetype s_demonpain;
+
+extern	statetype s_demonchase1;
+extern	statetype s_demonchase1s;
+extern	statetype s_demonchase2;
+extern	statetype s_demonchase3;
+extern	statetype s_demonchase3s;
+extern	statetype s_demonchase4;
+
+extern	statetype s_demondie1;
+extern	statetype s_demondie1d;
+extern	statetype s_demondie2;
+extern	statetype s_demondie3;
+extern	statetype s_demondead;
+
+statetype s_demonpath1 	= {true,SPR_DEMON_W1_1,20,T_Path,NULL,&s_demonpath1s};
+statetype s_demonpath1s 	= {true,SPR_DEMON_W1_1,5,NULL,NULL,&s_demonpath2};
+statetype s_demonpath2 	= {true,SPR_DEMON_W2_1,15,T_Path,NULL,&s_demonpath3};
+statetype s_demonpath3 	= {true,SPR_DEMON_W3_1,20,T_Path,NULL,&s_demonpath3s};
+statetype s_demonpath3s 	= {true,SPR_DEMON_W3_1,5,NULL,NULL,&s_demonpath4};
+statetype s_demonpath4 	= {true,SPR_DEMON_W4_1,15,T_Path,NULL,&s_demonpath1};
+
+statetype s_demonjump1 	= {false,SPR_DEMON_JUMP1,10,NULL,NULL,&s_demonjump2};
+statetype s_demonjump2 	= {false,SPR_DEMON_JUMP2,10,NULL,T_Bite,&s_demonjump3};
+statetype s_demonjump3 	= {false,SPR_DEMON_JUMP3,10,NULL,NULL,&s_demonjump4};
+statetype s_demonjump4 	= {false,SPR_DEMON_JUMP1,10,NULL,NULL,&s_demonjump5};
+statetype s_demonjump5 	= {false,SPR_DEMON_W1_1,10,NULL,NULL,&s_demonchase1};
+
+statetype s_demonpain	= {false,SPR_DEMON_DIE_1,10,NULL,NULL,&s_demonchase1};
+
+statetype s_demonchase1 	= {true,SPR_DEMON_W1_1,10,T_DemonChase,NULL,&s_demonchase1s};
+statetype s_demonchase1s 	= {true,SPR_DEMON_W1_1,3,NULL,NULL,&s_demonchase2};
+statetype s_demonchase2 	= {true,SPR_DEMON_W2_1,8,T_DemonChase,NULL,&s_demonchase3};
+statetype s_demonchase3 	= {true,SPR_DEMON_W3_1,10,T_DemonChase,NULL,&s_demonchase3s};
+statetype s_demonchase3s 	= {true,SPR_DEMON_W3_1,3,NULL,NULL,&s_demonchase4};
+statetype s_demonchase4 	= {true,SPR_DEMON_W4_1,8,T_DemonChase,NULL,&s_demonchase1};
+
+statetype s_demondie1		= {false,SPR_DEMON_DIE_1,15,NULL,A_DeathScream,&s_demondie2};
+statetype s_demondie2		= {false,SPR_DEMON_DIE_2,15,NULL,NULL,&s_demondie3};
+statetype s_demondie3		= {false,SPR_DEMON_DIE_3,15,NULL,NULL,&s_demondead};
+statetype s_demondead		= {false,SPR_DEMON_DEAD,15,NULL,NULL,&s_demondead};
 
 
 //
-// mutant
+// chaingun guy
 //
 
-extern	statetype s_mutstand;
+extern	statetype s_chainguystand;
 
-extern	statetype s_mutpath1;
-extern	statetype s_mutpath1s;
-extern	statetype s_mutpath2;
-extern	statetype s_mutpath3;
-extern	statetype s_mutpath3s;
-extern	statetype s_mutpath4;
+extern	statetype s_chainguypath1;
+extern	statetype s_chainguypath1s;
+extern	statetype s_chainguypath2;
+extern	statetype s_chainguypath3;
+extern	statetype s_chainguypath3s;
+extern	statetype s_chainguypath4;
 
-extern	statetype s_mutpain;
-extern	statetype s_mutpain1;
+extern	statetype s_chainguypain;
 
-extern	statetype s_mutgiveup;
+extern	statetype s_chainguyshoot1;
+extern	statetype s_chainguyshoot2;
+extern	statetype s_chainguyshoot3;
 
-extern	statetype s_mutshoot1;
-extern	statetype s_mutshoot2;
-extern	statetype s_mutshoot3;
-extern	statetype s_mutshoot4;
+extern	statetype s_chainguychase1;
+extern	statetype s_chainguychase1s;
+extern	statetype s_chainguychase2;
+extern	statetype s_chainguychase3;
+extern	statetype s_chainguychase3s;
+extern	statetype s_chainguychase4;
 
-extern	statetype s_mutchase1;
-extern	statetype s_mutchase1s;
-extern	statetype s_mutchase2;
-extern	statetype s_mutchase3;
-extern	statetype s_mutchase3s;
-extern	statetype s_mutchase4;
+extern	statetype s_chainguydie1;
+extern	statetype s_chainguydie2;
+extern	statetype s_chainguydie3;
+extern	statetype s_chainguydie4;
+extern	statetype s_chainguydie5;
 
-extern	statetype s_mutdie1;
-extern	statetype s_mutdie2;
-extern	statetype s_mutdie3;
-extern	statetype s_mutdie4;
-extern	statetype s_mutdie5;
+extern	statetype s_chainguyexpl1;
+extern	statetype s_chainguyexpl2;
+extern	statetype s_chainguyexpl3;
+extern	statetype s_chainguyexpl4;
+extern	statetype s_chainguyexpl5;
+extern	statetype s_chainguyexpl6;
 
-statetype s_mutstand	= {true,SPR_MUT_S_1,0,T_Stand,NULL,&s_mutstand};
+statetype s_chainguystand	= {true,SPR_CHAINGUY_W1_1,0,T_Stand,NULL,&s_chainguystand};
 
-statetype s_mutpath1 	= {true,SPR_MUT_W1_1,20,T_Path,NULL,&s_mutpath1s};
-statetype s_mutpath1s 	= {true,SPR_MUT_W1_1,5,NULL,NULL,&s_mutpath2};
-statetype s_mutpath2 	= {true,SPR_MUT_W2_1,15,T_Path,NULL,&s_mutpath3};
-statetype s_mutpath3 	= {true,SPR_MUT_W3_1,20,T_Path,NULL,&s_mutpath3s};
-statetype s_mutpath3s 	= {true,SPR_MUT_W3_1,5,NULL,NULL,&s_mutpath4};
-statetype s_mutpath4 	= {true,SPR_MUT_W4_1,15,T_Path,NULL,&s_mutpath1};
+statetype s_chainguypath1 	= {true,SPR_CHAINGUY_W1_1,20,T_Path,NULL,&s_chainguypath1s};
+statetype s_chainguypath1s 	= {true,SPR_CHAINGUY_W1_1,5,NULL,NULL,&s_chainguypath2};
+statetype s_chainguypath2 	= {true,SPR_CHAINGUY_W2_1,15,T_Path,NULL,&s_chainguypath3};
+statetype s_chainguypath3 	= {true,SPR_CHAINGUY_W3_1,20,T_Path,NULL,&s_chainguypath3s};
+statetype s_chainguypath3s 	= {true,SPR_CHAINGUY_W3_1,5,NULL,NULL,&s_chainguypath4};
+statetype s_chainguypath4 	= {true,SPR_CHAINGUY_W4_1,15,T_Path,NULL,&s_chainguypath1};
 
-statetype s_mutpain 	= {2,SPR_MUT_PAIN_1,10,NULL,NULL,&s_mutchase1};
-statetype s_mutpain1 	= {2,SPR_MUT_PAIN_2,10,NULL,NULL,&s_mutchase1};
+statetype s_chainguypain 	= {true,SPR_CHAINGUY_PAIN_1,10,NULL,NULL,&s_chainguychase1};
 
-statetype s_mutshoot1 	= {false,SPR_MUT_SHOOT1,6,NULL,T_Shoot,&s_mutshoot2};
-statetype s_mutshoot2 	= {false,SPR_MUT_SHOOT2,20,NULL,NULL,&s_mutshoot3};
-statetype s_mutshoot3 	= {false,SPR_MUT_SHOOT3,10,NULL,T_Shoot,&s_mutshoot4};
-statetype s_mutshoot4 	= {false,SPR_MUT_SHOOT4,20,NULL,NULL,&s_mutchase1};
+statetype s_chainguyshoot1 	= {false,SPR_CHAINGUY_SHOOT_1,6,NULL,T_Shoot,&s_chainguyshoot2};
+statetype s_chainguyshoot2 	= {false,SPR_CHAINGUY_SHOOT2_1,20,NULL,T_Shoot,&s_chainguyshoot3};
+statetype s_chainguyshoot3	= {false,SPR_CHAINGUY_SHOOT_1,6,NULL,T_Shoot,&s_chainguychase1};
 
-statetype s_mutchase1 	= {true,SPR_MUT_W1_1,10,T_Chase,NULL,&s_mutchase1s};
-statetype s_mutchase1s 	= {true,SPR_MUT_W1_1,3,NULL,NULL,&s_mutchase2};
-statetype s_mutchase2 	= {true,SPR_MUT_W2_1,8,T_Chase,NULL,&s_mutchase3};
-statetype s_mutchase3 	= {true,SPR_MUT_W3_1,10,T_Chase,NULL,&s_mutchase3s};
-statetype s_mutchase3s 	= {true,SPR_MUT_W3_1,3,NULL,NULL,&s_mutchase4};
-statetype s_mutchase4 	= {true,SPR_MUT_W4_1,8,T_Chase,NULL,&s_mutchase1};
+statetype s_chainguychase1 	= {true,SPR_CHAINGUY_W1_1,10,T_Chase,NULL,&s_chainguychase1s};
+statetype s_chainguychase1s 	= {true,SPR_CHAINGUY_W1_1,3,NULL,NULL,&s_chainguychase2};
+statetype s_chainguychase2 	= {true,SPR_CHAINGUY_W2_1,8,T_Chase,NULL,&s_chainguychase3};
+statetype s_chainguychase3 	= {true,SPR_CHAINGUY_W3_1,10,T_Chase,NULL,&s_chainguychase3s};
+statetype s_chainguychase3s 	= {true,SPR_CHAINGUY_W3_1,3,NULL,NULL,&s_chainguychase4};
+statetype s_chainguychase4 	= {true,SPR_CHAINGUY_W4_1,8,T_Chase,NULL,&s_chainguychase1};
 
-statetype s_mutdie1		= {false,SPR_MUT_DIE_1,7,NULL,A_DeathScream,&s_mutdie2};
-statetype s_mutdie2		= {false,SPR_MUT_DIE_2,7,NULL,NULL,&s_mutdie3};
-statetype s_mutdie3		= {false,SPR_MUT_DIE_3,7,NULL,NULL,&s_mutdie4};
-statetype s_mutdie4		= {false,SPR_MUT_DIE_4,7,NULL,NULL,&s_mutdie5};
-statetype s_mutdie5		= {false,SPR_MUT_DEAD,0,NULL,NULL,&s_mutdie5};
+statetype s_chainguydie1		= {false,SPR_CHAINGUY_DIE_1,11,NULL,A_DeathScream,&s_chainguydie2};
+statetype s_chainguydie2		= {false,SPR_CHAINGUY_DIE_2,11,NULL,NULL,&s_chainguydie3};
+statetype s_chainguydie3		= {false,SPR_CHAINGUY_DIE_3,11,NULL,NULL,&s_chainguydie4};
+statetype s_chainguydie4		= {false,SPR_CHAINGUY_DIE_4,11,NULL,NULL,&s_chainguydie5};
+statetype s_chainguydie5		= {false,SPR_CHAINGUY_DEAD,0,NULL,NULL,&s_chainguydie5};
 
-
-//
-// SS
-//
-
-extern	statetype s_ssstand;
-
-extern	statetype s_sspath1;
-extern	statetype s_sspath1s;
-extern	statetype s_sspath2;
-extern	statetype s_sspath3;
-extern	statetype s_sspath3s;
-extern	statetype s_sspath4;
-
-extern	statetype s_sspain;
-extern	statetype s_sspain1;
-
-extern	statetype s_ssshoot1;
-extern	statetype s_ssshoot2;
-extern	statetype s_ssshoot3;
-extern	statetype s_ssshoot4;
-extern	statetype s_ssshoot5;
-extern	statetype s_ssshoot6;
-extern	statetype s_ssshoot7;
-extern	statetype s_ssshoot8;
-extern	statetype s_ssshoot9;
-
-extern	statetype s_sschase1;
-extern	statetype s_sschase1s;
-extern	statetype s_sschase2;
-extern	statetype s_sschase3;
-extern	statetype s_sschase3s;
-extern	statetype s_sschase4;
-
-extern	statetype s_ssdie1;
-extern	statetype s_ssdie2;
-extern	statetype s_ssdie3;
-extern	statetype s_ssdie4;
-
-statetype s_ssstand	= {true,SPR_SS_S_1,0,T_Stand,NULL,&s_ssstand};
-
-statetype s_sspath1 	= {true,SPR_SS_W1_1,20,T_Path,NULL,&s_sspath1s};
-statetype s_sspath1s 	= {true,SPR_SS_W1_1,5,NULL,NULL,&s_sspath2};
-statetype s_sspath2 	= {true,SPR_SS_W2_1,15,T_Path,NULL,&s_sspath3};
-statetype s_sspath3 	= {true,SPR_SS_W3_1,20,T_Path,NULL,&s_sspath3s};
-statetype s_sspath3s 	= {true,SPR_SS_W3_1,5,NULL,NULL,&s_sspath4};
-statetype s_sspath4 	= {true,SPR_SS_W4_1,15,T_Path,NULL,&s_sspath1};
-
-statetype s_sspain 		= {2,SPR_SS_PAIN_1,10,NULL,NULL,&s_sschase1};
-statetype s_sspain1 	= {2,SPR_SS_PAIN_2,10,NULL,NULL,&s_sschase1};
-
-statetype s_ssshoot1 	= {false,SPR_SS_SHOOT1,20,NULL,NULL,&s_ssshoot2};
-statetype s_ssshoot2 	= {false,SPR_SS_SHOOT2,20,NULL,T_Shoot,&s_ssshoot3};
-statetype s_ssshoot3 	= {false,SPR_SS_SHOOT3,10,NULL,NULL,&s_ssshoot4};
-statetype s_ssshoot4 	= {false,SPR_SS_SHOOT2,10,NULL,T_Shoot,&s_ssshoot5};
-statetype s_ssshoot5 	= {false,SPR_SS_SHOOT3,10,NULL,NULL,&s_ssshoot6};
-statetype s_ssshoot6 	= {false,SPR_SS_SHOOT2,10,NULL,T_Shoot,&s_ssshoot7};
-statetype s_ssshoot7  	= {false,SPR_SS_SHOOT3,10,NULL,NULL,&s_ssshoot8};
-statetype s_ssshoot8  	= {false,SPR_SS_SHOOT2,10,NULL,T_Shoot,&s_ssshoot9};
-statetype s_ssshoot9  	= {false,SPR_SS_SHOOT3,10,NULL,NULL,&s_sschase1};
-
-statetype s_sschase1 	= {true,SPR_SS_W1_1,10,T_Chase,NULL,&s_sschase1s};
-statetype s_sschase1s 	= {true,SPR_SS_W1_1,3,NULL,NULL,&s_sschase2};
-statetype s_sschase2 	= {true,SPR_SS_W2_1,8,T_Chase,NULL,&s_sschase3};
-statetype s_sschase3 	= {true,SPR_SS_W3_1,10,T_Chase,NULL,&s_sschase3s};
-statetype s_sschase3s 	= {true,SPR_SS_W3_1,3,NULL,NULL,&s_sschase4};
-statetype s_sschase4 	= {true,SPR_SS_W4_1,8,T_Chase,NULL,&s_sschase1};
-
-statetype s_ssdie1		= {false,SPR_SS_DIE_1,15,NULL,A_DeathScream,&s_ssdie2};
-statetype s_ssdie2		= {false,SPR_SS_DIE_2,15,NULL,NULL,&s_ssdie3};
-statetype s_ssdie3		= {false,SPR_SS_DIE_3,15,NULL,NULL,&s_ssdie4};
-statetype s_ssdie4		= {false,SPR_SS_DEAD,0,NULL,NULL,&s_ssdie4};
-
-
-#ifndef SPEAR
-//
-// hans
-//
-extern	statetype s_bossstand;
-
-extern	statetype s_bosschase1;
-extern	statetype s_bosschase1s;
-extern	statetype s_bosschase2;
-extern	statetype s_bosschase3;
-extern	statetype s_bosschase3s;
-extern	statetype s_bosschase4;
-
-extern	statetype s_bossdie1;
-extern	statetype s_bossdie2;
-extern	statetype s_bossdie3;
-extern	statetype s_bossdie4;
-
-extern	statetype s_bossshoot1;
-extern	statetype s_bossshoot2;
-extern	statetype s_bossshoot3;
-extern	statetype s_bossshoot4;
-extern	statetype s_bossshoot5;
-extern	statetype s_bossshoot6;
-extern	statetype s_bossshoot7;
-extern	statetype s_bossshoot8;
-
-
-statetype s_bossstand	= {false,SPR_BOSS_W1,0,T_Stand,NULL,&s_bossstand};
-
-statetype s_bosschase1 	= {false,SPR_BOSS_W1,10,T_Chase,NULL,&s_bosschase1s};
-statetype s_bosschase1s	= {false,SPR_BOSS_W1,3,NULL,NULL,&s_bosschase2};
-statetype s_bosschase2 	= {false,SPR_BOSS_W2,8,T_Chase,NULL,&s_bosschase3};
-statetype s_bosschase3 	= {false,SPR_BOSS_W3,10,T_Chase,NULL,&s_bosschase3s};
-statetype s_bosschase3s	= {false,SPR_BOSS_W3,3,NULL,NULL,&s_bosschase4};
-statetype s_bosschase4 	= {false,SPR_BOSS_W4,8,T_Chase,NULL,&s_bosschase1};
-
-statetype s_bossdie1	= {false,SPR_BOSS_DIE1,15,NULL,A_DeathScream,&s_bossdie2};
-statetype s_bossdie2	= {false,SPR_BOSS_DIE2,15,NULL,NULL,&s_bossdie3};
-statetype s_bossdie3	= {false,SPR_BOSS_DIE3,15,NULL,NULL,&s_bossdie4};
-statetype s_bossdie4	= {false,SPR_BOSS_DEAD,0,NULL,NULL,&s_bossdie4};
-
-statetype s_bossshoot1 	= {false,SPR_BOSS_SHOOT1,30,NULL,NULL,&s_bossshoot2};
-statetype s_bossshoot2 	= {false,SPR_BOSS_SHOOT2,10,NULL,T_Shoot,&s_bossshoot3};
-statetype s_bossshoot3 	= {false,SPR_BOSS_SHOOT3,10,NULL,T_Shoot,&s_bossshoot4};
-statetype s_bossshoot4 	= {false,SPR_BOSS_SHOOT2,10,NULL,T_Shoot,&s_bossshoot5};
-statetype s_bossshoot5 	= {false,SPR_BOSS_SHOOT3,10,NULL,T_Shoot,&s_bossshoot6};
-statetype s_bossshoot6 	= {false,SPR_BOSS_SHOOT2,10,NULL,T_Shoot,&s_bossshoot7};
-statetype s_bossshoot7 	= {false,SPR_BOSS_SHOOT3,10,NULL,T_Shoot,&s_bossshoot8};
-statetype s_bossshoot8 	= {false,SPR_BOSS_SHOOT1,10,NULL,NULL,&s_bosschase1};
+statetype s_chainguyexpl1	= {false,SPR_CHAINGUY_DIE2_1,11,NULL,A_Slurpie,&s_chainguyexpl2};
+statetype s_chainguyexpl2	= {false,SPR_CHAINGUY_DIE2_2,11,NULL,NULL,&s_chainguyexpl3};
+statetype s_chainguyexpl3	= {false,SPR_CHAINGUY_DIE2_3,11,NULL,NULL,&s_chainguyexpl4};
+statetype s_chainguyexpl4	= {false,SPR_CHAINGUY_DIE2_4,11,NULL,NULL,&s_chainguyexpl5};
+statetype s_chainguyexpl5	= {false,SPR_CHAINGUY_DIE2_5,11,NULL,NULL,&s_chainguyexpl6};
+statetype s_chainguyexpl6	= {false,SPR_CHAINGUY_DIE2_6,0,NULL,NULL,&s_chainguyexpl6};
 
 
 //
-// gretel
+// shotgun guy
 //
-extern	statetype s_gretelstand;
 
-extern	statetype s_gretelchase1;
-extern	statetype s_gretelchase1s;
-extern	statetype s_gretelchase2;
-extern	statetype s_gretelchase3;
-extern	statetype s_gretelchase3s;
-extern	statetype s_gretelchase4;
+extern	statetype s_shotguystand;
 
-extern	statetype s_greteldie1;
-extern	statetype s_greteldie2;
-extern	statetype s_greteldie3;
-extern	statetype s_greteldie4;
+extern	statetype s_shotguypath1;
+extern	statetype s_shotguypath1s;
+extern	statetype s_shotguypath2;
+extern	statetype s_shotguypath3;
+extern	statetype s_shotguypath3s;
+extern	statetype s_shotguypath4;
 
-extern	statetype s_gretelshoot1;
-extern	statetype s_gretelshoot2;
-extern	statetype s_gretelshoot3;
-extern	statetype s_gretelshoot4;
-extern	statetype s_gretelshoot5;
-extern	statetype s_gretelshoot6;
-extern	statetype s_gretelshoot7;
-extern	statetype s_gretelshoot8;
+extern	statetype s_shotguypain;
+
+extern	statetype s_shotguyshoot1;
+extern	statetype s_shotguyshoot2;
+
+extern	statetype s_shotguychase1;
+extern	statetype s_shotguychase1s;
+extern	statetype s_shotguychase2;
+extern	statetype s_shotguychase3;
+extern	statetype s_shotguychase3s;
+extern	statetype s_shotguychase4;
+
+extern	statetype s_shotguydie1;
+extern	statetype s_shotguydie2;
+extern	statetype s_shotguydie3;
+extern	statetype s_shotguydie4;
+extern	statetype s_shotguydie5;
+
+extern	statetype s_shotguyexpl1;
+extern	statetype s_shotguyexpl2;
+extern	statetype s_shotguyexpl3;
+extern	statetype s_shotguyexpl4;
+extern	statetype s_shotguyexpl5;
+extern	statetype s_shotguyexpl6;
+extern	statetype s_shotguyexpl7;
+extern	statetype s_shotguyexpl8;
+extern	statetype s_shotguyexpl9;
+
+statetype s_shotguystand	= {true,SPR_SHOTGUY_W1_1,0,T_Stand,NULL,&s_shotguystand};
+
+statetype s_shotguypath1 	= {true,SPR_SHOTGUY_W1_1,20,T_Path,NULL,&s_shotguypath1s};
+statetype s_shotguypath1s 	= {true,SPR_SHOTGUY_W1_1,5,NULL,NULL,&s_shotguypath2};
+statetype s_shotguypath2 	= {true,SPR_SHOTGUY_W2_1,15,T_Path,NULL,&s_shotguypath3};
+statetype s_shotguypath3 	= {true,SPR_SHOTGUY_W3_1,20,T_Path,NULL,&s_shotguypath3s};
+statetype s_shotguypath3s 	= {true,SPR_SHOTGUY_W3_1,5,NULL,NULL,&s_shotguypath4};
+statetype s_shotguypath4 	= {true,SPR_SHOTGUY_W4_1,15,T_Path,NULL,&s_shotguypath1};
+
+statetype s_shotguypain 	= {true,SPR_SHOTGUY_PAIN_1,10,NULL,NULL,&s_shotguychase1};
+
+statetype s_shotguyshoot1 	= {false,SPR_SHOTGUY_SHOOT_1,20,NULL,T_Shoot,&s_shotguyshoot2};
+statetype s_shotguyshoot2 	= {false,SPR_SHOTGUY_SHOOT2_1,20,NULL,NULL,&s_shotguychase1};
+
+statetype s_shotguychase1 	= {true,SPR_SHOTGUY_W1_1,10,T_Chase,NULL,&s_shotguychase1s};
+statetype s_shotguychase1s 	= {true,SPR_SHOTGUY_W1_1,3,NULL,NULL,&s_shotguychase2};
+statetype s_shotguychase2 	= {true,SPR_SHOTGUY_W2_1,8,T_Chase,NULL,&s_shotguychase3};
+statetype s_shotguychase3 	= {true,SPR_SHOTGUY_W3_1,10,T_Chase,NULL,&s_shotguychase3s};
+statetype s_shotguychase3s 	= {true,SPR_SHOTGUY_W3_1,3,NULL,NULL,&s_shotguychase4};
+statetype s_shotguychase4 	= {true,SPR_SHOTGUY_W4_1,8,T_Chase,NULL,&s_shotguychase1};
+
+statetype s_shotguydie1		= {false,SPR_SHOTGUY_DIE_1,7,NULL,A_DeathScream,&s_shotguydie2};
+statetype s_shotguydie2		= {false,SPR_SHOTGUY_DIE_2,7,NULL,NULL,&s_shotguydie3};
+statetype s_shotguydie3		= {false,SPR_SHOTGUY_DIE_3,7,NULL,NULL,&s_shotguydie4};
+statetype s_shotguydie4		= {false,SPR_SHOTGUY_DIE_4,7,NULL,NULL,&s_shotguydie5};
+statetype s_shotguydie5		= {false,SPR_SHOTGUY_DEAD,0,NULL,NULL,&s_shotguydie5};
+
+statetype s_shotguyexpl1	= {false,SPR_SHOTGUY_DIE2_1,7,NULL,A_Slurpie,&s_shotguyexpl2};
+statetype s_shotguyexpl2	= {false,SPR_SHOTGUY_DIE2_2,7,NULL,NULL,&s_shotguyexpl3};
+statetype s_shotguyexpl3	= {false,SPR_SHOTGUY_DIE2_3,7,NULL,NULL,&s_shotguyexpl4};
+statetype s_shotguyexpl4	= {false,SPR_SHOTGUY_DIE2_4,7,NULL,NULL,&s_shotguyexpl5};
+statetype s_shotguyexpl5	= {false,SPR_SHOTGUY_DIE2_5,7,NULL,NULL,&s_shotguyexpl6};
+statetype s_shotguyexpl6	= {false,SPR_SHOTGUY_DIE2_6,7,NULL,NULL,&s_shotguyexpl7};
+statetype s_shotguyexpl7	= {false,SPR_SHOTGUY_DIE2_7,7,NULL,NULL,&s_shotguyexpl8};
+statetype s_shotguyexpl8	= {false,SPR_SHOTGUY_DIE2_8,7,NULL,NULL,&s_shotguyexpl9};
+statetype s_shotguyexpl9	= {false,SPR_SHOTGUY_DIE2_9,0,NULL,NULL,&s_shotguyexpl9};
 
 
-statetype s_gretelstand	= {false,SPR_GRETEL_W1,0,T_Stand,NULL,&s_gretelstand};
+//
+// Cacodemon
+//
+void T_CacoBallThrow (objtype *ob);
 
-statetype s_gretelchase1 	= {false,SPR_GRETEL_W1,10,T_Chase,NULL,&s_gretelchase1s};
-statetype s_gretelchase1s	= {false,SPR_GRETEL_W1,3,NULL,NULL,&s_gretelchase2};
-statetype s_gretelchase2 	= {false,SPR_GRETEL_W2,8,T_Chase,NULL,&s_gretelchase3};
-statetype s_gretelchase3 	= {false,SPR_GRETEL_W3,10,T_Chase,NULL,&s_gretelchase3s};
-statetype s_gretelchase3s	= {false,SPR_GRETEL_W3,3,NULL,NULL,&s_gretelchase4};
-statetype s_gretelchase4 	= {false,SPR_GRETEL_W4,8,T_Chase,NULL,&s_gretelchase1};
+extern	statetype s_cacostand;
 
-statetype s_greteldie1	= {false,SPR_GRETEL_DIE1,15,NULL,A_DeathScream,&s_greteldie2};
-statetype s_greteldie2	= {false,SPR_GRETEL_DIE2,15,NULL,NULL,&s_greteldie3};
-statetype s_greteldie3	= {false,SPR_GRETEL_DIE3,15,NULL,NULL,&s_greteldie4};
-statetype s_greteldie4	= {false,SPR_GRETEL_DEAD,0,NULL,NULL,&s_greteldie4};
+extern	statetype s_cacopath1;
+extern	statetype s_cacopath1s;
 
-statetype s_gretelshoot1 	= {false,SPR_GRETEL_SHOOT1,30,NULL,NULL,&s_gretelshoot2};
-statetype s_gretelshoot2 	= {false,SPR_GRETEL_SHOOT2,10,NULL,T_Shoot,&s_gretelshoot3};
-statetype s_gretelshoot3 	= {false,SPR_GRETEL_SHOOT3,10,NULL,T_Shoot,&s_gretelshoot4};
-statetype s_gretelshoot4 	= {false,SPR_GRETEL_SHOOT2,10,NULL,T_Shoot,&s_gretelshoot5};
-statetype s_gretelshoot5 	= {false,SPR_GRETEL_SHOOT3,10,NULL,T_Shoot,&s_gretelshoot6};
-statetype s_gretelshoot6 	= {false,SPR_GRETEL_SHOOT2,10,NULL,T_Shoot,&s_gretelshoot7};
-statetype s_gretelshoot7 	= {false,SPR_GRETEL_SHOOT3,10,NULL,T_Shoot,&s_gretelshoot8};
-statetype s_gretelshoot8 	= {false,SPR_GRETEL_SHOOT1,10,NULL,NULL,&s_gretelchase1};
-#endif
+extern	statetype s_cacopain;
+
+extern	statetype s_cacoshoot1;
+extern	statetype s_cacoshoot2;
+extern	statetype s_cacoshoot3;
+extern	statetype s_cacoshoot4;
+
+extern	statetype s_cacochase1;
+extern	statetype s_cacochase1s;
+
+extern	statetype s_cacodie1;
+extern	statetype s_cacodie2;
+extern	statetype s_cacodie3;
+extern	statetype s_cacodie4;
+
+statetype s_cacostand	= {true,SPR_CACO_W1_1,0,T_Stand,NULL,&s_cacostand};
+
+statetype s_cacopath1 	= {true,SPR_CACO_W1_1,20,T_Path,NULL,&s_cacopath1s};
+statetype s_cacopath1s 	= {true,SPR_CACO_W1_1,5,NULL,NULL,&s_cacopath1};
+
+statetype s_cacopain 	= {true,SPR_CACO_PAIN_1,10,NULL,NULL,&s_cacochase1};
+
+statetype s_cacoshoot1 	= {false,SPR_CACO_SHOOT1,20,NULL,NULL,&s_cacoshoot2};
+statetype s_cacoshoot2 	= {false,SPR_CACO_SHOOT2,20,NULL,T_CacoBallThrow,&s_cacoshoot3};
+statetype s_cacoshoot3 	= {false,SPR_CACO_SHOOT3,10,NULL,NULL,&s_cacoshoot4};
+statetype s_cacoshoot4	= {false,SPR_CACO_SHOOT4,10,NULL,NULL,&s_cacochase1};
+
+statetype s_cacochase1 	= {true,SPR_CACO_W1_1,10,T_Chase,NULL,&s_cacochase1s};
+statetype s_cacochase1s 	= {true,SPR_CACO_W1_1,3,NULL,NULL,&s_cacochase1};
+
+statetype s_cacodie1		= {false,SPR_CACO_DIE_1,15,NULL,A_DeathScream,&s_cacodie2};
+statetype s_cacodie2		= {false,SPR_CACO_DIE_2,15,NULL,NULL,&s_cacodie3};
+statetype s_cacodie3		= {false,SPR_CACO_DIE_3,15,NULL,NULL,&s_cacodie4};
+statetype s_cacodie4		= {false,SPR_CACO_DEAD,0,NULL,NULL,&s_cacodie4};
+
+extern	statetype s_cacoball1;
+extern	statetype s_cacoball2;
+extern	statetype s_cacoballboom1;
+extern	statetype s_cacoballboom2;
+extern	statetype s_cacoballboom3;
+
+statetype s_cacoball1	= {false,SPR_FIRE2_1,6,T_Projectile,NULL,&s_cacoball2};
+statetype s_cacoball2	= {false,SPR_FIRE2_2,6,T_Projectile,NULL,&s_cacoball1};
+
+statetype s_cacoballboom1	= {false,SPR_FIRE2_BOOM1,6,NULL,NULL,&s_cacoballboom2};
+statetype s_cacoballboom2	= {false,SPR_FIRE2_BOOM2,6,NULL,NULL,&s_cacoballboom3};
+statetype s_cacoballboom3	= {false,SPR_FIRE2_BOOM3,6,NULL,NULL,NULL};
+
+void T_CacoBallThrow (objtype *ob)
+{
+	long	deltax,deltay;
+	float	angle;
+	int	iangle;
+
+	deltax = player->x - ob->x;
+	deltay = ob->y - player->y;
+	angle = atan2 (deltay,deltax);
+	if (angle<0)
+		angle = M_PI*2+angle;
+	iangle = angle/(M_PI*2)*ANGLES;
+
+	GetNewActor ();
+	new->state = &s_cacoball1;
+	new->ticcount = 1;
+
+	new->tilex = ob->tilex;
+	new->tiley = ob->tiley;
+	new->x = ob->x;
+	new->y = ob->y;
+	new->obclass = cacoballobj;
+	new->dir = nodir;
+	new->angle = iangle;
+	new->speed = 0x2000l;
+
+	new->flags = FL_NONMARK;
+	new->active = true;
+
+	PlaySoundLocActor (IMPFIRESND,new);
+}
+//
+// cyber-demon
+//
+
+void T_MissileThrow (objtype *ob);
+
+extern	statetype s_cyberstand;
+
+extern	statetype s_cyberchase1;
+extern	statetype s_cyberchase1s;
+extern	statetype s_cyberchase2;
+extern	statetype s_cyberchase3;
+extern	statetype s_cyberchase3s;
+extern	statetype s_cyberchase4;
+
+extern	statetype s_cyberdie1;
+extern	statetype s_cyberdie2;
+extern	statetype s_cyberdie3;
+extern	statetype s_cyberdie4;
+extern	statetype s_cyberdie5;
+extern	statetype s_cyberdie6;
+extern	statetype s_cyberdie7;
+extern	statetype s_cyberdie8;
+extern	statetype s_cyberdie9;
+extern	statetype s_cyberdie10;
+
+extern	statetype s_cybershoot1;
+extern	statetype s_cybershoot2;
 
 
-/*
-===============
-=
-= SpawnStand
-=
-===============
-*/
+statetype s_cyberstand	= {true,SPR_CYBER_W1_1,0,T_Stand,NULL,&s_cyberstand};
+
+statetype s_cyberchase1 	= {true,SPR_CYBER_W1_1,10,T_Chase,A_MechaSound,&s_cyberchase1s};
+statetype s_cyberchase1s	= {true,SPR_CYBER_W1_1,3,NULL,NULL,&s_cyberchase2};
+statetype s_cyberchase2 	= {true,SPR_CYBER_W2_1,8,T_Chase,NULL,&s_cyberchase3};
+statetype s_cyberchase3 	= {true,SPR_CYBER_W3_1,10,T_Chase,A_MechaSound,&s_cyberchase3s};
+statetype s_cyberchase3s	= {true,SPR_CYBER_W3_1,3,NULL,NULL,&s_cyberchase4};
+statetype s_cyberchase4 	= {true,SPR_CYBER_W4_1,8,T_Chase,NULL,&s_cyberchase1};
+
+statetype s_cyberdie1	= {true,SPR_CYBER_DIE_1,15,NULL,A_DeathScream,&s_cyberdie2};
+statetype s_cyberdie2	= {false,SPR_CYBER_DIE2,15,NULL,NULL,&s_cyberdie3};
+statetype s_cyberdie3	= {false,SPR_CYBER_DIE3,15,NULL,NULL,&s_cyberdie4};
+statetype s_cyberdie4	= {false,SPR_CYBER_DIE4,15,NULL,NULL,&s_cyberdie5};
+statetype s_cyberdie5	= {false,SPR_CYBER_DIE5,15,NULL,NULL,&s_cyberdie6};
+statetype s_cyberdie6	= {false,SPR_CYBER_DIE6,15,NULL,NULL,&s_cyberdie7};
+statetype s_cyberdie7	= {false,SPR_CYBER_DIE7,15,NULL,NULL,&s_cyberdie8};
+statetype s_cyberdie8	= {false,SPR_CYBER_DIE8,15,NULL,NULL,&s_cyberdie9};
+statetype s_cyberdie9	= {false,SPR_CYBER_DIE9,15,NULL,NULL,&s_cyberdie10};
+statetype s_cyberdie10	= {false,SPR_CYBER_DEAD,0,NULL,NULL,&s_cyberdie10};
+
+statetype s_cybershoot1 	= {false,SPR_CYBER_SHOOT_1,30,NULL,NULL,&s_cybershoot2};
+statetype s_cybershoot2 	= {false,SPR_CYBER_SHOOT2_1,10,NULL,T_MissileThrow,&s_cyberchase1};
+
+void T_MissileThrow (objtype *ob)
+{
+   long   deltax,deltay;
+   float   angle;
+   int      iangle;
+
+   deltax = player->x - ob->x;
+   deltay = ob->y - player->y;
+   angle = atan2 (deltay,deltax);
+   if (angle<0)
+      angle = M_PI*2+angle;
+   iangle = angle/(M_PI*2)*ANGLES;
+
+   GetNewActor ();
+   new->state = &s_rocket;
+   new->ticcount = 1;
+
+   new->tilex = ob->tilex;
+   new->tiley = ob->tiley;
+   new->x = ob->x;
+   new->y = ob->y;
+   new->obclass = rocketobj;
+   new->dir = nodir;
+   new->angle = iangle;
+   new->speed = 0x2000l;
+
+   new->flags = FL_NONMARK;
+   new->active = true;
+
+   PlaySoundLocActor (RLAUNCHERFIRESND,new);   //Change to the sound you want.
+}
 
 void SpawnStand (enemy_t which, int tilex, int tiley, int dir)
 {
@@ -850,35 +1274,52 @@ void SpawnStand (enemy_t which, int tilex, int tiley, int dir)
 
 	switch (which)
 	{
-	case en_guard:
-		SpawnNewObj (tilex,tiley,&s_grdstand);
-		new->speed = SPDPATROL;
-		if (!loadedgame)
-		  gamestate.killtotal++;
-		break;
-
-	case en_officer:
-		SpawnNewObj (tilex,tiley,&s_ofcstand);
-		new->speed = SPDPATROL;
-		if (!loadedgame)
-		  gamestate.killtotal++;
-		break;
-
 	case en_mutant:
-		SpawnNewObj (tilex,tiley,&s_mutstand);
+		SpawnNewObj (tilex,tiley,&s_mutantstand);
+		new->speed = SPDPATROL;
+		if (!loadedgame)
+		  gamestate.killtotal++;
+		break;
+	case en_imp:
+		SpawnNewObj (tilex,tiley,&s_impstand);
+		new->speed = SPDPATROL;
+		if (!loadedgame)
+			gamestate.killtotal++;
+		break;
+	case en_painelemental:
+		SpawnNewObj (tilex,tiley,&s_painstand);
+		new->speed = SPDPATROL;
+		if (!loadedgame)
+			gamestate.killtotal++;
+		break;
+	case en_lostsoul:
+		SpawnNewObj (tilex,tiley,&s_soulstand);
+		new->speed = SPDPATROL;
+		if (!loadedgame)
+			gamestate.killtotal++;
+		break;
+
+	case en_chaingunguy:
+		SpawnNewObj (tilex,tiley,&s_chainguystand);
 		new->speed = SPDPATROL;
 		if (!loadedgame)
 		  gamestate.killtotal++;
 		break;
 
-	case en_ss:
-		SpawnNewObj (tilex,tiley,&s_ssstand);
+	case en_shotgunguy:
+		SpawnNewObj (tilex,tiley,&s_shotguystand);
+		new->speed = SPDPATROL;
+		if (!loadedgame)
+		  gamestate.killtotal++;
+		break;
+
+	case en_cacodemon:
+		SpawnNewObj (tilex,tiley,&s_cacostand);
 		new->speed = SPDPATROL;
 		if (!loadedgame)
 		  gamestate.killtotal++;
 		break;
 	}
-
 
 	map = mapsegs[0]+farmapylookup[tiley]+tilex;
 	if (*map == AMBUSHTILE)
@@ -900,127 +1341,91 @@ void SpawnStand (enemy_t which, int tilex, int tiley, int dir)
 		new->flags |= FL_AMBUSH;
 	}
 
-	new->obclass = guardobj+which;
+	new->obclass = mutantobj+which;
 	new->hitpoints = starthitpoints[gamestate.difficulty][which];
 	new->dir = dir*2;
 	new->flags |= FL_SHOOTABLE;
 }
 
-
-
-/*
-===============
-=
-= SpawnDeadGuard
-=
-===============
-*/
-
 void SpawnDeadGuard (int tilex, int tiley)
 {
-	SpawnNewObj (tilex,tiley,&s_grddie4);
+	SpawnNewObj (tilex,tiley,&s_mutantdie4);
 	new->obclass = inertobj;
 }
 
-
-
-#ifndef SPEAR
-/*
-===============
-=
-= SpawnBoss
-=
-===============
-*/
-
-void SpawnBoss (int tilex, int tiley)
+void SpawnCyber (int tilex, int tiley)
 {
 	unsigned	far *map,tile;
 
-	SpawnNewObj (tilex,tiley,&s_bossstand);
+	SpawnNewObj (tilex,tiley,&s_cyberstand);
 	new->speed = SPDPATROL;
 
-	new->obclass = bossobj;
-	new->hitpoints = starthitpoints[gamestate.difficulty][en_boss];
-	new->dir = south;
+	new->obclass = cyberobj;
+	new->hitpoints = starthitpoints[gamestate.difficulty][en_cyber];
+	new->dir = nodir;
 	new->flags |= FL_SHOOTABLE|FL_AMBUSH;
 	if (!loadedgame)
 	  gamestate.killtotal++;
 }
-
-/*
-===============
-=
-= SpawnGretel
-=
-===============
-*/
-
-void SpawnGretel (int tilex, int tiley)
-{
-	unsigned	far *map,tile;
-
-	SpawnNewObj (tilex,tiley,&s_gretelstand);
-	new->speed = SPDPATROL;
-
-	new->obclass = gretelobj;
-	new->hitpoints = starthitpoints[gamestate.difficulty][en_gretel];
-	new->dir = north;
-	new->flags |= FL_SHOOTABLE|FL_AMBUSH;
-	if (!loadedgame)
-	  gamestate.killtotal++;
-}
-#endif
-
-/*
-===============
-=
-= SpawnPatrol
-=
-===============
-*/
 
 void SpawnPatrol (enemy_t which, int tilex, int tiley, int dir)
 {
 	switch (which)
 	{
-	case en_guard:
-		SpawnNewObj (tilex,tiley,&s_grdpath1);
-		new->speed = SPDPATROL;
-		if (!loadedgame)
-		  gamestate.killtotal++;
-		break;
-
-	case en_officer:
-		SpawnNewObj (tilex,tiley,&s_ofcpath1);
-		new->speed = SPDPATROL;
-		if (!loadedgame)
-		  gamestate.killtotal++;
-		break;
-
-	case en_ss:
-		SpawnNewObj (tilex,tiley,&s_sspath1);
-		new->speed = SPDPATROL;
-		if (!loadedgame)
-		  gamestate.killtotal++;
-		break;
-
 	case en_mutant:
-		SpawnNewObj (tilex,tiley,&s_mutpath1);
+		SpawnNewObj (tilex,tiley,&s_mutantpath1);
+		new->speed = SPDPATROL;
+		if (!loadedgame)
+		  gamestate.killtotal++;
+		break;
+	case en_imp:
+		SpawnNewObj (tilex,tiley,&s_imppath1);
+		new->speed = SPDPATROL;
+		if (!loadedgame)
+			gamestate.killtotal++;
+		break;
+	case en_painelemental:
+		SpawnNewObj (tilex,tiley,&s_painpath1);
+		new->speed = SPDPATROL;
+		if (!loadedgame)
+			gamestate.killtotal++;
+		break;
+	case en_lostsoul:
+		SpawnNewObj (tilex,tiley,&s_soulpath1);
+		new->speed = SPDPATROL;
+		if (!loadedgame)
+			gamestate.killtotal++;
+		break;
+	case en_chaingunguy:
+		SpawnNewObj (tilex,tiley,&s_chainguypath1);
 		new->speed = SPDPATROL;
 		if (!loadedgame)
 		  gamestate.killtotal++;
 		break;
 
-	case en_dog:
-		SpawnNewObj (tilex,tiley,&s_dogpath1);
+	case en_cacodemon:
+		SpawnNewObj (tilex,tiley,&s_cacopath1);
+		new->speed = SPDPATROL;
+		if (!loadedgame)
+		  gamestate.killtotal++;
+		break;
+
+	case en_shotgunguy:
+		SpawnNewObj (tilex,tiley,&s_shotguypath1);
+		new->speed = SPDPATROL;
+		if (!loadedgame)
+		  gamestate.killtotal++;
+		break;
+
+	case en_demon:
+		SpawnNewObj (tilex,tiley,&s_demonpath1);
 		new->speed = SPDDOG;
 		if (!loadedgame)
 		  gamestate.killtotal++;
 		break;
 	}
 
-	new->obclass = guardobj+which;
+	new->obclass = mutantobj+which;
 	new->dir = dir*2;
 	new->hitpoints = starthitpoints[gamestate.difficulty][which];
 	new->distance = tileglobal;
@@ -1048,580 +1453,143 @@ void SpawnPatrol (enemy_t which, int tilex, int tiley, int dir)
 	actorat[new->tilex][new->tiley] = new;
 }
 
-
-
-/*
-==================
-=
-= A_DeathScream
-=
-==================
-*/
-
 void A_DeathScream (objtype *ob)
 {
-#ifndef UPLOAD
-#ifndef SPEAR
-	if (mapon==9 && !US_RndT())
-#else
-	if ((mapon==18 || mapon==19) && !US_RndT())
-#endif
-	{
-	 switch(ob->obclass)
-	 {
-	  case mutantobj:
-	  case guardobj:
-	  case officerobj:
-	  case ssobj:
-	  case dogobj:
-		PlaySoundLocActor(DEATHSCREAM6SND,ob);
-		return;
-	 }
-	}
-#endif
-
 	switch (ob->obclass)
 	{
+	case impobj:
+	{
+		int sounds[2]={	MUTDIE1SND,
+				MUTDIE2SND
+				};
+		PlaySoundLocActor(sounds[US_RndT()%1],ob);
+		}
+		break;
+
+	case shotguyobj:
 	case mutantobj:
-		PlaySoundLocActor(AHHHGSND,ob);
-		break;
-
-	case guardobj:
+	case chainguyobj:
 		{
-		 int sounds[9]={ DEATHSCREAM1SND,
-				 DEATHSCREAM2SND,
-				 DEATHSCREAM3SND,
-				 DEATHSCREAM4SND,
-				 DEATHSCREAM5SND,
-				 DEATHSCREAM7SND,
-				 DEATHSCREAM8SND,
-				 DEATHSCREAM9SND
+		 int sounds[3]={ SHOTGUYDIE1SND,
+				 SHOTGUYDIE2SND,
+				 SHOTGUYDIE3SND
 				 };
-
-		 #ifndef UPLOAD
-		 PlaySoundLocActor(sounds[US_RndT()%8],ob);
-		 #else
 		 PlaySoundLocActor(sounds[US_RndT()%2],ob);
-		 #endif
 		}
 		break;
-	case officerobj:
-		PlaySoundLocActor(NEINSOVASSND,ob);
+	case soulobj:
+		PlaySoundLocActor (IMPFIREBOOMSND,ob);
 		break;
-	case ssobj:
-		PlaySoundLocActor(LEBENSND,ob);	// JAB
+	case cacoobj:
+		PlaySoundLocActor(CACODIESND,ob);	// JAB
 		break;
-	case dogobj:
-		PlaySoundLocActor(DOGDEATHSND,ob);	// JAB
+	case painobj:
+		PlaySoundLocActor (PAINDIESND,ob);
+                break;
+	case demonobj:
+		PlaySoundLocActor(DEMONDIESND,ob);	// JAB
 		break;
-#ifndef SPEAR
+	case cyberobj:
+		SD_PlaySound(CYBERDIESND);				// JAB
+		break;
+	case spiderobj:
+		SD_PlaySound(SPIDERDIESND);
+		break;
+	case revenantobj:
+		SD_PlaySound(REVDIESND);
+		break;
 	case bossobj:
-		SD_PlaySound(MUTTISND);				// JAB
+		SD_PlaySound(BOSSDIESND);
 		break;
-	case schabbobj:
-		SD_PlaySound(MEINGOTTSND);
+	case boss2obj:
+		SD_PlaySound(DTHKNTDIESND);
 		break;
-	case fakeobj:
-		SD_PlaySound(HITLERHASND);
+	case mancubusobj:
+		SD_PlaySound(MANDIESND);
 		break;
-	case mechahitlerobj:
-		SD_PlaySound(SCHEISTSND);
+	case vileobj:
+		SD_PlaySound(VILEDIESND);
 		break;
-	case realhitlerobj:
-		SD_PlaySound(EVASND);
-		break;
-	case gretelobj:
-		SD_PlaySound(MEINSND);
-		break;
-	case giftobj:
-		SD_PlaySound(DONNERSND);
-		break;
-	case fatobj:
-		SD_PlaySound(ROSESND);
-		break;
-#else
-	case spectreobj:
-		SD_PlaySound(GHOSTFADESND);
-		break;
-	case angelobj:
-		SD_PlaySound(ANGELDEATHSND);
-		break;
-	case transobj:
-		SD_PlaySound(TRANSDEATHSND);
-		break;
-	case uberobj:
-		SD_PlaySound(UBERDEATHSND);
-		break;
-	case willobj:
-		SD_PlaySound(WILHELMDEATHSND);
-		break;
-	case deathobj:
-		SD_PlaySound(KNIGHTDEATHSND);
-		break;
-#endif
+
 	}
 }
 
-
-/*
-=============================================================================
-
-						 SPEAR ACTORS
-
-=============================================================================
-*/
-
-#ifdef SPEAR
-
-void T_Launch (objtype *ob);
-void T_Will (objtype *ob);
-
-extern	statetype s_angelshoot1;
-extern	statetype s_deathshoot1;
-extern	statetype s_spark1;
-
-//
-// trans
-//
-extern	statetype s_transstand;
-
-extern	statetype s_transchase1;
-extern	statetype s_transchase1s;
-extern	statetype s_transchase2;
-extern	statetype s_transchase3;
-extern	statetype s_transchase3s;
-extern	statetype s_transchase4;
-
-extern	statetype s_transdie0;
-extern	statetype s_transdie01;
-extern	statetype s_transdie1;
-extern	statetype s_transdie2;
-extern	statetype s_transdie3;
-extern	statetype s_transdie4;
-
-extern	statetype s_transshoot1;
-extern	statetype s_transshoot2;
-extern	statetype s_transshoot3;
-extern	statetype s_transshoot4;
-extern	statetype s_transshoot5;
-extern	statetype s_transshoot6;
-extern	statetype s_transshoot7;
-extern	statetype s_transshoot8;
-
-
-statetype s_transstand	= {false,SPR_TRANS_W1,0,T_Stand,NULL,&s_transstand};
-
-statetype s_transchase1 	= {false,SPR_TRANS_W1,10,T_Chase,NULL,&s_transchase1s};
-statetype s_transchase1s	= {false,SPR_TRANS_W1,3,NULL,NULL,&s_transchase2};
-statetype s_transchase2 	= {false,SPR_TRANS_W2,8,T_Chase,NULL,&s_transchase3};
-statetype s_transchase3 	= {false,SPR_TRANS_W3,10,T_Chase,NULL,&s_transchase3s};
-statetype s_transchase3s	= {false,SPR_TRANS_W3,3,NULL,NULL,&s_transchase4};
-statetype s_transchase4 	= {false,SPR_TRANS_W4,8,T_Chase,NULL,&s_transchase1};
-
-statetype s_transdie0	= {false,SPR_TRANS_W1,1,NULL,A_DeathScream,&s_transdie01};
-statetype s_transdie01	= {false,SPR_TRANS_W1,1,NULL,NULL,&s_transdie1};
-statetype s_transdie1	= {false,SPR_TRANS_DIE1,15,NULL,NULL,&s_transdie2};
-statetype s_transdie2	= {false,SPR_TRANS_DIE2,15,NULL,NULL,&s_transdie3};
-statetype s_transdie3	= {false,SPR_TRANS_DIE3,15,NULL,NULL,&s_transdie4};
-statetype s_transdie4	= {false,SPR_TRANS_DEAD,0,NULL,NULL,&s_transdie4};
-
-statetype s_transshoot1 	= {false,SPR_TRANS_SHOOT1,30,NULL,NULL,&s_transshoot2};
-statetype s_transshoot2 	= {false,SPR_TRANS_SHOOT2,10,NULL,T_Shoot,&s_transshoot3};
-statetype s_transshoot3 	= {false,SPR_TRANS_SHOOT3,10,NULL,T_Shoot,&s_transshoot4};
-statetype s_transshoot4 	= {false,SPR_TRANS_SHOOT2,10,NULL,T_Shoot,&s_transshoot5};
-statetype s_transshoot5 	= {false,SPR_TRANS_SHOOT3,10,NULL,T_Shoot,&s_transshoot6};
-statetype s_transshoot6 	= {false,SPR_TRANS_SHOOT2,10,NULL,T_Shoot,&s_transshoot7};
-statetype s_transshoot7 	= {false,SPR_TRANS_SHOOT3,10,NULL,T_Shoot,&s_transshoot8};
-statetype s_transshoot8 	= {false,SPR_TRANS_SHOOT1,10,NULL,NULL,&s_transchase1};
-
-
-/*
-===============
-=
-= SpawnTrans
-=
-===============
-*/
-
-void SpawnTrans (int tilex, int tiley)
-{
-	unsigned	far *map,tile;
-
-	if (SoundBlasterPresent && DigiMode != sds_Off)
-		s_transdie01.tictime = 105;
-
-	SpawnNewObj (tilex,tiley,&s_transstand);
-	new->obclass = transobj;
-	new->hitpoints = starthitpoints[gamestate.difficulty][en_trans];
-	new->flags |= FL_SHOOTABLE|FL_AMBUSH;
-	if (!loadedgame)
-	  gamestate.killtotal++;
-}
-
-
-//
-// uber
-//
-void T_UShoot (objtype *ob);
-
-extern	statetype s_uberstand;
-
-extern	statetype s_uberchase1;
-extern	statetype s_uberchase1s;
-extern	statetype s_uberchase2;
-extern	statetype s_uberchase3;
-extern	statetype s_uberchase3s;
-extern	statetype s_uberchase4;
-
-extern	statetype s_uberdie0;
-extern	statetype s_uberdie01;
-extern	statetype s_uberdie1;
-extern	statetype s_uberdie2;
-extern	statetype s_uberdie3;
-extern	statetype s_uberdie4;
-extern	statetype s_uberdie5;
-
-extern	statetype s_ubershoot1;
-extern	statetype s_ubershoot2;
-extern	statetype s_ubershoot3;
-extern	statetype s_ubershoot4;
-extern	statetype s_ubershoot5;
-extern	statetype s_ubershoot6;
-extern	statetype s_ubershoot7;
-
-
-statetype s_uberstand	= {false,SPR_UBER_W1,0,T_Stand,NULL,&s_uberstand};
-
-statetype s_uberchase1 	= {false,SPR_UBER_W1,10,T_Chase,NULL,&s_uberchase1s};
-statetype s_uberchase1s	= {false,SPR_UBER_W1,3,NULL,NULL,&s_uberchase2};
-statetype s_uberchase2 	= {false,SPR_UBER_W2,8,T_Chase,NULL,&s_uberchase3};
-statetype s_uberchase3 	= {false,SPR_UBER_W3,10,T_Chase,NULL,&s_uberchase3s};
-statetype s_uberchase3s	= {false,SPR_UBER_W3,3,NULL,NULL,&s_uberchase4};
-statetype s_uberchase4 	= {false,SPR_UBER_W4,8,T_Chase,NULL,&s_uberchase1};
-
-statetype s_uberdie0	= {false,SPR_UBER_W1,1,NULL,A_DeathScream,&s_uberdie01};
-statetype s_uberdie01	= {false,SPR_UBER_W1,1,NULL,NULL,&s_uberdie1};
-statetype s_uberdie1	= {false,SPR_UBER_DIE1,15,NULL,NULL,&s_uberdie2};
-statetype s_uberdie2	= {false,SPR_UBER_DIE2,15,NULL,NULL,&s_uberdie3};
-statetype s_uberdie3	= {false,SPR_UBER_DIE3,15,NULL,NULL,&s_uberdie4};
-statetype s_uberdie4	= {false,SPR_UBER_DIE4,15,NULL,NULL,&s_uberdie5};
-statetype s_uberdie5	= {false,SPR_UBER_DEAD,0,NULL,NULL,&s_uberdie5};
-
-statetype s_ubershoot1 	= {false,SPR_UBER_SHOOT1,30,NULL,NULL,&s_ubershoot2};
-statetype s_ubershoot2 	= {false,SPR_UBER_SHOOT2,12,NULL,T_UShoot,&s_ubershoot3};
-statetype s_ubershoot3 	= {false,SPR_UBER_SHOOT3,12,NULL,T_UShoot,&s_ubershoot4};
-statetype s_ubershoot4 	= {false,SPR_UBER_SHOOT4,12,NULL,T_UShoot,&s_ubershoot5};
-statetype s_ubershoot5 	= {false,SPR_UBER_SHOOT3,12,NULL,T_UShoot,&s_ubershoot6};
-statetype s_ubershoot6 	= {false,SPR_UBER_SHOOT2,12,NULL,T_UShoot,&s_ubershoot7};
-statetype s_ubershoot7 	= {false,SPR_UBER_SHOOT1,12,NULL,NULL,&s_uberchase1};
-
-
-/*
-===============
-=
-= SpawnUber
-=
-===============
-*/
-
-void SpawnUber (int tilex, int tiley)
-{
-	unsigned	far *map,tile;
-
-	if (SoundBlasterPresent && DigiMode != sds_Off)
-		s_uberdie01.tictime = 70;
-
-	SpawnNewObj (tilex,tiley,&s_uberstand);
-	new->obclass = uberobj;
-	new->hitpoints = starthitpoints[gamestate.difficulty][en_uber];
-	new->flags |= FL_SHOOTABLE|FL_AMBUSH;
-	if (!loadedgame)
-	  gamestate.killtotal++;
-}
-
-
-/*
-===============
-=
-= T_UShoot
-=
-===============
-*/
-
-void T_UShoot (objtype *ob)
-{
-	int	dx,dy,dist;
-
-	T_Shoot (ob);
-
-	dx = abs(ob->tilex - player->tilex);
-	dy = abs(ob->tiley - player->tiley);
-	dist = dx>dy ? dx : dy;
-	if (dist <= 1)
-		TakeDamage (10,ob);
-}
-
-
-//
-// will
-//
-extern	statetype s_willstand;
-
-extern	statetype s_willchase1;
-extern	statetype s_willchase1s;
-extern	statetype s_willchase2;
-extern	statetype s_willchase3;
-extern	statetype s_willchase3s;
-extern	statetype s_willchase4;
-
-extern	statetype s_willdie1;
-extern	statetype s_willdie2;
-extern	statetype s_willdie3;
-extern	statetype s_willdie4;
-extern	statetype s_willdie5;
-extern	statetype s_willdie6;
-
-extern	statetype s_willshoot1;
-extern	statetype s_willshoot2;
-extern	statetype s_willshoot3;
-extern	statetype s_willshoot4;
-extern	statetype s_willshoot5;
-extern	statetype s_willshoot6;
-
-
-statetype s_willstand	= {false,SPR_WILL_W1,0,T_Stand,NULL,&s_willstand};
-
-statetype s_willchase1 	= {false,SPR_WILL_W1,10,T_Will,NULL,&s_willchase1s};
-statetype s_willchase1s	= {false,SPR_WILL_W1,3,NULL,NULL,&s_willchase2};
-statetype s_willchase2 	= {false,SPR_WILL_W2,8,T_Will,NULL,&s_willchase3};
-statetype s_willchase3 	= {false,SPR_WILL_W3,10,T_Will,NULL,&s_willchase3s};
-statetype s_willchase3s	= {false,SPR_WILL_W3,3,NULL,NULL,&s_willchase4};
-statetype s_willchase4 	= {false,SPR_WILL_W4,8,T_Will,NULL,&s_willchase1};
-
-statetype s_willdeathcam	= {false,SPR_WILL_W1,1,NULL,NULL,&s_willdie1};
-
-statetype s_willdie1	= {false,SPR_WILL_W1,1,NULL,A_DeathScream,&s_willdie2};
-statetype s_willdie2	= {false,SPR_WILL_W1,10,NULL,NULL,&s_willdie3};
-statetype s_willdie3	= {false,SPR_WILL_DIE1,10,NULL,NULL,&s_willdie4};
-statetype s_willdie4	= {false,SPR_WILL_DIE2,10,NULL,NULL,&s_willdie5};
-statetype s_willdie5	= {false,SPR_WILL_DIE3,10,NULL,NULL,&s_willdie6};
-statetype s_willdie6	= {false,SPR_WILL_DEAD,20,NULL,NULL,&s_willdie6};
-
-statetype s_willshoot1 	= {false,SPR_WILL_SHOOT1,30,NULL,NULL,&s_willshoot2};
-statetype s_willshoot2 	= {false,SPR_WILL_SHOOT2,10,NULL,T_Launch,&s_willshoot3};
-statetype s_willshoot3 	= {false,SPR_WILL_SHOOT3,10,NULL,T_Shoot,&s_willshoot4};
-statetype s_willshoot4 	= {false,SPR_WILL_SHOOT4,10,NULL,T_Shoot,&s_willshoot5};
-statetype s_willshoot5 	= {false,SPR_WILL_SHOOT3,10,NULL,T_Shoot,&s_willshoot6};
-statetype s_willshoot6 	= {false,SPR_WILL_SHOOT4,10,NULL,T_Shoot,&s_willchase1};
-
-
-/*
-===============
-=
-= SpawnWill
-=
-===============
-*/
-
-void SpawnWill (int tilex, int tiley)
-{
-	unsigned	far *map,tile;
-
-	if (SoundBlasterPresent && DigiMode != sds_Off)
-		s_willdie2.tictime = 70;
-
-	SpawnNewObj (tilex,tiley,&s_willstand);
-	new->obclass = willobj;
-	new->hitpoints = starthitpoints[gamestate.difficulty][en_will];
-	new->flags |= FL_SHOOTABLE|FL_AMBUSH;
-	if (!loadedgame)
-	  gamestate.killtotal++;
-}
-
-
-/*
-================
-=
-= T_Will
-=
-================
-*/
-
-void T_Will (objtype *ob)
-{
-	long move;
-	int	dx,dy,dist;
-	boolean	dodge;
-
-	dodge = false;
-	dx = abs(ob->tilex - player->tilex);
-	dy = abs(ob->tiley - player->tiley);
-	dist = dx>dy ? dx : dy;
-
-	if (CheckLine(ob))						// got a shot at player?
-	{
-		if ( US_RndT() < (tics<<3) )
-		{
-		//
-		// go into attack frame
-		//
-			if (ob->obclass == willobj)
-				NewState (ob,&s_willshoot1);
-			else if (ob->obclass == angelobj)
-				NewState (ob,&s_angelshoot1);
-			else
-				NewState (ob,&s_deathshoot1);
-			return;
-		}
-		dodge = true;
-	}
-
-	if (ob->dir == nodir)
-	{
-		if (dodge)
-			SelectDodgeDir (ob);
-		else
-			SelectChaseDir (ob);
-		if (ob->dir == nodir)
-			return;							// object is blocked in
-	}
-
-	move = ob->speed*tics;
-
-	while (move)
-	{
-		if (ob->distance < 0)
-		{
-		//
-		// waiting for a door to open
-		//
-			OpenDoor (-ob->distance-1);
-			if (doorobjlist[-ob->distance-1].action != dr_open)
-				return;
-			ob->distance = TILEGLOBAL;	// go ahead, the door is now opoen
-		}
-
-		if (move < ob->distance)
-		{
-			MoveObj (ob,move);
-			break;
-		}
-
-		//
-		// reached goal tile, so select another one
-		//
-
-		//
-		// fix position to account for round off during moving
-		//
-		ob->x = ((long)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
-		ob->y = ((long)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
-
-		move -= ob->distance;
-
-		if (dist <4)
-			SelectRunDir (ob);
-		else if (dodge)
-			SelectDodgeDir (ob);
-		else
-			SelectChaseDir (ob);
-
-		if (ob->dir == nodir)
-			return;							// object is blocked in
-	}
-
-}
-
-
-//
-// death
-//
-extern	statetype s_deathstand;
-
-extern	statetype s_deathchase1;
-extern	statetype s_deathchase1s;
-extern	statetype s_deathchase2;
-extern	statetype s_deathchase3;
-extern	statetype s_deathchase3s;
-extern	statetype s_deathchase4;
-
-extern	statetype s_deathdie1;
-extern	statetype s_deathdie2;
-extern	statetype s_deathdie3;
-extern	statetype s_deathdie4;
-extern	statetype s_deathdie5;
-extern	statetype s_deathdie6;
-extern	statetype s_deathdie7;
-extern	statetype s_deathdie8;
-extern	statetype s_deathdie9;
-
-extern	statetype s_deathshoot1;
-extern	statetype s_deathshoot2;
-extern	statetype s_deathshoot3;
-extern	statetype s_deathshoot4;
-extern	statetype s_deathshoot5;
-
-
-statetype s_deathstand	= {false,SPR_DEATH_W1,0,T_Stand,NULL,&s_deathstand};
-
-statetype s_deathchase1 	= {false,SPR_DEATH_W1,10,T_Will,NULL,&s_deathchase1s};
-statetype s_deathchase1s	= {false,SPR_DEATH_W1,3,NULL,NULL,&s_deathchase2};
-statetype s_deathchase2 	= {false,SPR_DEATH_W2,8,T_Will,NULL,&s_deathchase3};
-statetype s_deathchase3 	= {false,SPR_DEATH_W3,10,T_Will,NULL,&s_deathchase3s};
-statetype s_deathchase3s	= {false,SPR_DEATH_W3,3,NULL,NULL,&s_deathchase4};
-statetype s_deathchase4 	= {false,SPR_DEATH_W4,8,T_Will,NULL,&s_deathchase1};
-
-statetype s_deathdeathcam	= {false,SPR_DEATH_W1,1,NULL,NULL,&s_deathdie1};
-
-statetype s_deathdie1	= {false,SPR_DEATH_W1,1,NULL,A_DeathScream,&s_deathdie2};
-statetype s_deathdie2	= {false,SPR_DEATH_W1,10,NULL,NULL,&s_deathdie3};
-statetype s_deathdie3	= {false,SPR_DEATH_DIE1,10,NULL,NULL,&s_deathdie4};
-statetype s_deathdie4	= {false,SPR_DEATH_DIE2,10,NULL,NULL,&s_deathdie5};
-statetype s_deathdie5	= {false,SPR_DEATH_DIE3,10,NULL,NULL,&s_deathdie6};
-statetype s_deathdie6	= {false,SPR_DEATH_DIE4,10,NULL,NULL,&s_deathdie7};
-statetype s_deathdie7	= {false,SPR_DEATH_DIE5,10,NULL,NULL,&s_deathdie8};
-statetype s_deathdie8	= {false,SPR_DEATH_DIE6,10,NULL,NULL,&s_deathdie9};
-statetype s_deathdie9	= {false,SPR_DEATH_DEAD,0,NULL,NULL,&s_deathdie9};
-
-statetype s_deathshoot1 	= {false,SPR_DEATH_SHOOT1,30,NULL,NULL,&s_deathshoot2};
-statetype s_deathshoot2 	= {false,SPR_DEATH_SHOOT2,10,NULL,T_Launch,&s_deathshoot3};
-statetype s_deathshoot3 	= {false,SPR_DEATH_SHOOT4,10,NULL,T_Shoot,&s_deathshoot4};
-statetype s_deathshoot4 	= {false,SPR_DEATH_SHOOT3,10,NULL,T_Launch,&s_deathshoot5};
-statetype s_deathshoot5 	= {false,SPR_DEATH_SHOOT4,10,NULL,T_Shoot,&s_deathchase1};
-
-
-/*
-===============
-=
-= SpawnDeath
-=
-===============
-*/
-
-void SpawnDeath (int tilex, int tiley)
-{
-	unsigned	far *map,tile;
-
-	if (SoundBlasterPresent && DigiMode != sds_Off)
-		s_deathdie2.tictime = 105;
-
-	SpawnNewObj (tilex,tiley,&s_deathstand);
-	new->obclass = deathobj;
-	new->hitpoints = starthitpoints[gamestate.difficulty][en_death];
-	new->flags |= FL_SHOOTABLE|FL_AMBUSH;
-	if (!loadedgame)
-	  gamestate.killtotal++;
-}
-
-/*
-===============
-=
-= T_Launch
-=
-===============
-*/
-
-void T_Launch (objtype *ob)
+void	T_Mancubus (objtype *ob);
+void T_PlasmaThrow (objtype *ob);
+
+extern	statetype s_spiderstand;
+
+extern	statetype s_spiderchase1;
+extern	statetype s_spiderchase1s;
+extern	statetype s_spiderchase2;
+extern	statetype s_spiderchase3;
+extern	statetype s_spiderchase3s;
+extern	statetype s_spiderchase4;
+extern	statetype s_spiderchase5;
+extern	statetype s_spiderchase5s;
+extern	statetype s_spiderchase6;
+
+extern	statetype s_spiderdie1;
+extern	statetype s_spiderdie2;
+extern	statetype s_spiderdie3;
+extern	statetype s_spiderdie4;
+extern	statetype s_spiderdie5;
+extern	statetype s_spiderdie6;
+extern	statetype s_spiderdie7;
+extern	statetype s_spiderdie8;
+
+extern	statetype s_spidershoot1;
+extern	statetype s_spidershoot2;
+extern	statetype s_spidershoot3;
+extern	statetype s_spidershoot4;
+extern	statetype s_spidershoot5;
+extern	statetype s_spidershoot6;
+
+statetype s_spiderstand	= {true,SPR_SPIDER_W1_1,0,T_Stand,NULL,&s_spiderstand};
+
+statetype s_spiderchase1 	= {true,SPR_SPIDER_W1_1,10,T_Spider,NULL,&s_spiderchase1s};
+statetype s_spiderchase1s	= {true,SPR_SPIDER_W1_1,3,NULL,NULL,&s_spiderchase2};
+statetype s_spiderchase2 	= {true,SPR_SPIDER_W2_1,8,T_Spider,NULL,&s_spiderchase3};
+statetype s_spiderchase3 	= {true,SPR_SPIDER_W3_1,10,T_Spider,NULL,&s_spiderchase3s};
+statetype s_spiderchase3s	= {true,SPR_SPIDER_W3_1,3,NULL,NULL,&s_spiderchase4};
+statetype s_spiderchase4 	= {true,SPR_SPIDER_W4_1,8,T_Spider,NULL,&s_spiderchase5};
+statetype s_spiderchase5	= {true,SPR_SPIDER_W5_1,10,T_Spider,NULL,&s_spiderchase5s};
+statetype s_spiderchase5s	= {true,SPR_SPIDER_W5_1,3,NULL,NULL,&s_spiderchase6};
+statetype s_spiderchase6	= {true,SPR_SPIDER_W6_1,8,T_Spider,NULL,&s_spiderchase1};
+
+statetype s_spiderdie1	= {true,SPR_SPIDER_DIE1_1,10,NULL,A_DeathScream,&s_spiderdie2};
+statetype s_spiderdie2	= {false,SPR_SPIDER_DIE2,10,NULL,NULL,&s_spiderdie3};
+statetype s_spiderdie3	= {false,SPR_SPIDER_DIE3,10,NULL,NULL,&s_spiderdie4};
+statetype s_spiderdie4	= {false,SPR_SPIDER_DIE4,10,NULL,NULL,&s_spiderdie5};
+statetype s_spiderdie5	= {false,SPR_SPIDER_DIE5,10,NULL,NULL,&s_spiderdie6};
+statetype s_spiderdie6	= {false,SPR_SPIDER_DIE6,10,NULL,NULL,&s_spiderdie7};
+statetype s_spiderdie7	= {false,SPR_SPIDER_DIE7,10,NULL,NULL,&s_spiderdie8};
+statetype s_spiderdie8	= {false,SPR_SPIDER_DEAD,20,NULL,NULL,&s_spiderdie8};
+
+statetype s_spidershoot1 	= {false,SPR_SPIDER_SHOOT1_1,10,NULL,T_PlasmaThrow,&s_spidershoot2};
+statetype s_spidershoot2 	= {false,SPR_SPIDER_SHOOT2_1,10,NULL,T_PlasmaThrow,&s_spidershoot3};
+statetype s_spidershoot3	= {false,SPR_SPIDER_SHOOT1_1,10,NULL,T_PlasmaThrow,&s_spidershoot4};
+statetype s_spidershoot4	= {false,SPR_SPIDER_SHOOT2_1,10,NULL,T_PlasmaThrow,&s_spidershoot5};
+statetype s_spidershoot5	= {false,SPR_SPIDER_SHOOT1_1,10,NULL,T_PlasmaThrow,&s_spidershoot6};
+statetype s_spidershoot6	= {false,SPR_SPIDER_SHOOT2_1,10,NULL,T_PlasmaThrow,&s_spiderchase1};
+
+extern	statetype s_splasma1;
+extern	statetype s_splasma2;
+extern	statetype s_splasmaboom1;
+extern	statetype s_splasmaboom2;
+extern	statetype s_splasmaboom3;
+extern	statetype s_splasmaboom4;
+extern	statetype s_splasmaboom5;
+
+statetype s_splasma1	= {false,SPR_SPLASMA_1,1,NULL,T_Projectile,&s_splasma2};
+statetype s_splasma2	= {false,SPR_SPLASMA_2,1,NULL,T_Projectile,&s_splasma1};
+statetype s_splasmaboom1	= {false,SPR_SPLASMA_BOOM1,10,NULL,NULL,&s_splasmaboom2};
+statetype s_splasmaboom2	= {false,SPR_SPLASMA_BOOM2,10,NULL,NULL,&s_splasmaboom3};
+statetype s_splasmaboom3	= {false,SPR_SPLASMA_BOOM3,10,NULL,NULL,&s_splasmaboom4};
+statetype s_splasmaboom4	= {false,SPR_SPLASMA_BOOM4,10,NULL,NULL,&s_splasmaboom5};
+statetype s_splasmaboom5	= {false,SPR_SPLASMA_BOOM5,1,NULL,NULL,NULL};
+
+void T_PlasmaThrow (objtype *ob)
 {
 	long	deltax,deltay;
 	float	angle;
@@ -1633,10 +1601,112 @@ void T_Launch (objtype *ob)
 	if (angle<0)
 		angle = M_PI*2+angle;
 	iangle = angle/(M_PI*2)*ANGLES;
-	if (ob->obclass == deathobj)
+
+	GetNewActor ();
+	new->state = &s_splasma1;
+	new->ticcount = 1;
+
+	new->tilex = ob->tilex;
+	new->tiley = ob->tiley;
+	new->x = ob->x;
+	new->y = ob->y;
+	new->obclass = splasmaobj;
+	new->dir = nodir;
+	new->angle = iangle;
+	new->speed = 0x2000l;
+	new->flags = FL_NONMARK;
+	new->active = true;
+
+	PlaySoundLocActor (PLASMAGUNFIRESND,new);
+}
+void T_FatThrow (objtype *ob);
+void A_FatAtkSnd (objtype *ob);
+
+extern	statetype s_mancubusstand;
+
+extern	statetype s_mancubuschase1;
+extern	statetype s_mancubuschase1s;
+extern	statetype s_mancubuschase2;
+extern	statetype s_mancubuschase3;
+extern	statetype s_mancubuschase3s;
+extern	statetype s_mancubuschase4;
+
+extern	statetype s_mancubusdie1;
+extern	statetype s_mancubusdie2;
+extern	statetype s_mancubusdie3;
+extern	statetype s_mancubusdie4;
+extern	statetype s_mancubusdie5;
+extern	statetype s_mancubusdie6;
+extern  statetype s_mancubusdie7;
+extern	statetype s_mancubusdie8;
+extern	statetype s_mancubusdie9;
+extern	statetype s_mancubusdie10;
+extern	statetype s_mancubusdie11;
+extern	statetype s_mancubusdie12;
+
+extern	statetype s_mancubusshoot1;
+extern	statetype s_mancubusshoot2;
+extern	statetype s_mancubusshoot3;
+
+statetype s_mancubusstand	= {true,SPR_MANCUBUS_W1_1,0,T_Stand,NULL,&s_mancubusstand};
+
+statetype s_mancubuschase1 	= {true,SPR_MANCUBUS_W1_1,10,T_Mancubus,NULL,&s_mancubuschase1s};
+statetype s_mancubuschase1s	= {true,SPR_MANCUBUS_W2_1,3,NULL,NULL,&s_mancubuschase2};
+statetype s_mancubuschase2 	= {true,SPR_MANCUBUS_W3_1,8,T_Mancubus,NULL,&s_mancubuschase3};
+statetype s_mancubuschase3 	= {true,SPR_MANCUBUS_W4_1,10,T_Mancubus,NULL,&s_mancubuschase3s};
+statetype s_mancubuschase3s	= {true,SPR_MANCUBUS_W5_1,3,NULL,NULL,&s_mancubuschase4};
+statetype s_mancubuschase4 	= {true,SPR_MANCUBUS_W6_1,8,T_Mancubus,NULL,&s_mancubuschase1};
+
+statetype s_mancubusdie1	= {true,SPR_MANCUBUS_DIE_1,1,NULL,A_DeathScream,&s_mancubusdie2};
+statetype s_mancubusdie2	= {true,SPR_MANCUBUS_DIE_2,10,NULL,NULL,&s_mancubusdie3};
+statetype s_mancubusdie3	= {false,SPR_MANCUBUS_DIE3,10,NULL,NULL,&s_mancubusdie4};
+statetype s_mancubusdie4	= {false,SPR_MANCUBUS_DIE4,10,NULL,NULL,&s_mancubusdie5};
+statetype s_mancubusdie5	= {false,SPR_MANCUBUS_DIE5,10,NULL,NULL,&s_mancubusdie6};
+statetype s_mancubusdie6	= {false,SPR_MANCUBUS_DIE6,10,NULL,NULL,&s_mancubusdie7};
+statetype s_mancubusdie7	= {false,SPR_MANCUBUS_DIE7,10,NULL,NULL,&s_mancubusdie8};
+statetype s_mancubusdie8	= {false,SPR_MANCUBUS_DIE8,10,NULL,NULL,&s_mancubusdie9};
+statetype s_mancubusdie9	= {false,SPR_MANCUBUS_DIE9,10,NULL,NULL,&s_mancubusdie10};
+statetype s_mancubusdie10	= {false,SPR_MANCUBUS_DIE10,10,NULL,NULL,&s_mancubusdie11};
+statetype s_mancubusdie11	= {false,SPR_MANCUBUS_DIE11,10,NULL,NULL,&s_mancubusdie12};
+statetype s_mancubusdie12	= {false,SPR_MANCUBUS_DEAD,20,NULL,NULL,&s_mancubusdie12};
+
+statetype s_mancubusshoot1 	= {false,SPR_MANCUBUS_SHOOT_1,30,NULL,A_FatAtkSnd,&s_mancubusshoot2};
+statetype s_mancubusshoot2 	= {false,SPR_MANCUBUS_SHOOT2_1,10,NULL,T_FatThrow,&s_mancubusshoot3};
+statetype s_mancubusshoot3	= {false,SPR_MANCUBUS_SHOOT2_1,10,NULL,T_FatThrow,&s_mancubuschase1};
+
+extern	statetype s_fatball;
+extern	statetype s_fatball2;
+
+extern	statetype s_fatballboom1;
+extern	statetype s_fatballboom2;
+extern	statetype s_fatballboom3;
+
+statetype s_fatball	= {true,SPR_FAT_1,6,T_Projectile,NULL,&s_fatball2};
+statetype s_fatball2	= {true,SPR_FAT2_1,6,T_Projectile,NULL,&s_fatball};
+
+statetype s_fatballboom1	= {false,SPR_BOOM_1,10,NULL,NULL,&s_fatballboom2};
+statetype s_fatballboom2	= {false,SPR_BOOM_2,10,NULL,NULL,&s_fatballboom3};
+statetype s_fatballboom3	= {false,SPR_BOOM_3,1,NULL,NULL,NULL};
+
+void A_FatAtkSnd (objtype *ob)
+{
+	PlaySoundLocActor(MANATKSND,ob);
+}
+void T_FatThrow (objtype *ob)
+{
+	long	deltax,deltay;
+	float	angle;
+	int		iangle;
+
+	deltax = player->x - ob->x;
+	deltay = ob->y - player->y;
+	angle = atan2 (deltay,deltax);
+	if (angle<0)
+		angle = M_PI*2+angle;
+	iangle = angle/(M_PI*2)*ANGLES;
+	if (ob->obclass == mancubusobj)
 	{
-		T_Shoot (ob);
-		if (ob->state == &s_deathshoot2)
+		if (ob->state == &s_mancubusshoot2)
 		{
 			iangle-=4;
 			if (iangle<0)
@@ -1651,29 +1721,15 @@ void T_Launch (objtype *ob)
 	}
 
 	GetNewActor ();
-	new->state = &s_rocket;
+	new->state = &s_fatball;
 	new->ticcount = 1;
 
 	new->tilex = ob->tilex;
 	new->tiley = ob->tiley;
 	new->x = ob->x;
 	new->y = ob->y;
-	new->obclass = rocketobj;
-	switch(ob->obclass)
-	{
-	case deathobj:
-		new->state = &s_hrocket;
-		new->obclass = hrocketobj;
-		PlaySoundLocActor (KNIGHTMISSILESND,new);
-		break;
-	case angelobj:
-		new->state = &s_spark1;
-		new->obclass = sparkobj;
-		PlaySoundLocActor (ANGELFIRESND,new);
-		break;
-	default:
-		PlaySoundLocActor (MISSILEFIRESND,new);
-	}
+	new->obclass = fatballobj;
+	PlaySoundLocActor (IMPFIRESND,new);
 
 	new->dir = nodir;
 	new->angle = iangle;
@@ -1681,140 +1737,236 @@ void T_Launch (objtype *ob)
 	new->flags = FL_NONMARK;
 	new->active = true;
 }
-
-
-
-//
-// angel
-//
-void A_Relaunch (objtype *ob);
-void A_Victory (objtype *ob);
-void A_StartAttack (objtype *ob);
-void A_Breathing (objtype *ob);
-
-extern	statetype s_angelstand;
-
-extern	statetype s_angelchase1;
-extern	statetype s_angelchase1s;
-extern	statetype s_angelchase2;
-extern	statetype s_angelchase3;
-extern	statetype s_angelchase3s;
-extern	statetype s_angelchase4;
-
-extern	statetype s_angeldie1;
-extern	statetype s_angeldie11;
-extern	statetype s_angeldie2;
-extern	statetype s_angeldie3;
-extern	statetype s_angeldie4;
-extern	statetype s_angeldie5;
-extern	statetype s_angeldie6;
-extern	statetype s_angeldie7;
-extern	statetype s_angeldie8;
-extern	statetype s_angeldie9;
-
-extern	statetype s_angelshoot1;
-extern	statetype s_angelshoot2;
-extern	statetype s_angelshoot3;
-extern	statetype s_angelshoot4;
-extern	statetype s_angelshoot5;
-extern	statetype s_angelshoot6;
-
-extern	statetype s_angeltired;
-extern	statetype s_angeltired2;
-extern	statetype s_angeltired3;
-extern	statetype s_angeltired4;
-extern	statetype s_angeltired5;
-extern	statetype s_angeltired6;
-extern	statetype s_angeltired7;
-
-extern	statetype s_spark1;
-extern	statetype s_spark2;
-extern	statetype s_spark3;
-extern	statetype s_spark4;
-
-
-statetype s_angelstand	= {false,SPR_ANGEL_W1,0,T_Stand,NULL,&s_angelstand};
-
-statetype s_angelchase1 	= {false,SPR_ANGEL_W1,10,T_Will,NULL,&s_angelchase1s};
-statetype s_angelchase1s	= {false,SPR_ANGEL_W1,3,NULL,NULL,&s_angelchase2};
-statetype s_angelchase2 	= {false,SPR_ANGEL_W2,8,T_Will,NULL,&s_angelchase3};
-statetype s_angelchase3 	= {false,SPR_ANGEL_W3,10,T_Will,NULL,&s_angelchase3s};
-statetype s_angelchase3s	= {false,SPR_ANGEL_W3,3,NULL,NULL,&s_angelchase4};
-statetype s_angelchase4 	= {false,SPR_ANGEL_W4,8,T_Will,NULL,&s_angelchase1};
-
-statetype s_angeldie1	= {false,SPR_ANGEL_W1,1,NULL,A_DeathScream,&s_angeldie11};
-statetype s_angeldie11	= {false,SPR_ANGEL_W1,1,NULL,NULL,&s_angeldie2};
-statetype s_angeldie2	= {false,SPR_ANGEL_DIE1,10,NULL,A_Slurpie,&s_angeldie3};
-statetype s_angeldie3	= {false,SPR_ANGEL_DIE2,10,NULL,NULL,&s_angeldie4};
-statetype s_angeldie4	= {false,SPR_ANGEL_DIE3,10,NULL,NULL,&s_angeldie5};
-statetype s_angeldie5	= {false,SPR_ANGEL_DIE4,10,NULL,NULL,&s_angeldie6};
-statetype s_angeldie6	= {false,SPR_ANGEL_DIE5,10,NULL,NULL,&s_angeldie7};
-statetype s_angeldie7	= {false,SPR_ANGEL_DIE6,10,NULL,NULL,&s_angeldie8};
-statetype s_angeldie8	= {false,SPR_ANGEL_DIE7,10,NULL,NULL,&s_angeldie9};
-statetype s_angeldie9	= {false,SPR_ANGEL_DEAD,130,NULL,A_Victory,&s_angeldie9};
-
-statetype s_angelshoot1 	= {false,SPR_ANGEL_SHOOT1,10,NULL,A_StartAttack,&s_angelshoot2};
-statetype s_angelshoot2 	= {false,SPR_ANGEL_SHOOT2,20,NULL,T_Launch,&s_angelshoot3};
-statetype s_angelshoot3 	= {false,SPR_ANGEL_SHOOT1,10,NULL,A_Relaunch,&s_angelshoot2};
-
-statetype s_angeltired 	= {false,SPR_ANGEL_TIRED1,40,NULL,A_Breathing,&s_angeltired2};
-statetype s_angeltired2	= {false,SPR_ANGEL_TIRED2,40,NULL,NULL,&s_angeltired3};
-statetype s_angeltired3	= {false,SPR_ANGEL_TIRED1,40,NULL,A_Breathing,&s_angeltired4};
-statetype s_angeltired4	= {false,SPR_ANGEL_TIRED2,40,NULL,NULL,&s_angeltired5};
-statetype s_angeltired5	= {false,SPR_ANGEL_TIRED1,40,NULL,A_Breathing,&s_angeltired6};
-statetype s_angeltired6	= {false,SPR_ANGEL_TIRED2,40,NULL,NULL,&s_angeltired7};
-statetype s_angeltired7	= {false,SPR_ANGEL_TIRED1,40,NULL,A_Breathing,&s_angelchase1};
-
-statetype s_spark1 	= {false,SPR_SPARK1,6,T_Projectile,NULL,&s_spark2};
-statetype s_spark2 	= {false,SPR_SPARK2,6,T_Projectile,NULL,&s_spark3};
-statetype s_spark3 	= {false,SPR_SPARK3,6,T_Projectile,NULL,&s_spark4};
-statetype s_spark4 	= {false,SPR_SPARK4,6,T_Projectile,NULL,&s_spark1};
-
-
-#pragma argsused
-void A_Slurpie (objtype *ob)
-{
- SD_PlaySound(SLURPIESND);
-}
-
-#pragma argsused
-void A_Breathing (objtype *ob)
-{
- SD_PlaySound(ANGELTIREDSND);
-}
-
-/*
-===============
-=
-= SpawnAngel
-=
-===============
-*/
-
-void SpawnAngel (int tilex, int tiley)
+void SpawnSpider (int tilex, int tiley)
 {
 	unsigned	far *map,tile;
 
+	SpawnNewObj (tilex,tiley,&s_spiderstand);
+	new->speed = SPDPATROL;
 
-	if (SoundBlasterPresent && DigiMode != sds_Off)
-		s_angeldie11.tictime = 105;
-
-	SpawnNewObj (tilex,tiley,&s_angelstand);
-	new->obclass = angelobj;
-	new->hitpoints = starthitpoints[gamestate.difficulty][en_angel];
+	new->obclass = spiderobj;
+	new->hitpoints = starthitpoints[gamestate.difficulty][en_spider];
+	new->dir = nodir;
 	new->flags |= FL_SHOOTABLE|FL_AMBUSH;
 	if (!loadedgame)
 	  gamestate.killtotal++;
 }
 
+void SpawnMancubus (int tilex, int tiley)
+{
+	unsigned	far *map,tile;
 
-/*
-=================
-=
-= A_Victory
-=
-=================
-*/
+	SpawnNewObj (tilex,tiley,&s_mancubusstand);
+	new->speed = SPDPATROL;
+
+	new->obclass = mancubusobj;
+	new->hitpoints = starthitpoints[gamestate.difficulty][en_mancubus];
+	new->dir = nodir;
+	new->flags |= FL_SHOOTABLE|FL_AMBUSH;
+	if (!loadedgame)
+	  gamestate.killtotal++;
+}
+
+void T_Spider (objtype *ob)
+{
+	long move;
+	int	dx,dy,dist;
+	boolean	dodge;
+
+	dodge = false;
+	dx = abs(ob->tilex - player->tilex);
+	dy = abs(ob->tiley - player->tiley);
+	dist = dx>dy ? dx : dy;
+
+	if (CheckLine(ob))						// got a shot at player?
+	{
+
+		if ( US_RndT() < (tics<<3) )
+		{
+			NewState (ob,&s_spidershoot1);
+			return;
+		}
+		dodge = true;
+	}
+
+	if (ob->dir == nodir)
+	{
+		if (dodge)
+			SelectDodgeDir (ob);
+		else
+			SelectChaseDir (ob);
+		if (ob->dir == nodir)
+			return;							// object is blocked in
+	}
+
+	move = ob->speed*tics;
+
+	while (move)
+	{
+		if (ob->distance < 0)
+		{
+			OpenDoor (-ob->distance-1);
+			if (doorobjlist[-ob->distance-1].action != dr_open)
+				return;
+			ob->distance = TILEGLOBAL;	// go ahead, the door is now opoen
+		}
+
+		if (move < ob->distance)
+		{
+			MoveObj (ob,move);
+			break;
+		}
+		ob->x = ((long)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
+		ob->y = ((long)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
+
+		move -= ob->distance;
+
+		if (dist <4)
+			SelectRunDir (ob);
+		else if (dodge)
+			SelectDodgeDir (ob);
+		else
+			SelectChaseDir (ob);
+
+		if (ob->dir == nodir)
+			return;							// object is blocked in
+	}
+
+}
+void T_Mancubus (objtype *ob)
+{
+	long move;
+	int	dx,dy,dist;
+	boolean	dodge;
+
+	dodge = false;
+	dx = abs(ob->tilex - player->tilex);
+	dy = abs(ob->tiley - player->tiley);
+	dist = dx>dy ? dx : dy;
+
+	if (CheckLine(ob))						// got a shot at player?
+	{
+
+		if ( US_RndT() < (tics<<3) )
+		{
+			NewState (ob,&s_mancubusshoot1);
+			return;
+		}
+		dodge = true;
+	}
+
+	if (ob->dir == nodir)
+	{
+		if (dodge)
+			SelectDodgeDir (ob);
+		else
+			SelectChaseDir (ob);
+		if (ob->dir == nodir)
+			return;							// object is blocked in
+	}
+
+	move = ob->speed*tics;
+
+	while (move)
+	{
+		if (ob->distance < 0)
+		{
+			OpenDoor (-ob->distance-1);
+			if (doorobjlist[-ob->distance-1].action != dr_open)
+				return;
+			ob->distance = TILEGLOBAL;	// go ahead, the door is now opoen
+		}
+
+		if (move < ob->distance)
+		{
+			MoveObj (ob,move);
+			break;
+		}
+		ob->x = ((long)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
+		ob->y = ((long)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
+
+		move -= ob->distance;
+
+		if (dist <4)
+			SelectRunDir (ob);
+		else if (dodge)
+			SelectDodgeDir (ob);
+		else
+			SelectChaseDir (ob);
+
+		if (ob->dir == nodir)
+			return;							// object is blocked in
+	}
+
+}
+void A_VileFire (objtype *ob);
+void A_Victory (objtype *ob);
+void A_VileFireSnd (objtype *ob);
+
+extern  statetype s_vilechase1;
+extern	statetype s_vilechase1s;
+extern	statetype s_vilechase2;
+extern	statetype s_vilechase3;
+extern	statetype s_vilechase3s;
+extern	statetype s_vilechase4;
+
+extern	statetype s_viledie1;
+extern	statetype s_viledie2;
+extern	statetype s_viledie3;
+extern	statetype s_viledie4;
+extern	statetype s_viledie5;
+extern	statetype s_viledie6;
+extern	statetype s_viledie7;
+extern	statetype s_viledie8;
+extern	statetype s_viledie9;
+extern	statetype s_viledie10;
+
+extern	statetype s_vileshoot1;
+extern	statetype s_vileshoot2;
+extern	statetype s_vileshoot3;
+extern	statetype s_vileshoot4;
+extern	statetype s_vileshoot5;
+extern	statetype s_vileshoot6;
+extern	statetype s_vileshoot7;
+extern	statetype s_vileshoot8;
+extern	statetype s_vileshoot9;
+extern	statetype s_vileshoot10;
+
+statetype s_vilestand	= {true,SPR_VILE_W1_1,0,T_Stand,NULL,&s_vilestand};
+
+statetype s_vilechase1	= {true,SPR_VILE_W1_1,10,T_Chase,NULL,&s_vilechase1s};
+statetype s_vilechase1s	= {true,SPR_VILE_W2_1,6,NULL,NULL,&s_vilechase2};
+statetype s_vilechase2	= {true,SPR_VILE_W3_1,8,T_Chase,NULL,&s_vilechase3};
+statetype s_vilechase3	= {true,SPR_VILE_W4_1,10,T_Chase,NULL,&s_vilechase3s};
+statetype s_vilechase3s	= {true,SPR_VILE_W5_1,6,NULL,NULL,&s_vilechase4};
+statetype s_vilechase4	= {true,SPR_VILE_W6_1,8,T_Chase,NULL,&s_vilechase1};
+
+statetype s_vileshoot1	= {false,SPR_VILE_SHOOT1_1,10,NULL,A_VileFireSnd,&s_vileshoot2};
+statetype s_vileshoot2	= {false,SPR_VILE_SHOOT2_1,10,NULL,NULL,&s_vileshoot3};
+statetype s_vileshoot3	= {false,SPR_VILE_SHOOT3_1,10,NULL,NULL,&s_vileshoot4};
+statetype s_vileshoot4	= {false,SPR_VILE_SHOOT4_1,10,NULL,NULL,&s_vileshoot5};
+statetype s_vileshoot5	= {false,SPR_VILE_SHOOT5_1,10,NULL,NULL,&s_vileshoot6};
+statetype s_vileshoot6	= {false,SPR_VILE_SHOOT6_1,10,NULL,NULL,&s_vileshoot7};
+statetype s_vileshoot7	= {false,SPR_VILE_SHOOT7_1,10,NULL,NULL,&s_vileshoot8};
+statetype s_vileshoot8	= {false,SPR_VILE_SHOOT8_1,10,NULL,NULL,&s_vileshoot9};
+statetype s_vileshoot9	= {false,SPR_VILE_SHOOT9_1,10,NULL,A_VileFire,&s_vileshoot10};
+statetype s_vileshoot10	= {false,SPR_VILE_SHOOT10_1,10,NULL,NULL,&s_vilechase1};
+
+statetype s_viledie1	= {true,SPR_VILE_DIE1_1,10,NULL,A_DeathScream,&s_viledie2};
+statetype s_viledie2	= {false,SPR_VILE_DIE2,10,NULL,NULL,&s_viledie3};
+statetype s_viledie3	= {false,SPR_VILE_DIE3,10,NULL,NULL,&s_viledie4};
+statetype s_viledie4	= {false,SPR_VILE_DIE4,10,NULL,NULL,&s_viledie5};
+statetype s_viledie5	= {false,SPR_VILE_DIE5,10,NULL,NULL,&s_viledie6};
+statetype s_viledie6	= {false,SPR_VILE_DIE6,10,NULL,NULL,&s_viledie7};
+statetype s_viledie7	= {false,SPR_VILE_DIE7,10,NULL,NULL,&s_viledie8};
+statetype s_viledie8	= {false,SPR_VILE_DIE8,10,NULL,NULL,&s_viledie9};
+statetype s_viledie9	= {false,SPR_VILE_DIE9,10,NULL,NULL,&s_viledie10};
+statetype s_viledie10	= {false,SPR_VILE_DEAD,130,NULL,A_Victory,&s_viledie10};
+
+void A_VileFireSnd (objtype *ob)
+{
+	PlaySoundLocActor (VILEATKSND,ob);
+}
 
 #pragma argsused
 void A_Victory (objtype *ob)
@@ -1822,485 +1974,43 @@ void A_Victory (objtype *ob)
 	playstate = ex_victorious;
 }
 
+extern	statetype s_vilefire1;
+extern	statetype s_vilefire2;
+extern	statetype s_vilefire3;
+extern	statetype s_vilefire4;
+extern	statetype s_vilefire5;
+extern	statetype s_vilefire6;
+extern	statetype s_vilefire7;
+extern	statetype s_vilefire8;
 
-/*
-=================
-=
-= A_StartAttack
-=
-=================
-*/
+statetype s_vilefire1	= {false,SPR_VILE_FIRE1,10,T_Projectile,NULL,&s_vilefire2};
+statetype s_vilefire2	= {false,SPR_VILE_FIRE2,10,T_Projectile,NULL,&s_vilefire3};
+statetype s_vilefire3	= {false,SPR_VILE_FIRE3,10,T_Projectile,NULL,&s_vilefire4};
+statetype s_vilefire4	= {false,SPR_VILE_FIRE4,10,T_Projectile,NULL,&s_vilefire5};
+statetype s_vilefire5	= {false,SPR_VILE_FIRE5,10,T_Projectile,NULL,&s_vilefire6};
+statetype s_vilefire6	= {false,SPR_VILE_FIRE6,10,T_Projectile,NULL,&s_vilefire7};
+statetype s_vilefire7	= {false,SPR_VILE_FIRE7,10,T_Projectile,NULL,&s_vilefire8};
+statetype s_vilefire8	= {false,SPR_VILE_FIRE8,10,T_Projectile,NULL,NULL};
 
-void A_StartAttack (objtype *ob)
-{
-	ob->temp1 = 0;
-}
-
-
-/*
-=================
-=
-= A_Relaunch
-=
-=================
-*/
-
-void A_Relaunch (objtype *ob)
-{
-	if (++ob->temp1 == 3)
-	{
-		NewState (ob,&s_angeltired);
-		return;
-	}
-
-	if (US_RndT()&1)
-	{
-		NewState (ob,&s_angelchase1);
-		return;
-	}
-}
-
-
-
-
-//
-// spectre
-//
-void T_SpectreWait (objtype *ob);
-void A_Dormant (objtype *ob);
-
-extern	statetype s_spectrewait1;
-extern	statetype s_spectrewait2;
-extern	statetype s_spectrewait3;
-extern	statetype s_spectrewait4;
-
-extern	statetype s_spectrechase1;
-extern	statetype s_spectrechase2;
-extern	statetype s_spectrechase3;
-extern	statetype s_spectrechase4;
-
-extern	statetype s_spectredie1;
-extern	statetype s_spectredie2;
-extern	statetype s_spectredie3;
-extern	statetype s_spectredie4;
-
-extern	statetype s_spectrewake;
-
-statetype s_spectrewait1	= {false,SPR_SPECTRE_W1,10,T_Stand,NULL,&s_spectrewait2};
-statetype s_spectrewait2	= {false,SPR_SPECTRE_W2,10,T_Stand,NULL,&s_spectrewait3};
-statetype s_spectrewait3	= {false,SPR_SPECTRE_W3,10,T_Stand,NULL,&s_spectrewait4};
-statetype s_spectrewait4	= {false,SPR_SPECTRE_W4,10,T_Stand,NULL,&s_spectrewait1};
-
-statetype s_spectrechase1	= {false,SPR_SPECTRE_W1,10,T_Ghosts,NULL,&s_spectrechase2};
-statetype s_spectrechase2	= {false,SPR_SPECTRE_W2,10,T_Ghosts,NULL,&s_spectrechase3};
-statetype s_spectrechase3	= {false,SPR_SPECTRE_W3,10,T_Ghosts,NULL,&s_spectrechase4};
-statetype s_spectrechase4	= {false,SPR_SPECTRE_W4,10,T_Ghosts,NULL,&s_spectrechase1};
-
-statetype s_spectredie1	= {false,SPR_SPECTRE_F1,10,NULL,NULL,&s_spectredie2};
-statetype s_spectredie2	= {false,SPR_SPECTRE_F2,10,NULL,NULL,&s_spectredie3};
-statetype s_spectredie3	= {false,SPR_SPECTRE_F3,10,NULL,NULL,&s_spectredie4};
-statetype s_spectredie4	= {false,SPR_SPECTRE_F4,300,NULL,NULL,&s_spectrewake};
-statetype s_spectrewake	= {false,SPR_SPECTRE_F4,10,NULL,A_Dormant,&s_spectrewake};
-
-/*
-===============
-=
-= SpawnSpectre
-=
-===============
-*/
-
-void SpawnSpectre (int tilex, int tiley)
+void SpawnVile (int tilex, int tiley)
 {
 	unsigned	far *map,tile;
 
-	SpawnNewObj (tilex,tiley,&s_spectrewait1);
-	new->obclass = spectreobj;
-	new->hitpoints = starthitpoints[gamestate.difficulty][en_spectre];
-	new->flags |= FL_SHOOTABLE|FL_AMBUSH; // |FL_NEVERMARK|FL_NONMARK;
-	if (!loadedgame)
-	  gamestate.killtotal++;
-}
-
-
-/*
-===============
-=
-= A_Dormant
-=
-===============
-*/
-
-void A_Dormant (objtype *ob)
-{
-	long	deltax,deltay;
-	int	xl,xh,yl,yh;
-	int	x,y;
-	unsigned	tile;
-
-	deltax = ob->x - player->x;
-	if (deltax < -MINACTORDIST || deltax > MINACTORDIST)
-		goto moveok;
-	deltay = ob->y - player->y;
-	if (deltay < -MINACTORDIST || deltay > MINACTORDIST)
-		goto moveok;
-
-	return;
-moveok:
-
-	xl = (ob->x-MINDIST) >> TILESHIFT;
-	xh = (ob->x+MINDIST) >> TILESHIFT;
-	yl = (ob->y-MINDIST) >> TILESHIFT;
-	yh = (ob->y+MINDIST) >> TILESHIFT;
-
-	for (y=yl ; y<=yh ; y++)
-		for (x=xl ; x<=xh ; x++)
-		{
-			tile = actorat[x][y];
-			if (!tile)
-				continue;
-			if (tile<256)
-				return;
-			if (((objtype *)tile)->flags&FL_SHOOTABLE)
-				return;
-		}
-
-	ob->flags |= FL_AMBUSH | FL_SHOOTABLE;
-	ob->flags &= ~FL_ATTACKMODE;
-	ob->dir = nodir;
-	NewState (ob,&s_spectrewait1);
-}
-
-
-#endif
-
-/*
-=============================================================================
-
-						 SCHABBS / GIFT / FAT
-
-=============================================================================
-*/
-
-#ifndef SPEAR
-/*
-===============
-=
-= SpawnGhosts
-=
-===============
-*/
-
-void SpawnGhosts (int which, int tilex, int tiley)
-{
-	unsigned	far *map,tile;
-
-	switch(which)
-	{
-	 case en_blinky:
-	   SpawnNewObj (tilex,tiley,&s_blinkychase1);
-	   break;
-	 case en_clyde:
-	   SpawnNewObj (tilex,tiley,&s_clydechase1);
-	   break;
-	 case en_pinky:
-	   SpawnNewObj (tilex,tiley,&s_pinkychase1);
-	   break;
-	 case en_inky:
-	   SpawnNewObj (tilex,tiley,&s_inkychase1);
-	   break;
-	}
-
-	new->obclass = ghostobj;
-	new->speed = SPDDOG;
-
-	new->dir = east;
-	new->flags |= FL_AMBUSH;
-	if (!loadedgame)
-	  gamestate.killtotal++;
-}
-
-
-
-void	T_Gift (objtype *ob);
-void	T_GiftThrow (objtype *ob);
-
-void	T_Fat (objtype *ob);
-void	T_FatThrow (objtype *ob);
-
-//
-// schabb
-//
-extern	statetype s_schabbstand;
-
-extern	statetype s_schabbchase1;
-extern	statetype s_schabbchase1s;
-extern	statetype s_schabbchase2;
-extern	statetype s_schabbchase3;
-extern	statetype s_schabbchase3s;
-extern	statetype s_schabbchase4;
-
-extern	statetype s_schabbdie1;
-extern	statetype s_schabbdie2;
-extern	statetype s_schabbdie3;
-extern	statetype s_schabbdie4;
-extern	statetype s_schabbdie5;
-extern	statetype s_schabbdie6;
-
-extern	statetype s_schabbshoot1;
-extern	statetype s_schabbshoot2;
-
-extern	statetype s_needle1;
-extern	statetype s_needle2;
-extern	statetype s_needle3;
-extern	statetype s_needle4;
-
-extern	statetype s_schabbdeathcam;
-
-
-statetype s_schabbstand	= {false,SPR_SCHABB_W1,0,T_Stand,NULL,&s_schabbstand};
-
-statetype s_schabbchase1 	= {false,SPR_SCHABB_W1,10,T_Schabb,NULL,&s_schabbchase1s};
-statetype s_schabbchase1s	= {false,SPR_SCHABB_W1,3,NULL,NULL,&s_schabbchase2};
-statetype s_schabbchase2 	= {false,SPR_SCHABB_W2,8,T_Schabb,NULL,&s_schabbchase3};
-statetype s_schabbchase3 	= {false,SPR_SCHABB_W3,10,T_Schabb,NULL,&s_schabbchase3s};
-statetype s_schabbchase3s	= {false,SPR_SCHABB_W3,3,NULL,NULL,&s_schabbchase4};
-statetype s_schabbchase4 	= {false,SPR_SCHABB_W4,8,T_Schabb,NULL,&s_schabbchase1};
-
-statetype s_schabbdeathcam	= {false,SPR_SCHABB_W1,1,NULL,NULL,&s_schabbdie1};
-
-statetype s_schabbdie1	= {false,SPR_SCHABB_W1,10,NULL,A_DeathScream,&s_schabbdie2};
-statetype s_schabbdie2	= {false,SPR_SCHABB_W1,10,NULL,NULL,&s_schabbdie3};
-statetype s_schabbdie3	= {false,SPR_SCHABB_DIE1,10,NULL,NULL,&s_schabbdie4};
-statetype s_schabbdie4	= {false,SPR_SCHABB_DIE2,10,NULL,NULL,&s_schabbdie5};
-statetype s_schabbdie5	= {false,SPR_SCHABB_DIE3,10,NULL,NULL,&s_schabbdie6};
-statetype s_schabbdie6	= {false,SPR_SCHABB_DEAD,20,NULL,A_StartDeathCam,&s_schabbdie6};
-
-statetype s_schabbshoot1 	= {false,SPR_SCHABB_SHOOT1,30,NULL,NULL,&s_schabbshoot2};
-statetype s_schabbshoot2 	= {false,SPR_SCHABB_SHOOT2,10,NULL,T_SchabbThrow,&s_schabbchase1};
-
-statetype s_needle1 	= {false,SPR_HYPO1,6,T_Projectile,NULL,&s_needle2};
-statetype s_needle2 	= {false,SPR_HYPO2,6,T_Projectile,NULL,&s_needle3};
-statetype s_needle3 	= {false,SPR_HYPO3,6,T_Projectile,NULL,&s_needle4};
-statetype s_needle4 	= {false,SPR_HYPO4,6,T_Projectile,NULL,&s_needle1};
-
-
-//
-// gift
-//
-extern	statetype s_giftstand;
-
-extern	statetype s_giftchase1;
-extern	statetype s_giftchase1s;
-extern	statetype s_giftchase2;
-extern	statetype s_giftchase3;
-extern	statetype s_giftchase3s;
-extern	statetype s_giftchase4;
-
-extern	statetype s_giftdie1;
-extern	statetype s_giftdie2;
-extern	statetype s_giftdie3;
-extern	statetype s_giftdie4;
-extern	statetype s_giftdie5;
-extern	statetype s_giftdie6;
-
-extern	statetype s_giftshoot1;
-extern	statetype s_giftshoot2;
-
-extern	statetype s_needle1;
-extern	statetype s_needle2;
-extern	statetype s_needle3;
-extern	statetype s_needle4;
-
-extern	statetype s_giftdeathcam;
-
-extern	statetype s_boom1;
-extern	statetype s_boom2;
-extern	statetype s_boom3;
-
-
-statetype s_giftstand	= {false,SPR_GIFT_W1,0,T_Stand,NULL,&s_giftstand};
-
-statetype s_giftchase1 	= {false,SPR_GIFT_W1,10,T_Gift,NULL,&s_giftchase1s};
-statetype s_giftchase1s	= {false,SPR_GIFT_W1,3,NULL,NULL,&s_giftchase2};
-statetype s_giftchase2 	= {false,SPR_GIFT_W2,8,T_Gift,NULL,&s_giftchase3};
-statetype s_giftchase3 	= {false,SPR_GIFT_W3,10,T_Gift,NULL,&s_giftchase3s};
-statetype s_giftchase3s	= {false,SPR_GIFT_W3,3,NULL,NULL,&s_giftchase4};
-statetype s_giftchase4 	= {false,SPR_GIFT_W4,8,T_Gift,NULL,&s_giftchase1};
-
-statetype s_giftdeathcam	= {false,SPR_GIFT_W1,1,NULL,NULL,&s_giftdie1};
-
-statetype s_giftdie1	= {false,SPR_GIFT_W1,1,NULL,A_DeathScream,&s_giftdie2};
-statetype s_giftdie2	= {false,SPR_GIFT_W1,10,NULL,NULL,&s_giftdie3};
-statetype s_giftdie3	= {false,SPR_GIFT_DIE1,10,NULL,NULL,&s_giftdie4};
-statetype s_giftdie4	= {false,SPR_GIFT_DIE2,10,NULL,NULL,&s_giftdie5};
-statetype s_giftdie5	= {false,SPR_GIFT_DIE3,10,NULL,NULL,&s_giftdie6};
-statetype s_giftdie6	= {false,SPR_GIFT_DEAD,20,NULL,A_StartDeathCam,&s_giftdie6};
-
-statetype s_giftshoot1 	= {false,SPR_GIFT_SHOOT1,30,NULL,NULL,&s_giftshoot2};
-statetype s_giftshoot2 	= {false,SPR_GIFT_SHOOT2,10,NULL,T_GiftThrow,&s_giftchase1};
-
-
-//
-// fat
-//
-extern	statetype s_fatstand;
-
-extern	statetype s_fatchase1;
-extern	statetype s_fatchase1s;
-extern	statetype s_fatchase2;
-extern	statetype s_fatchase3;
-extern	statetype s_fatchase3s;
-extern	statetype s_fatchase4;
-
-extern	statetype s_fatdie1;
-extern	statetype s_fatdie2;
-extern	statetype s_fatdie3;
-extern	statetype s_fatdie4;
-extern	statetype s_fatdie5;
-extern	statetype s_fatdie6;
-
-extern	statetype s_fatshoot1;
-extern	statetype s_fatshoot2;
-extern	statetype s_fatshoot3;
-extern	statetype s_fatshoot4;
-extern	statetype s_fatshoot5;
-extern	statetype s_fatshoot6;
-
-extern	statetype s_needle1;
-extern	statetype s_needle2;
-extern	statetype s_needle3;
-extern	statetype s_needle4;
-
-extern	statetype s_fatdeathcam;
-
-
-statetype s_fatstand	= {false,SPR_FAT_W1,0,T_Stand,NULL,&s_fatstand};
-
-statetype s_fatchase1 	= {false,SPR_FAT_W1,10,T_Fat,NULL,&s_fatchase1s};
-statetype s_fatchase1s	= {false,SPR_FAT_W1,3,NULL,NULL,&s_fatchase2};
-statetype s_fatchase2 	= {false,SPR_FAT_W2,8,T_Fat,NULL,&s_fatchase3};
-statetype s_fatchase3 	= {false,SPR_FAT_W3,10,T_Fat,NULL,&s_fatchase3s};
-statetype s_fatchase3s	= {false,SPR_FAT_W3,3,NULL,NULL,&s_fatchase4};
-statetype s_fatchase4 	= {false,SPR_FAT_W4,8,T_Fat,NULL,&s_fatchase1};
-
-statetype s_fatdeathcam	= {false,SPR_FAT_W1,1,NULL,NULL,&s_fatdie1};
-
-statetype s_fatdie1	= {false,SPR_FAT_W1,1,NULL,A_DeathScream,&s_fatdie2};
-statetype s_fatdie2	= {false,SPR_FAT_W1,10,NULL,NULL,&s_fatdie3};
-statetype s_fatdie3	= {false,SPR_FAT_DIE1,10,NULL,NULL,&s_fatdie4};
-statetype s_fatdie4	= {false,SPR_FAT_DIE2,10,NULL,NULL,&s_fatdie5};
-statetype s_fatdie5	= {false,SPR_FAT_DIE3,10,NULL,NULL,&s_fatdie6};
-statetype s_fatdie6	= {false,SPR_FAT_DEAD,20,NULL,A_StartDeathCam,&s_fatdie6};
-
-statetype s_fatshoot1 	= {false,SPR_FAT_SHOOT1,30,NULL,NULL,&s_fatshoot2};
-statetype s_fatshoot2 	= {false,SPR_FAT_SHOOT2,10,NULL,T_GiftThrow,&s_fatshoot3};
-statetype s_fatshoot3 	= {false,SPR_FAT_SHOOT3,10,NULL,T_Shoot,&s_fatshoot4};
-statetype s_fatshoot4 	= {false,SPR_FAT_SHOOT4,10,NULL,T_Shoot,&s_fatshoot5};
-statetype s_fatshoot5 	= {false,SPR_FAT_SHOOT3,10,NULL,T_Shoot,&s_fatshoot6};
-statetype s_fatshoot6 	= {false,SPR_FAT_SHOOT4,10,NULL,T_Shoot,&s_fatchase1};
-
-
-/*
-===============
-=
-= SpawnSchabbs
-=
-===============
-*/
-
-void SpawnSchabbs (int tilex, int tiley)
-{
-	unsigned	far *map,tile;
-
-	if (DigiMode != sds_Off)
-		s_schabbdie2.tictime = 140;
-	else
-		s_schabbdie2.tictime = 5;
-
-	SpawnNewObj (tilex,tiley,&s_schabbstand);
+	SpawnNewObj (tilex,tiley,&s_vilestand);
 	new->speed = SPDPATROL;
 
-	new->obclass = schabbobj;
-	new->hitpoints = starthitpoints[gamestate.difficulty][en_schabbs];
-	new->dir = south;
+	new->obclass = vileobj;
+	new->hitpoints = starthitpoints[gamestate.difficulty][en_vile];
+	new->dir = nodir;
 	new->flags |= FL_SHOOTABLE|FL_AMBUSH;
 	if (!loadedgame)
 	  gamestate.killtotal++;
 }
-
-
-/*
-===============
-=
-= SpawnGift
-=
-===============
-*/
-
-void SpawnGift (int tilex, int tiley)
+void A_VileFire (objtype *ob)
 {
-	unsigned	far *map,tile;
-
-	if (DigiMode != sds_Off)
-	  s_giftdie2.tictime = 140;
-	else
-	  s_giftdie2.tictime = 5;
-
-	SpawnNewObj (tilex,tiley,&s_giftstand);
-	new->speed = SPDPATROL;
-
-	new->obclass = giftobj;
-	new->hitpoints = starthitpoints[gamestate.difficulty][en_gift];
-	new->dir = north;
-	new->flags |= FL_SHOOTABLE|FL_AMBUSH;
-	if (!loadedgame)
-	  gamestate.killtotal++;
-}
-
-
-/*
-===============
-=
-= SpawnFat
-=
-===============
-*/
-
-void SpawnFat (int tilex, int tiley)
-{
-	unsigned	far *map,tile;
-
-	if (DigiMode != sds_Off)
-	  s_fatdie2.tictime = 140;
-	else
-	  s_fatdie2.tictime = 5;
-
-	SpawnNewObj (tilex,tiley,&s_fatstand);
-	new->speed = SPDPATROL;
-
-	new->obclass = fatobj;
-	new->hitpoints = starthitpoints[gamestate.difficulty][en_fat];
-	new->dir = south;
-	new->flags |= FL_SHOOTABLE|FL_AMBUSH;
-	if (!loadedgame)
-	  gamestate.killtotal++;
-}
-
-
-/*
-=================
-=
-= T_SchabbThrow
-=
-=================
-*/
-
-void T_SchabbThrow (objtype *ob)
-{
-	long	deltax,deltay;
+	long deltax,deltay;
 	float	angle;
-	int		iangle;
+	int	iangle;
 
 	deltax = player->x - ob->x;
 	deltay = ob->y - player->y;
@@ -2310,761 +2020,300 @@ void T_SchabbThrow (objtype *ob)
 	iangle = angle/(M_PI*2)*ANGLES;
 
 	GetNewActor ();
-	new->state = &s_needle1;
+	new->state = &s_vilefire1;
 	new->ticcount = 1;
 
 	new->tilex = ob->tilex;
 	new->tiley = ob->tiley;
 	new->x = ob->x;
 	new->y = ob->y;
-	new->obclass = needleobj;
+	new->obclass = vilefireobj;
 	new->dir = nodir;
 	new->angle = iangle;
 	new->speed = 0x2000l;
-
-	new->flags = FL_NONMARK;
-	new->active = true;
-
-	PlaySoundLocActor (SCHABBSTHROWSND,new);
 }
+void T_RevBallThrow (objtype *ob);
 
-/*
-=================
-=
-= T_GiftThrow
-=
-=================
-*/
+extern	statetype s_revenantchase1;
+extern	statetype s_revenantchase1s;
+extern	statetype s_revenantchase2;
+extern	statetype s_revenantchase3;
+extern	statetype s_revenantchase3s;
+extern	statetype s_revenantchase4;
 
-void T_GiftThrow (objtype *ob)
+extern	statetype s_revenantdie1;
+extern	statetype s_revenantdie2;
+extern	statetype s_revenantdie3;
+extern	statetype s_revenantdie4;
+extern	statetype s_revenantdie5;
+extern	statetype s_revenantdie6;
+extern	statetype s_revenantdie7;
+
+extern	statetype s_revenantshoot1;
+extern	statetype s_revenantshoot2;
+extern	statetype s_revenantshoot3;
+
+statetype s_revenantstand	= {true,SPR_REVENANT_W1_1,0,T_Stand,NULL,&s_revenantstand};
+
+statetype s_revenantchase1 	= {true,SPR_REVENANT_W1_1,10,T_Chase,NULL,&s_revenantchase1s};
+statetype s_revenantchase1s	= {true,SPR_REVENANT_W2_1,6,NULL,NULL,&s_revenantchase2};
+statetype s_revenantchase2 	= {true,SPR_REVENANT_W3_1,8,T_Chase,NULL,&s_revenantchase3};
+statetype s_revenantchase3 	= {true,SPR_REVENANT_W4_1,10,T_Chase,NULL,&s_revenantchase3s};
+statetype s_revenantchase3s	= {true,SPR_REVENANT_W5_1,6,NULL,NULL,&s_revenantchase4};
+statetype s_revenantchase4 	= {true,SPR_REVENANT_W6_1,8,T_Chase,NULL,&s_revenantchase1};
+
+statetype s_revenantdie1	= {true,SPR_REVENANT_DIE1_1,10,NULL,A_DeathScream,&s_revenantdie2};
+statetype s_revenantdie2	= {true,SPR_REVENANT_DIE2_1,10,NULL,NULL,&s_revenantdie3};
+statetype s_revenantdie3	= {false,SPR_REVENANT_DIE3,10,NULL,NULL,&s_revenantdie4};
+statetype s_revenantdie4	= {false,SPR_REVENANT_DIE4,10,NULL,NULL,&s_revenantdie5};
+statetype s_revenantdie5	= {false,SPR_REVENANT_DIE5,10,NULL,NULL,&s_revenantdie6};
+statetype s_revenantdie6	= {false,SPR_REVENANT_DIE6,10,NULL,NULL,&s_revenantdie7};
+statetype s_revenantdie7	= {false,SPR_REVENANT_DEAD,0,NULL,NULL,&s_revenantdie7};
+
+statetype s_revenantshoot1 	= {false,SPR_REVENANT_SHOOT1_1,30,NULL,NULL,&s_revenantshoot2};
+statetype s_revenantshoot2 	= {false,SPR_REVENANT_SHOOT4_1,10,NULL,T_RevBallThrow,&s_revenantshoot3};
+statetype s_revenantshoot3	= {false,SPR_REVENANT_SHOOT4_1,10,NULL,T_RevBallThrow,&s_revenantchase1};
+
+void T_RevBallThrow (objtype *ob)
 {
-	long	deltax,deltay;
-	float	angle;
-	int		iangle;
-
-	deltax = player->x - ob->x;
-	deltay = ob->y - player->y;
-	angle = atan2 (deltay,deltax);
-	if (angle<0)
-		angle = M_PI*2+angle;
-	iangle = angle/(M_PI*2)*ANGLES;
-
-	GetNewActor ();
-	new->state = &s_rocket;
-	new->ticcount = 1;
-
-	new->tilex = ob->tilex;
-	new->tiley = ob->tiley;
-	new->x = ob->x;
-	new->y = ob->y;
-	new->obclass = rocketobj;
-	new->dir = nodir;
-	new->angle = iangle;
-	new->speed = 0x2000l;
-	new->flags = FL_NONMARK;
-	new->active = true;
-
-	PlaySoundLocActor (MISSILEFIRESND,new);
-}
-
-
-
-/*
-=================
-=
-= T_Schabb
-=
-=================
-*/
-
-void T_Schabb (objtype *ob)
-{
-	long move;
-	int	dx,dy,dist;
-	boolean	dodge;
-
-	dodge = false;
-	dx = abs(ob->tilex - player->tilex);
-	dy = abs(ob->tiley - player->tiley);
-	dist = dx>dy ? dx : dy;
-
-	if (CheckLine(ob))						// got a shot at player?
-	{
-
-		if ( US_RndT() < (tics<<3) )
-		{
-		//
-		// go into attack frame
-		//
-			NewState (ob,&s_schabbshoot1);
-			return;
-		}
-		dodge = true;
-	}
-
-	if (ob->dir == nodir)
-	{
-		if (dodge)
-			SelectDodgeDir (ob);
-		else
-			SelectChaseDir (ob);
-		if (ob->dir == nodir)
-			return;							// object is blocked in
-	}
-
-	move = ob->speed*tics;
-
-	while (move)
-	{
-		if (ob->distance < 0)
-		{
-		//
-		// waiting for a door to open
-		//
-			OpenDoor (-ob->distance-1);
-			if (doorobjlist[-ob->distance-1].action != dr_open)
-				return;
-			ob->distance = TILEGLOBAL;	// go ahead, the door is now opoen
-		}
-
-		if (move < ob->distance)
-		{
-			MoveObj (ob,move);
-			break;
-		}
-
-		//
-		// reached goal tile, so select another one
-		//
-
-		//
-		// fix position to account for round off during moving
-		//
-		ob->x = ((long)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
-		ob->y = ((long)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
-
-		move -= ob->distance;
-
-		if (dist <4)
-			SelectRunDir (ob);
-		else if (dodge)
-			SelectDodgeDir (ob);
-		else
-			SelectChaseDir (ob);
-
-		if (ob->dir == nodir)
-			return;							// object is blocked in
-	}
-
-}
-
-
-
-
-/*
-=================
-=
-= T_Gift
-=
-=================
-*/
-
-void T_Gift (objtype *ob)
-{
-	long move;
-	int	dx,dy,dist;
-	boolean	dodge;
-
-	dodge = false;
-	dx = abs(ob->tilex - player->tilex);
-	dy = abs(ob->tiley - player->tiley);
-	dist = dx>dy ? dx : dy;
-
-	if (CheckLine(ob))						// got a shot at player?
-	{
-
-		if ( US_RndT() < (tics<<3) )
-		{
-		//
-		// go into attack frame
-		//
-			NewState (ob,&s_giftshoot1);
-			return;
-		}
-		dodge = true;
-	}
-
-	if (ob->dir == nodir)
-	{
-		if (dodge)
-			SelectDodgeDir (ob);
-		else
-			SelectChaseDir (ob);
-		if (ob->dir == nodir)
-			return;							// object is blocked in
-	}
-
-	move = ob->speed*tics;
-
-	while (move)
-	{
-		if (ob->distance < 0)
-		{
-		//
-		// waiting for a door to open
-		//
-			OpenDoor (-ob->distance-1);
-			if (doorobjlist[-ob->distance-1].action != dr_open)
-				return;
-			ob->distance = TILEGLOBAL;	// go ahead, the door is now opoen
-		}
-
-		if (move < ob->distance)
-		{
-			MoveObj (ob,move);
-			break;
-		}
-
-		//
-		// reached goal tile, so select another one
-		//
-
-		//
-		// fix position to account for round off during moving
-		//
-		ob->x = ((long)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
-		ob->y = ((long)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
-
-		move -= ob->distance;
-
-		if (dist <4)
-			SelectRunDir (ob);
-		else if (dodge)
-			SelectDodgeDir (ob);
-		else
-			SelectChaseDir (ob);
-
-		if (ob->dir == nodir)
-			return;							// object is blocked in
-	}
-
-}
-
-
-
-
-/*
-=================
-=
-= T_Fat
-=
-=================
-*/
-
-void T_Fat (objtype *ob)
-{
-	long move;
-	int	dx,dy,dist;
-	boolean	dodge;
-
-	dodge = false;
-	dx = abs(ob->tilex - player->tilex);
-	dy = abs(ob->tiley - player->tiley);
-	dist = dx>dy ? dx : dy;
-
-	if (CheckLine(ob))						// got a shot at player?
-	{
-
-		if ( US_RndT() < (tics<<3) )
-		{
-		//
-		// go into attack frame
-		//
-			NewState (ob,&s_fatshoot1);
-			return;
-		}
-		dodge = true;
-	}
-
-	if (ob->dir == nodir)
-	{
-		if (dodge)
-			SelectDodgeDir (ob);
-		else
-			SelectChaseDir (ob);
-		if (ob->dir == nodir)
-			return;							// object is blocked in
-	}
-
-	move = ob->speed*tics;
-
-	while (move)
-	{
-		if (ob->distance < 0)
-		{
-		//
-		// waiting for a door to open
-		//
-			OpenDoor (-ob->distance-1);
-			if (doorobjlist[-ob->distance-1].action != dr_open)
-				return;
-			ob->distance = TILEGLOBAL;	// go ahead, the door is now opoen
-		}
-
-		if (move < ob->distance)
-		{
-			MoveObj (ob,move);
-			break;
-		}
-
-		//
-		// reached goal tile, so select another one
-		//
-
-		//
-		// fix position to account for round off during moving
-		//
-		ob->x = ((long)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
-		ob->y = ((long)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
-
-		move -= ob->distance;
-
-		if (dist <4)
-			SelectRunDir (ob);
-		else if (dodge)
-			SelectDodgeDir (ob);
-		else
-			SelectChaseDir (ob);
-
-		if (ob->dir == nodir)
-			return;							// object is blocked in
-	}
-
-}
-
-
-
-/*
-=============================================================================
-
-							HITLERS
-
-=============================================================================
-*/
-
-
-//
-// fake
-//
-extern	statetype s_fakestand;
-
-extern	statetype s_fakechase1;
-extern	statetype s_fakechase1s;
-extern	statetype s_fakechase2;
-extern	statetype s_fakechase3;
-extern	statetype s_fakechase3s;
-extern	statetype s_fakechase4;
-
-extern	statetype s_fakedie1;
-extern	statetype s_fakedie2;
-extern	statetype s_fakedie3;
-extern	statetype s_fakedie4;
-extern	statetype s_fakedie5;
-extern	statetype s_fakedie6;
-
-extern	statetype s_fakeshoot1;
-extern	statetype s_fakeshoot2;
-extern	statetype s_fakeshoot3;
-extern	statetype s_fakeshoot4;
-extern	statetype s_fakeshoot5;
-extern	statetype s_fakeshoot6;
-extern	statetype s_fakeshoot7;
-extern	statetype s_fakeshoot8;
-extern	statetype s_fakeshoot9;
-
-extern	statetype s_fire1;
-extern	statetype s_fire2;
-
-statetype s_fakestand	= {false,SPR_FAKE_W1,0,T_Stand,NULL,&s_fakestand};
-
-statetype s_fakechase1 	= {false,SPR_FAKE_W1,10,T_Fake,NULL,&s_fakechase1s};
-statetype s_fakechase1s	= {false,SPR_FAKE_W1,3,NULL,NULL,&s_fakechase2};
-statetype s_fakechase2 	= {false,SPR_FAKE_W2,8,T_Fake,NULL,&s_fakechase3};
-statetype s_fakechase3 	= {false,SPR_FAKE_W3,10,T_Fake,NULL,&s_fakechase3s};
-statetype s_fakechase3s	= {false,SPR_FAKE_W3,3,NULL,NULL,&s_fakechase4};
-statetype s_fakechase4 	= {false,SPR_FAKE_W4,8,T_Fake,NULL,&s_fakechase1};
-
-statetype s_fakedie1	= {false,SPR_FAKE_DIE1,10,NULL,A_DeathScream,&s_fakedie2};
-statetype s_fakedie2	= {false,SPR_FAKE_DIE2,10,NULL,NULL,&s_fakedie3};
-statetype s_fakedie3	= {false,SPR_FAKE_DIE3,10,NULL,NULL,&s_fakedie4};
-statetype s_fakedie4	= {false,SPR_FAKE_DIE4,10,NULL,NULL,&s_fakedie5};
-statetype s_fakedie5	= {false,SPR_FAKE_DIE5,10,NULL,NULL,&s_fakedie6};
-statetype s_fakedie6	= {false,SPR_FAKE_DEAD,0,NULL,NULL,&s_fakedie6};
-
-statetype s_fakeshoot1 	= {false,SPR_FAKE_SHOOT,8,NULL,T_FakeFire,&s_fakeshoot2};
-statetype s_fakeshoot2 	= {false,SPR_FAKE_SHOOT,8,NULL,T_FakeFire,&s_fakeshoot3};
-statetype s_fakeshoot3 	= {false,SPR_FAKE_SHOOT,8,NULL,T_FakeFire,&s_fakeshoot4};
-statetype s_fakeshoot4 	= {false,SPR_FAKE_SHOOT,8,NULL,T_FakeFire,&s_fakeshoot5};
-statetype s_fakeshoot5 	= {false,SPR_FAKE_SHOOT,8,NULL,T_FakeFire,&s_fakeshoot6};
-statetype s_fakeshoot6 	= {false,SPR_FAKE_SHOOT,8,NULL,T_FakeFire,&s_fakeshoot7};
-statetype s_fakeshoot7 	= {false,SPR_FAKE_SHOOT,8,NULL,T_FakeFire,&s_fakeshoot8};
-statetype s_fakeshoot8 	= {false,SPR_FAKE_SHOOT,8,NULL,T_FakeFire,&s_fakeshoot9};
-statetype s_fakeshoot9 	= {false,SPR_FAKE_SHOOT,8,NULL,NULL,&s_fakechase1};
-
-statetype s_fire1 	= {false,SPR_FIRE1,6,NULL,T_Projectile,&s_fire2};
-statetype s_fire2 	= {false,SPR_FIRE2,6,NULL,T_Projectile,&s_fire1};
-
-//
-// hitler
-//
-extern	statetype s_mechachase1;
-extern	statetype s_mechachase1s;
-extern	statetype s_mechachase2;
-extern	statetype s_mechachase3;
-extern	statetype s_mechachase3s;
-extern	statetype s_mechachase4;
-
-extern	statetype s_mechadie1;
-extern	statetype s_mechadie2;
-extern	statetype s_mechadie3;
-extern	statetype s_mechadie4;
-
-extern	statetype s_mechashoot1;
-extern	statetype s_mechashoot2;
-extern	statetype s_mechashoot3;
-extern	statetype s_mechashoot4;
-extern	statetype s_mechashoot5;
-extern	statetype s_mechashoot6;
-
-
-extern	statetype s_hitlerchase1;
-extern	statetype s_hitlerchase1s;
-extern	statetype s_hitlerchase2;
-extern	statetype s_hitlerchase3;
-extern	statetype s_hitlerchase3s;
-extern	statetype s_hitlerchase4;
-
-extern	statetype s_hitlerdie1;
-extern	statetype s_hitlerdie2;
-extern	statetype s_hitlerdie3;
-extern	statetype s_hitlerdie4;
-extern	statetype s_hitlerdie5;
-extern	statetype s_hitlerdie6;
-extern	statetype s_hitlerdie7;
-extern	statetype s_hitlerdie8;
-extern	statetype s_hitlerdie9;
-extern	statetype s_hitlerdie10;
-
-extern	statetype s_hitlershoot1;
-extern	statetype s_hitlershoot2;
-extern	statetype s_hitlershoot3;
-extern	statetype s_hitlershoot4;
-extern	statetype s_hitlershoot5;
-extern	statetype s_hitlershoot6;
-
-extern	statetype s_hitlerdeathcam;
-
-statetype s_mechastand	= {false,SPR_MECHA_W1,0,T_Stand,NULL,&s_mechastand};
-
-statetype s_mechachase1 	= {false,SPR_MECHA_W1,10,T_Chase,A_MechaSound,&s_mechachase1s};
-statetype s_mechachase1s	= {false,SPR_MECHA_W1,6,NULL,NULL,&s_mechachase2};
-statetype s_mechachase2 	= {false,SPR_MECHA_W2,8,T_Chase,NULL,&s_mechachase3};
-statetype s_mechachase3 	= {false,SPR_MECHA_W3,10,T_Chase,A_MechaSound,&s_mechachase3s};
-statetype s_mechachase3s	= {false,SPR_MECHA_W3,6,NULL,NULL,&s_mechachase4};
-statetype s_mechachase4 	= {false,SPR_MECHA_W4,8,T_Chase,NULL,&s_mechachase1};
-
-statetype s_mechadie1	= {false,SPR_MECHA_DIE1,10,NULL,A_DeathScream,&s_mechadie2};
-statetype s_mechadie2	= {false,SPR_MECHA_DIE2,10,NULL,NULL,&s_mechadie3};
-statetype s_mechadie3	= {false,SPR_MECHA_DIE3,10,NULL,A_HitlerMorph,&s_mechadie4};
-statetype s_mechadie4	= {false,SPR_MECHA_DEAD,0,NULL,NULL,&s_mechadie4};
-
-statetype s_mechashoot1 	= {false,SPR_MECHA_SHOOT1,30,NULL,NULL,&s_mechashoot2};
-statetype s_mechashoot2 	= {false,SPR_MECHA_SHOOT2,10,NULL,T_Shoot,&s_mechashoot3};
-statetype s_mechashoot3 	= {false,SPR_MECHA_SHOOT3,10,NULL,T_Shoot,&s_mechashoot4};
-statetype s_mechashoot4 	= {false,SPR_MECHA_SHOOT2,10,NULL,T_Shoot,&s_mechashoot5};
-statetype s_mechashoot5 	= {false,SPR_MECHA_SHOOT3,10,NULL,T_Shoot,&s_mechashoot6};
-statetype s_mechashoot6 	= {false,SPR_MECHA_SHOOT2,10,NULL,T_Shoot,&s_mechachase1};
-
-
-statetype s_hitlerchase1 	= {false,SPR_HITLER_W1,6,T_Chase,NULL,&s_hitlerchase1s};
-statetype s_hitlerchase1s	= {false,SPR_HITLER_W1,4,NULL,NULL,&s_hitlerchase2};
-statetype s_hitlerchase2 	= {false,SPR_HITLER_W2,2,T_Chase,NULL,&s_hitlerchase3};
-statetype s_hitlerchase3 	= {false,SPR_HITLER_W3,6,T_Chase,NULL,&s_hitlerchase3s};
-statetype s_hitlerchase3s	= {false,SPR_HITLER_W3,4,NULL,NULL,&s_hitlerchase4};
-statetype s_hitlerchase4 	= {false,SPR_HITLER_W4,2,T_Chase,NULL,&s_hitlerchase1};
-
-statetype s_hitlerdeathcam	= {false,SPR_HITLER_W1,10,NULL,NULL,&s_hitlerdie1};
-
-statetype s_hitlerdie1	= {false,SPR_HITLER_W1,1,NULL,A_DeathScream,&s_hitlerdie2};
-statetype s_hitlerdie2	= {false,SPR_HITLER_W1,10,NULL,NULL,&s_hitlerdie3};
-statetype s_hitlerdie3	= {false,SPR_HITLER_DIE1,10,NULL,A_Slurpie,&s_hitlerdie4};
-statetype s_hitlerdie4	= {false,SPR_HITLER_DIE2,10,NULL,NULL,&s_hitlerdie5};
-statetype s_hitlerdie5	= {false,SPR_HITLER_DIE3,10,NULL,NULL,&s_hitlerdie6};
-statetype s_hitlerdie6	= {false,SPR_HITLER_DIE4,10,NULL,NULL,&s_hitlerdie7};
-statetype s_hitlerdie7	= {false,SPR_HITLER_DIE5,10,NULL,NULL,&s_hitlerdie8};
-statetype s_hitlerdie8	= {false,SPR_HITLER_DIE6,10,NULL,NULL,&s_hitlerdie9};
-statetype s_hitlerdie9	= {false,SPR_HITLER_DIE7,10,NULL,NULL,&s_hitlerdie10};
-statetype s_hitlerdie10	= {false,SPR_HITLER_DEAD,20,NULL,A_StartDeathCam,&s_hitlerdie10};
-
-statetype s_hitlershoot1 	= {false,SPR_HITLER_SHOOT1,30,NULL,NULL,&s_hitlershoot2};
-statetype s_hitlershoot2 	= {false,SPR_HITLER_SHOOT2,10,NULL,T_Shoot,&s_hitlershoot3};
-statetype s_hitlershoot3 	= {false,SPR_HITLER_SHOOT3,10,NULL,T_Shoot,&s_hitlershoot4};
-statetype s_hitlershoot4 	= {false,SPR_HITLER_SHOOT2,10,NULL,T_Shoot,&s_hitlershoot5};
-statetype s_hitlershoot5 	= {false,SPR_HITLER_SHOOT3,10,NULL,T_Shoot,&s_hitlershoot6};
-statetype s_hitlershoot6 	= {false,SPR_HITLER_SHOOT2,10,NULL,T_Shoot,&s_hitlerchase1};
-
-
-
-/*
-===============
-=
-= SpawnFakeHitler
-=
-===============
-*/
-
-void SpawnFakeHitler (int tilex, int tiley)
+   long   deltax,deltay;
+   float   angle;
+   int      iangle;
+
+   deltax = player->x - ob->x;
+   deltay = ob->y - player->y;
+   angle = atan2 (deltay,deltax);
+   if (angle<0)
+      angle = M_PI*2+angle;
+   iangle = angle/(M_PI*2)*ANGLES;
+
+   GetNewActor ();
+   new->state = &s_revball1;
+   new->ticcount = 1;
+
+   new->tilex = ob->tilex;
+   new->tiley = ob->tiley;
+   new->x = ob->x;
+   new->y = ob->y;
+   new->obclass = revballobj;
+   new->dir = nodir;
+   new->angle = iangle;
+   new->speed = 0x2000l;
+
+   new->flags = FL_NONMARK;
+   new->active = true;
+
+   PlaySoundLocActor (RLAUNCHERFIRESND,new);   //Change to the sound you want.
+} 
+
+void SpawnRevenant (int tilex, int tiley)
 {
 	unsigned	far *map,tile;
 
-
-	if (DigiMode != sds_Off)
-	  s_hitlerdie2.tictime = 140;
-	else
-	  s_hitlerdie2.tictime = 5;
-
-	SpawnNewObj (tilex,tiley,&s_fakestand);
+	SpawnNewObj (tilex,tiley,&s_revenantstand);
 	new->speed = SPDPATROL;
 
-	new->obclass = fakeobj;
-	new->hitpoints = starthitpoints[gamestate.difficulty][en_fake];
-	new->dir = north;
+	new->obclass = revenantobj;
+	new->hitpoints = starthitpoints[gamestate.difficulty][en_revenant];
+	new->dir = nodir;
 	new->flags |= FL_SHOOTABLE|FL_AMBUSH;
 	if (!loadedgame)
 	  gamestate.killtotal++;
 }
 
-
-/*
-===============
-=
-= SpawnHitler
-=
-===============
-*/
-
-void SpawnHitler (int tilex, int tiley)
-{
-	unsigned	far *map,tile;
-
-	if (DigiMode != sds_Off)
-		s_hitlerdie2.tictime = 140;
-	else
-		s_hitlerdie2.tictime = 5;
-
-
-	SpawnNewObj (tilex,tiley,&s_mechastand);
-	new->speed = SPDPATROL;
-
-	new->obclass = mechahitlerobj;
-	new->hitpoints = starthitpoints[gamestate.difficulty][en_hitler];
-	new->dir = south;
-	new->flags |= FL_SHOOTABLE|FL_AMBUSH;
-	if (!loadedgame)
-	  gamestate.killtotal++;
-}
-
-
-/*
-===============
-=
-= A_HitlerMorph
-=
-===============
-*/
-
-void A_HitlerMorph (objtype *ob)
-{
-	unsigned	far *map,tile,hitpoints[4]={500,700,800,900};
-
-
-	SpawnNewObj (ob->tilex,ob->tiley,&s_hitlerchase1);
-	new->speed = SPDPATROL*5;
-
-	new->x = ob->x;
-	new->y = ob->y;
-
-	new->distance = ob->distance;
-	new->dir = ob->dir;
-	new->flags = ob->flags | FL_SHOOTABLE;
-
-	new->obclass = realhitlerobj;
-	new->hitpoints = hitpoints[gamestate.difficulty];
-}
-
-
-////////////////////////////////////////////////////////
-//
-// A_MechaSound
-// A_Slurpie
-//
-////////////////////////////////////////////////////////
 void A_MechaSound (objtype *ob)
 {
 	if (areabyplayer[ob->areanumber])
-		PlaySoundLocActor (MECHSTEPSND,ob);
+		PlaySoundLocActor (MOVEUPDOWNSND,ob);
 }
 
+//
+// boss
+//
+void T_BossObjThrow (objtype *ob);
+
+extern	statetype s_bossstand;
+
+extern	statetype s_bosschase1;
+extern	statetype s_bosschase1s;
+extern	statetype s_bosschase2;
+extern	statetype s_bosschase3;
+extern	statetype s_bosschase3s;
+extern	statetype s_bosschase4;
+
+extern	statetype s_bossdie1;
+extern	statetype s_bossdie2;
+extern	statetype s_bossdie3;
+extern	statetype s_bossdie4;
+extern	statetype s_bossdie5;
+extern	statetype s_bossdie6;
+extern	statetype s_bossdie7;
+extern	statetype s_bossdie8;
+extern	statetype s_bossdie9;
+extern	statetype s_bossdie10;
+
+extern	statetype s_bossshoot1;
+extern	statetype s_bossshoot2;
+extern	statetype s_bossshoot3;
+
+statetype s_bossstand	= {true,SPR_BOSS_W1_1,0,T_Stand,NULL,&s_bossstand};
+statetype s_bosschase1 	= {true,SPR_BOSS_W1_1,6,T_Chase,NULL,&s_bosschase1s};
+statetype s_bosschase1s	= {true,SPR_BOSS_W1_1,4,NULL,NULL,&s_bosschase2};
+statetype s_bosschase2 	= {true,SPR_BOSS_W2_1,2,T_Chase,NULL,&s_bosschase3};
+statetype s_bosschase3 	= {true,SPR_BOSS_W3_1,6,T_Chase,NULL,&s_bosschase3s};
+statetype s_bosschase3s	= {true,SPR_BOSS_W3_1,4,NULL,NULL,&s_bosschase4};
+statetype s_bosschase4 	= {true,SPR_BOSS_W4_1,2,T_Chase,NULL,&s_bosschase1};
+
+statetype s_bossdie1	= {true,SPR_BOSS_W1_1,1,NULL,A_DeathScream,&s_bossdie2};
+statetype s_bossdie2	= {false,SPR_BOSS_W1_1,10,NULL,NULL,&s_bossdie3};
+statetype s_bossdie3	= {false,SPR_BOSS_DIE_1,10,NULL,A_Slurpie,&s_bossdie4};
+statetype s_bossdie4	= {false,SPR_BOSS_DIE2,10,NULL,NULL,&s_bossdie5};
+statetype s_bossdie5	= {false,SPR_BOSS_DIE3,10,NULL,NULL,&s_bossdie6};
+statetype s_bossdie6	= {false,SPR_BOSS_DIE4,10,NULL,NULL,&s_bossdie7};
+statetype s_bossdie7	= {false,SPR_BOSS_DIE5,10,NULL,NULL,&s_bossdie8};
+statetype s_bossdie8	= {false,SPR_BOSS_DIE6,10,NULL,NULL,&s_bossdie9};
+statetype s_bossdie9	= {false,SPR_BOSS_DIE7,10,NULL,NULL,&s_bossdie10};
+statetype s_bossdie10	= {false,SPR_BOSS_DEAD,20,NULL,NULL,&s_bossdie10};
+
+statetype s_bossshoot1 	= {false,SPR_BOSS_SHOOT_1,30,NULL,NULL,&s_bossshoot2};
+statetype s_bossshoot2 	= {false,SPR_BOSS_SHOOT2_1,10,NULL,NULL,&s_bossshoot3};
+statetype s_bossshoot3 	= {false,SPR_BOSS_SHOOT3_1,10,NULL,T_BossObjThrow,&s_bosschase1};
+
+void SpawnBoss (int tilex, int tiley)
+{
+	unsigned	far *map,tile;
+
+	SpawnNewObj (tilex,tiley,&s_bossstand);
+	new->speed = SPDPATROL;
+
+	new->obclass = bossobj;
+	new->hitpoints = starthitpoints[gamestate.difficulty][en_boss];
+	new->dir = nodir;
+	new->flags |= FL_SHOOTABLE|FL_AMBUSH;
+	if (!loadedgame)
+	  gamestate.killtotal++;
+}
+//
+// boss2
+//
+void T_BossObjThrow (objtype *ob);
+
+extern	statetype s_boss2stand;
+
+extern	statetype s_boss2chase1;
+extern	statetype s_boss2chase1s;
+extern	statetype s_boss2chase2;
+extern	statetype s_boss2chase3;
+extern	statetype s_boss2chase3s;
+extern	statetype s_boss2chase4;
+
+extern	statetype s_boss2die1;
+extern	statetype s_boss2die2;
+extern	statetype s_boss2die3;
+extern	statetype s_boss2die4;
+extern	statetype s_boss2die5;
+extern	statetype s_boss2die6;
+extern	statetype s_boss2die7;
+extern	statetype s_boss2die8;
+extern	statetype s_boss2die9;
+extern	statetype s_boss2die10;
+
+extern	statetype s_boss2shoot1;
+extern	statetype s_boss2shoot2;
+extern	statetype s_boss2shoot3;
+
+statetype s_boss2stand	= {true,SPR_BOSS2_W1_1,0,T_Stand,NULL,&s_boss2stand};
+statetype s_boss2chase1 	= {true,SPR_BOSS2_W1_1,6,T_Chase,NULL,&s_boss2chase1s};
+statetype s_boss2chase1s	= {true,SPR_BOSS2_W1_1,4,NULL,NULL,&s_boss2chase2};
+statetype s_boss2chase2 	= {true,SPR_BOSS2_W2_1,2,T_Chase,NULL,&s_boss2chase3};
+statetype s_boss2chase3 	= {true,SPR_BOSS2_W3_1,6,T_Chase,NULL,&s_boss2chase3s};
+statetype s_boss2chase3s	= {true,SPR_BOSS2_W3_1,4,NULL,NULL,&s_boss2chase4};
+statetype s_boss2chase4 	= {true,SPR_BOSS2_W4_1,2,T_Chase,NULL,&s_boss2chase1};
+
+statetype s_boss2die1	= {true,SPR_BOSS2_W1_1,1,NULL,A_DeathScream,&s_boss2die2};
+statetype s_boss2die2	= {false,SPR_BOSS2_W1_1,10,NULL,NULL,&s_boss2die3};
+statetype s_boss2die3	= {false,SPR_BOSS2_DIE_1,10,NULL,A_Slurpie,&s_boss2die4};
+statetype s_boss2die4	= {false,SPR_BOSS2_DIE2,10,NULL,NULL,&s_boss2die5};
+statetype s_boss2die5	= {false,SPR_BOSS2_DIE3,10,NULL,NULL,&s_boss2die6};
+statetype s_boss2die6	= {false,SPR_BOSS2_DIE4,10,NULL,NULL,&s_boss2die7};
+statetype s_boss2die7	= {false,SPR_BOSS2_DIE5,10,NULL,NULL,&s_boss2die8};
+statetype s_boss2die8	= {false,SPR_BOSS2_DIE6,10,NULL,NULL,&s_boss2die9};
+statetype s_boss2die9	= {false,SPR_BOSS2_DIE7,10,NULL,NULL,&s_boss2die10};
+statetype s_boss2die10	= {false,SPR_BOSS2_DEAD,20,NULL,NULL,&s_boss2die10};
+
+statetype s_boss2shoot1 	= {false,SPR_BOSS2_SHOOT_1,30,NULL,NULL,&s_boss2shoot2};
+statetype s_boss2shoot2 	= {false,SPR_BOSS2_SHOOT2_1,10,NULL,NULL,&s_boss2shoot3};
+statetype s_boss2shoot3 	= {false,SPR_BOSS2_SHOOT3_1,10,NULL,T_BossObjThrow,&s_boss2chase1};
+
+void SpawnBoss2 (int tilex, int tiley)
+{
+	unsigned	far *map,tile;
+
+	SpawnNewObj (tilex,tiley,&s_boss2stand);
+	new->speed = SPDPATROL;
+
+	new->obclass = boss2obj;
+	new->hitpoints = starthitpoints[gamestate.difficulty][en_boss2];
+	new->dir = nodir;
+	new->flags |= FL_SHOOTABLE|FL_AMBUSH;
+	if (!loadedgame)
+	  gamestate.killtotal++;
+}
+//
+// boss projectile
+//
+extern	statetype s_bossballobj;
+extern	statetype s_bossballobj2;
+extern	statetype s_bossballboom1;
+extern	statetype s_bossballboom2;
+extern	statetype s_bossballboom3;
+
+statetype s_bossballobj	= {true,SPR_GREEN_1,6,T_Projectile,NULL,&s_bossballobj2};
+statetype s_bossballobj2	= {true,SPR_GREEN2_1,6,T_Projectile,NULL,&s_bossballobj};
+
+statetype s_bossballboom1	= {false,SPR_GREEN_BOOM_1,6,NULL,NULL,&s_bossballboom2};
+statetype s_bossballboom2	= {false,SPR_GREEN_BOOM_2,6,NULL,NULL,&s_bossballboom3};
+statetype s_bossballboom3	= {false,SPR_GREEN_BOOM_3,6,NULL,NULL,NULL};
+
+void T_BossObjThrow (objtype *ob)
+{
+	long deltax,deltay;
+	float	angle;
+	int	iangle;
+
+	deltax = player->x - ob->x;
+	deltay = ob->y - player->y;
+	angle = atan2 (deltay,deltax);
+	if (angle<0)
+		angle = M_PI*2+angle;
+	iangle = angle/(M_PI*2)*ANGLES;
+
+	GetNewActor ();
+	new->state = &s_bossballobj;
+	new->ticcount = 1;
+
+	new->tilex = ob->tilex;
+	new->tiley = ob->tiley;
+	new->x = ob->x;
+	new->y = ob->y;
+	new->obclass = bossballobj;
+	new->dir = nodir;
+	new->angle = iangle;
+	new->speed = 0x2000l;
+
+	PlaySoundLocActor (IMPFIRESND,new);
+}
 
 #pragma argsused
 void A_Slurpie (objtype *ob)
 {
- SD_PlaySound(SLURPIESND);
+ SD_PlaySound(SLOPSND);
 }
-
-/*
-=================
-=
-= T_FakeFire
-=
-=================
-*/
-
-void T_FakeFire (objtype *ob)
-{
-	long	deltax,deltay;
-	float	angle;
-	int		iangle;
-
-	deltax = player->x - ob->x;
-	deltay = ob->y - player->y;
-	angle = atan2 (deltay,deltax);
-	if (angle<0)
-		angle = M_PI*2+angle;
-	iangle = angle/(M_PI*2)*ANGLES;
-
-	GetNewActor ();
-	new->state = &s_fire1;
-	new->ticcount = 1;
-
-	new->tilex = ob->tilex;
-	new->tiley = ob->tiley;
-	new->x = ob->x;
-	new->y = ob->y;
-	new->dir = nodir;
-	new->angle = iangle;
-	new->obclass = fireobj;
-	new->speed = 0x1200l;
-	new->flags = FL_NEVERMARK;
-	new->active = true;
-
-	PlaySoundLocActor (FLAMETHROWERSND,new);
-}
-
-
-
-/*
-=================
-=
-= T_Fake
-=
-=================
-*/
-
-void T_Fake (objtype *ob)
-{
-	long move;
-	int	dx,dy,dist;
-	boolean	dodge;
-
-	if (CheckLine(ob))			// got a shot at player?
-	{
-		if ( US_RndT() < (tics<<1) )
-		{
-		//
-		// go into attack frame
-		//
-			NewState (ob,&s_fakeshoot1);
-			return;
-		}
-	}
-
-	if (ob->dir == nodir)
-	{
-		SelectDodgeDir (ob);
-		if (ob->dir == nodir)
-			return;							// object is blocked in
-	}
-
-	move = ob->speed*tics;
-
-	while (move)
-	{
-		if (move < ob->distance)
-		{
-			MoveObj (ob,move);
-			break;
-		}
-
-		//
-		// reached goal tile, so select another one
-		//
-
-		//
-		// fix position to account for round off during moving
-		//
-		ob->x = ((long)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
-		ob->y = ((long)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
-
-		move -= ob->distance;
-
-		SelectDodgeDir (ob);
-
-		if (ob->dir == nodir)
-			return;							// object is blocked in
-	}
-
-}
-
-#endif
-/*
-============================================================================
-
-							STAND
-
-============================================================================
-*/
-
-
-/*
-===============
-=
-= T_Stand
-=
-===============
-*/
 
 void T_Stand (objtype *ob)
 {
 	SightPlayer (ob);
 }
-
-
-/*
-============================================================================
-
-								CHASE
-
-============================================================================
-*/
-
-/*
-=================
-=
-= T_Chase
-=
-=================
-*/
 
 void T_Chase (objtype *ob)
 {
@@ -3076,7 +2325,7 @@ void T_Chase (objtype *ob)
 		return;
 
 	dodge = false;
-	if (CheckLine(ob))	// got a shot at player?
+	if (CheckLine(ob))
 	{
 		dx = abs(ob->tilex - player->tilex);
 		dy = abs(ob->tiley - player->tiley);
@@ -3085,62 +2334,53 @@ void T_Chase (objtype *ob)
 			chance = 300;
 		else
 			chance = (tics<<4)/dist;
-
+		if (gamestate.invisibility && dist>1) goto invisible;
 		if ( US_RndT()<chance)
 		{
-		//
-		// go into attack frame
-		//
 			switch (ob->obclass)
 			{
-			case guardobj:
-				NewState (ob,&s_grdshoot1);
-				break;
-			case officerobj:
-				NewState (ob,&s_ofcshoot1);
-				break;
 			case mutantobj:
-				NewState (ob,&s_mutshoot1);
+				NewState (ob,&s_mutantshoot1);
 				break;
-			case ssobj:
-				NewState (ob,&s_ssshoot1);
+			case chainguyobj:
+				NewState (ob,&s_chainguyshoot1);
 				break;
-#ifndef SPEAR
+			case shotguyobj:
+				NewState (ob,&s_shotguyshoot1);
+				break;
+			case cacoobj:
+				NewState (ob,&s_cacoshoot1);
+				break;
+			case cyberobj:
+				NewState (ob,&s_cybershoot1);
+				break;
+			case revenantobj:
+				NewState (ob,&s_revenantshoot1);
+				break;
 			case bossobj:
 				NewState (ob,&s_bossshoot1);
 				break;
-			case gretelobj:
-				NewState (ob,&s_gretelshoot1);
+			case boss2obj:
+				NewState (ob,&s_boss2shoot1);
 				break;
-			case mechahitlerobj:
-				NewState (ob,&s_mechashoot1);
+			case impobj:
+				NewState (ob,&s_impshoot1);
 				break;
-			case realhitlerobj:
-				NewState (ob,&s_hitlershoot1);
+			case painobj:
+				NewState (ob,&s_painshoot1);
 				break;
-#else
-			case angelobj:
-				NewState (ob,&s_angelshoot1);
+			case soulobj:
+				NewState (ob,&s_soulshoot1);
 				break;
-			case transobj:
-				NewState (ob,&s_transshoot1);
+			case vileobj:
+				NewState (ob,&s_vileshoot1);
 				break;
-			case uberobj:
-				NewState (ob,&s_ubershoot1);
-				break;
-			case willobj:
-				NewState (ob,&s_willshoot1);
-				break;
-			case deathobj:
-				NewState (ob,&s_deathshoot1);
-				break;
-#endif
 			}
 			return;
 		}
 		dodge = true;
 	}
-
+	invisible:
 	if (ob->dir == nodir)
 	{
 		if (dodge)
@@ -3157,9 +2397,6 @@ void T_Chase (objtype *ob)
 	{
 		if (ob->distance < 0)
 		{
-		//
-		// waiting for a door to open
-		//
 			OpenDoor (-ob->distance-1);
 			if (doorobjlist[-ob->distance-1].action != dr_open)
 				return;
@@ -3171,14 +2408,6 @@ void T_Chase (objtype *ob)
 			MoveObj (ob,move);
 			break;
 		}
-
-		//
-		// reached goal tile, so select another one
-		//
-
-		//
-		// fix position to account for round off during moving
-		//
 		ob->x = ((long)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
 		ob->y = ((long)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
 
@@ -3195,66 +2424,7 @@ void T_Chase (objtype *ob)
 
 }
 
-
-/*
-=================
-=
-= T_Ghosts
-=
-=================
-*/
-
-void T_Ghosts (objtype *ob)
-{
-	long move;
-
-
-	if (ob->dir == nodir)
-	{
-		SelectChaseDir (ob);
-		if (ob->dir == nodir)
-			return;							// object is blocked in
-	}
-
-	move = ob->speed*tics;
-
-	while (move)
-	{
-		if (move < ob->distance)
-		{
-			MoveObj (ob,move);
-			break;
-		}
-
-		//
-		// reached goal tile, so select another one
-		//
-
-		//
-		// fix position to account for round off during moving
-		//
-		ob->x = ((long)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
-		ob->y = ((long)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
-
-		move -= ob->distance;
-
-		SelectChaseDir (ob);
-
-		if (ob->dir == nodir)
-			return;							// object is blocked in
-	}
-
-}
-
-/*
-=================
-=
-= T_DogChase
-=
-=================
-*/
-
-void T_DogChase (objtype *ob)
+void T_DemonChase (objtype *ob)
 {
 	long 	move;
 	int		dist,chance;
@@ -3272,9 +2442,6 @@ void T_DogChase (objtype *ob)
 
 	while (move)
 	{
-	//
-	// check for byte range
-	//
 		dx = player->x - ob->x;
 		if (dx<0)
 			dx = -dx;
@@ -3287,8 +2454,16 @@ void T_DogChase (objtype *ob)
 			dy -= move;
 			if (dy <= MINACTORDIST)
 			{
-				NewState (ob,&s_dogjump1);
-				return;
+			switch (ob->obclass)
+			{
+			case demonobj:
+				NewState (ob,&s_demonjump1);
+				break;
+			case soulobj:
+				NewState (ob,&s_soulshoot1);
+				break;
+			}
+			return;
 			}
 		}
 
@@ -3297,14 +2472,6 @@ void T_DogChase (objtype *ob)
 			MoveObj (ob,move);
 			break;
 		}
-
-		//
-		// reached goal tile, so select another one
-		//
-
-		//
-		// fix position to account for round off during moving
-		//
 		ob->x = ((long)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
 		ob->y = ((long)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
 
@@ -3317,25 +2484,6 @@ void T_DogChase (objtype *ob)
 	}
 
 }
-
-
-
-/*
-============================================================================
-
-								PATH
-
-============================================================================
-*/
-
-
-/*
-===============
-=
-= SelectPathDir
-=
-===============
-*/
 
 void SelectPathDir (objtype *ob)
 {
@@ -3354,15 +2502,6 @@ void SelectPathDir (objtype *ob)
 	if (!TryWalk (ob))
 		ob->dir = nodir;
 }
-
-
-/*
-===============
-=
-= T_Path
-=
-===============
-*/
 
 void T_Path (objtype *ob)
 {
@@ -3386,9 +2525,6 @@ void T_Path (objtype *ob)
 	{
 		if (ob->distance < 0)
 		{
-		//
-		// waiting for a door to open
-		//
 			OpenDoor (-ob->distance-1);
 			if (doorobjlist[-ob->distance-1].action != dr_open)
 				return;
@@ -3407,9 +2543,6 @@ void T_Path (objtype *ob)
 			,ob->tilex,ob->tiley,ob->dir);
 			Quit (str);
 		}
-
-
-
 		ob->x = ((long)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
 		ob->y = ((long)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
 		move -= ob->distance;
@@ -3420,26 +2553,6 @@ void T_Path (objtype *ob)
 			return;					// all movement is blocked
 	}
 }
-
-
-/*
-=============================================================================
-
-								FIGHT
-
-=============================================================================
-*/
-
-
-/*
-===============
-=
-= T_Shoot
-=
-= Try to damage the player, based on skill level and player's speed
-=
-===============
-*/
 
 void T_Shoot (objtype *ob)
 {
@@ -3458,9 +2571,6 @@ void T_Shoot (objtype *ob)
 	dy = abs(ob->tiley - player->tiley);
 	dist = dx>dy ? dx:dy;
 
-	if (ob->obclass == ssobj || ob->obclass == bossobj)
-		dist = dist*2/3;					// ss are better shots
-
 	if (thrustspeed >= RUNSPEED)
 	{
 		if (ob->flags&FL_VISABLE)
@@ -3476,8 +2586,6 @@ void T_Shoot (objtype *ob)
 			hitchance = 256-dist*8;
 	}
 
-// see if the shot was a hit
-
 	if (US_RndT()<hitchance)
 	{
 		if (dist<2)
@@ -3492,48 +2600,30 @@ void T_Shoot (objtype *ob)
 
 	switch(ob->obclass)
 	{
-	 case ssobj:
-	   PlaySoundLocActor(SSFIRESND,ob);
+	 case shotguyobj:
+	 case chainguyobj:
+	   PlaySoundLocActor(SHOTGUNFIRESND,ob);
 	   break;
-#ifndef SPEAR
-	 case giftobj:
-	 case fatobj:
-	   PlaySoundLocActor(MISSILEFIRESND,ob);
-	   break;
-	 case mechahitlerobj:
-	 case realhitlerobj:
-	 case bossobj:
-	   PlaySoundLocActor(BOSSFIRESND,ob);
-	   break;
-	 case schabbobj:
-	   PlaySoundLocActor(SCHABBSTHROWSND,ob);
-	   break;
-	 case fakeobj:
-	   PlaySoundLocActor(FLAMETHROWERSND,ob);
-	   break;
-#endif
 	 default:
-	   PlaySoundLocActor(NAZIFIRESND,ob);
+	   PlaySoundLocActor(PISTOLFIRESND,ob);
 	}
 
 }
-
-
-/*
-===============
-=
-= T_Bite
-=
-===============
-*/
 
 void T_Bite (objtype *ob)
 {
 	long	dx,dy;
 	int	hitchance,damage;
 
-
-	PlaySoundLocActor(DOGATTACKSND,ob);	// JAB
+	switch (ob->obclass)
+	{
+	case demonobj:
+		PlaySoundLocActor(DEMONFIRESND,ob);	// JAB
+		break;
+	case soulobj:
+		PlaySoundLocActor(SOULATKSND,ob);	// JAB
+		break;
+	}
 
 	dx = player->x - ob->x;
 	if (dx<0)
@@ -3558,176 +2648,6 @@ void T_Bite (objtype *ob)
 	return;
 }
 
-
-#ifndef SPEAR
-/*
-============================================================================
-
-							BJ VICTORY
-
-============================================================================
-*/
-
-
-//
-// BJ victory
-//
-
-void T_BJRun (objtype *ob);
-void T_BJJump (objtype *ob);
-void T_BJDone (objtype *ob);
-void T_BJYell (objtype *ob);
-
-void T_DeathCam (objtype *ob);
-
-extern	statetype s_bjrun1;
-extern	statetype s_bjrun1s;
-extern	statetype s_bjrun2;
-extern	statetype s_bjrun3;
-extern	statetype s_bjrun3s;
-extern	statetype s_bjrun4;
-
-extern	statetype s_bjjump1;
-extern	statetype s_bjjump2;
-extern	statetype s_bjjump3;
-extern	statetype s_bjjump4;
-
-
-statetype s_bjrun1 	= {false,SPR_BJ_W1,12,T_BJRun,NULL,&s_bjrun1s};
-statetype s_bjrun1s	= {false,SPR_BJ_W1,3, NULL,NULL,&s_bjrun2};
-statetype s_bjrun2 	= {false,SPR_BJ_W2,8,T_BJRun,NULL,&s_bjrun3};
-statetype s_bjrun3 	= {false,SPR_BJ_W3,12,T_BJRun,NULL,&s_bjrun3s};
-statetype s_bjrun3s	= {false,SPR_BJ_W3,3, NULL,NULL,&s_bjrun4};
-statetype s_bjrun4 	= {false,SPR_BJ_W4,8,T_BJRun,NULL,&s_bjrun1};
-
-
-statetype s_bjjump1	= {false,SPR_BJ_JUMP1,14,T_BJJump,NULL,&s_bjjump2};
-statetype s_bjjump2	= {false,SPR_BJ_JUMP2,14,T_BJJump,T_BJYell,&s_bjjump3};
-statetype s_bjjump3	= {false,SPR_BJ_JUMP3,14,T_BJJump,NULL,&s_bjjump4};
-statetype s_bjjump4	= {false,SPR_BJ_JUMP4,300,NULL,T_BJDone,&s_bjjump4};
-
-
-statetype s_deathcam = {false,0,0,NULL,NULL,NULL};
-
-
-/*
-===============
-=
-= SpawnBJVictory
-=
-===============
-*/
-
-void SpawnBJVictory (void)
-{
-	unsigned	far *map,tile;
-
-	SpawnNewObj (player->tilex,player->tiley+1,&s_bjrun1);
-	new->x = player->x;
-	new->y = player->y;
-	new->obclass = bjobj;
-	new->dir = north;
-	new->temp1 = 6;			// tiles to run forward
-}
-
-
-
-/*
-===============
-=
-= T_BJRun
-=
-===============
-*/
-
-void T_BJRun (objtype *ob)
-{
-	long 	move;
-
-	move = BJRUNSPEED*tics;
-
-	while (move)
-	{
-		if (move < ob->distance)
-		{
-			MoveObj (ob,move);
-			break;
-		}
-
-
-		ob->x = ((long)ob->tilex<<TILESHIFT)+TILEGLOBAL/2;
-		ob->y = ((long)ob->tiley<<TILESHIFT)+TILEGLOBAL/2;
-		move -= ob->distance;
-
-		SelectPathDir (ob);
-
-		if ( !(--ob->temp1) )
-		{
-			NewState (ob,&s_bjjump1);
-			return;
-		}
-	}
-}
-
-
-/*
-===============
-=
-= T_BJJump
-=
-===============
-*/
-
-void T_BJJump (objtype *ob)
-{
-	long 	move;
-
-	move = BJJUMPSPEED*tics;
-	MoveObj (ob,move);
-}
-
-
-/*
-===============
-=
-= T_BJYell
-=
-===============
-*/
-
-void T_BJYell (objtype *ob)
-{
-	PlaySoundLocActor(YEAHSND,ob);	// JAB
-}
-
-
-/*
-===============
-=
-= T_BJDone
-=
-===============
-*/
-
-#pragma argsused
-void T_BJDone (objtype *ob)
-{
-	playstate = ex_victorious;				// exit castle tile
-}
-
-
-
-//===========================================================================
-
-
-/*
-===============
-=
-= CheckPosition
-=
-===============
-*/
-
 boolean	CheckPosition (objtype *ob)
 {
 	int	x,y,xl,yl,xh,yh;
@@ -3739,9 +2659,6 @@ boolean	CheckPosition (objtype *ob)
 	xh = (ob->x+PLAYERSIZE) >>TILESHIFT;
 	yh = (ob->y+PLAYERSIZE) >>TILESHIFT;
 
-	//
-	// check for solid walls
-	//
 	for (y=yl;y<=yh;y++)
 		for (x=xl;x<=xh;x++)
 		{
@@ -3752,121 +2669,3 @@ boolean	CheckPosition (objtype *ob)
 
 	return true;
 }
-
-
-/*
-===============
-=
-= A_StartDeathCam
-=
-===============
-*/
-
-void	A_StartDeathCam (objtype *ob)
-{
-	long	dx,dy;
-	float	fangle;
-	long    xmove,ymove;
-	long	dist;
-	int		temp,i;
-
-	FinishPaletteShifts ();
-
-	VW_WaitVBL (100);
-
-	if (gamestate.victoryflag)
-	{
-		playstate = ex_victorious;				// exit castle tile
-		return;
-	}
-
-	gamestate.victoryflag = true;
-	VW_Bar (0,0,320,200-STATUSLINES,127);
-	FizzleFade(bufferofs,displayofs,320,200-STATUSLINES,70,false);
-
-	PM_UnlockMainMem ();
-	CA_UpLevel ();
-	CacheLump(LEVELEND_LUMP_START,LEVELEND_LUMP_END);
-	#ifdef JAPAN
-	#ifndef JAPDEMO
-	CA_CacheScreen(C_LETSSEEPIC);
-	#endif
-	#else
-	Write(0,7,STR_SEEAGAIN);
-	#endif
-	CA_DownLevel ();
-	PM_CheckMainMem ();
-
-	VW_UpdateScreen ();
-
-	IN_UserInput(300);
-
-//
-// line angle up exactly
-//
-	NewState (player,&s_deathcam);
-
-	player->x = gamestate.killx;
-	player->y = gamestate.killy;
-
-	dx = ob->x - player->x;
-	dy = player->y - ob->y;
-
-	fangle = atan2(dy,dx);			// returns -pi to pi
-	if (fangle<0)
-		fangle = M_PI*2+fangle;
-
-	player->angle = fangle/(M_PI*2)*ANGLES;
-
-//
-// try to position as close as possible without being in a wall
-//
-	dist = 0x14000l;
-	do
-	{
-		xmove = FixedByFrac(dist,costable[player->angle]);
-		ymove = -FixedByFrac(dist,sintable[player->angle]);
-
-		player->x = ob->x - xmove;
-		player->y = ob->y - ymove;
-		dist += 0x1000;
-
-	} while (!CheckPosition (player));
-	plux = player->x >> UNSIGNEDSHIFT;			// scale to fit in unsigned
-	pluy = player->y >> UNSIGNEDSHIFT;
-	player->tilex = player->x >> TILESHIFT;		// scale to tile values
-	player->tiley = player->y >> TILESHIFT;
-
-//
-// go back to the game
-//
-	temp = bufferofs;
-	for (i=0;i<3;i++)
-	{
-		bufferofs = screenloc[i];
-		DrawPlayBorder ();
-	}
-	bufferofs = temp;
-
-	fizzlein = true;
-	switch (ob->obclass)
-	{
-#ifndef SPEAR
-	case schabbobj:
-		NewState (ob,&s_schabbdeathcam);
-		break;
-	case realhitlerobj:
-		NewState (ob,&s_hitlerdeathcam);
-		break;
-	case giftobj:
-		NewState (ob,&s_giftdeathcam);
-		break;
-	case fatobj:
-		NewState (ob,&s_fatdeathcam);
-		break;
-#endif
-	}
-
-}
-
-#endif

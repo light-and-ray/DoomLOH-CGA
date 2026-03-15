@@ -38,26 +38,6 @@ void VL_WaitVBL (int vbls);
 
 //===========================================================================
 
-
-/*
-=======================
-=
-= VL_Startup
-=
-=======================
-*/
-
-#if 0
-void	VL_Startup (void)
-{
-	if ( !MS_CheckParm ("HIDDENCARD") && VL_VideoID () != 5)
-		MS_Quit ("You need a VGA graphics card to run this!");
-
-	asm	cld;				// all string instructions assume forward
-}
-
-#endif
-
 /*
 =======================
 =
@@ -83,8 +63,7 @@ void	VL_Startup (void)
 		}
 
 	if (videocard != 5)
-Quit ("Improper video card!  If you really have a VGA card that I am not \n"
-	  "detecting, use the -HIDDENCARD command line parameter!");
+Quit ("No VGA Card!");
 
 }
 
@@ -806,7 +785,9 @@ void VL_MemToScreen (byte far *source, int width, int height, int x, int y)
 
 		screen = dest;
 		for (y=0;y<height;y++,screen+=linewidth,source+=width)
-			_fmemcpy (screen,source,width);
+			for (x=0;x<width;x++)
+				if ((byte)(*(source+x)) != 255)
+			_fmemcpy (screen+x,source+x,1);
 	}
 }
 
@@ -894,60 +875,12 @@ asm	mov	ds,ax
 }
 
 
-//===========================================================================
-
-#if 0
-
-/*
-=================
-=
-= VL_ScreenToScreen
-=
-=================
-*/
-
-void VL_ScreenToScreen (unsigned source, unsigned dest,int width, int height)
-{
-	VGAWRITEMODE(1);
-	VGAMAPMASK(15);
-
-asm	mov	si,[source]
-asm	mov	di,[dest]
-asm	mov	ax,[width]
-asm	mov	bx,[linewidth]
-asm	sub	bx,ax
-asm	mov	dx,[height]
-asm	mov	cx,SCREENSEG
-asm	mov	ds,cx
-asm	mov	es,cx
-
-drawline:
-asm	mov	cx,ax
-asm	rep movsb
-asm	add	si,bx
-asm	add	di,bx
-asm	dec	dx
-asm	jnz	drawline
-
-asm	mov	ax,ss
-asm	mov	ds,ax
-
-	VGAWRITEMODE(0);
-}
-
-
-#endif
-
-/*
-=============================================================================
+/*/===========================================================================
 
 						STRING OUTPUT ROUTINES
 
 =============================================================================
 */
-
-
-
 
 /*
 ===================

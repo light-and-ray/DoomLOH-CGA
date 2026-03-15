@@ -598,6 +598,7 @@ PML_GetEMSAddress(int page,PMLockType lock)
 	if (emspage == -1)
 		Quit("PML_GetEMSAddress: EMS find failed");
 
+	PM_NextFrame();
 	EMSList[emspage].lastHit = PMFrameCount;
 	offset = emspage * EMSPageSizeSeg;
 	offset += emsoff * PMPageSizeSeg;
@@ -881,16 +882,6 @@ PM_GetPage(int pagenum)
 	if (pagenum >= ChunksInFile)
 		Quit("PM_GetPage: Invalid page request");
 
-#if 0	// for debugging
-asm	mov	dx,STATUS_REGISTER_1
-asm	in	al,dx
-asm	mov	dx,ATR_INDEX
-asm	mov	al,ATR_OVERSCAN
-asm	out	dx,al
-asm	mov	al,10	// bright green
-asm	out	dx,al
-#endif
-
 	if (!(result = PM_GetPageAddress(pagenum)))
 	{
 		boolean mainonly = (pagenum >= PMSoundStart);
@@ -906,18 +897,6 @@ if (!PMPages[pagenum].offset)	// JDC: sparse page
 		}
 	}
 	PMPages[pagenum].lastHit = PMFrameCount;
-
-#if 0	// for debugging
-asm	mov	dx,STATUS_REGISTER_1
-asm	in	al,dx
-asm	mov	dx,ATR_INDEX
-asm	mov	al,ATR_OVERSCAN
-asm	out	dx,al
-asm	mov	al,3	// blue
-asm	out	dx,al
-asm	mov	al,0x20	// normal
-asm	out	dx,al
-#endif
 
 	return(result);
 }
@@ -1081,18 +1060,6 @@ PM_NextFrame(void)
 			PMPages[i].lastHit = 0;
 		PMFrameCount = 0;
 	}
-
-#if 0
-	for (i = 0;i < PMSoundStart;i++)
-	{
-		if (PMPages[i].locked)
-		{
-			char buf[40];
-			sprintf(buf,"PM_NextFrame: Page %d is locked",i);
-			Quit(buf);
-		}
-	}
-#endif
 
 	if (PMPanicMode)
 	{

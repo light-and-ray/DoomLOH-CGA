@@ -3,7 +3,7 @@
 /*
 =============================================================================
 
-		   ID software memory manager
+		   ID software memory manager!
 		   --------------------------
 
 Primary coder: John Carmack
@@ -537,7 +537,7 @@ mmblocktype	far *savedmmnew;
 			goto tryagain;
 		}
 
-//		unlink(configname);
+	     //	unlink(configname);
 		Quit ("MM_GetPtr: Out of memory!");
 	}
 	else
@@ -767,7 +767,7 @@ void MM_SortMem (void)
 = MM_ShowMemory
 =
 =====================
-*/
+
 
 void MM_ShowMemory (void)
 {
@@ -808,7 +808,7 @@ void MM_ShowMemory (void)
 
 	bufferofs = temp;
 }
-
+*/
 //==========================================================================
 
 /*
@@ -817,7 +817,7 @@ void MM_ShowMemory (void)
 = MM_DumpData
 =
 =====================
-*/
+
 
 void MM_DumpData (void)
 {
@@ -872,7 +872,7 @@ void MM_DumpData (void)
 	fclose (dumpfile);
 	Quit ("MMDUMP.TXT created.");
 }
-
+*/
 //==========================================================================
 
 

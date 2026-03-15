@@ -7,69 +7,29 @@
 #include <TIME.H>
 #endif
 
-
-/*
-=============================================================================
-
-						 LOCAL CONSTANTS
-
-=============================================================================
-*/
-
-
-/*
-=============================================================================
-
-						 GLOBAL VARIABLES
-
-=============================================================================
-*/
-
 boolean		ingame,fizzlein;
 unsigned	latchpics[NUMLATCHPICS];
 gametype	gamestate;
 
 long		spearx,speary;
-unsigned	spearangle;
+unsigned        spearangle;
 boolean		spearflag;
 
-//
-// ELEVATOR BACK MAPS - REMEMBER (-1)!!
-//
-int ElevatorBackTo[]={1,1,7,3,5,3};
+extern	objtype *LastAttacker;
+
+long		spearx,speary;
+unsigned	spearangle;
+boolean		spearflag;
+int	warpwx,warpwy,warpex,warpey;
+byte	pwx,pwy,pw2x,pw2y,pw3x,pw3y,pw4x,pw4y;
+
+int ElevatorBackTo[]={2,4,8,4};
 
 void ScanInfoPlane (void);
 void SetupGameLevel (void);
 void DrawPlayScreen (void);
 void LoadLatchMem (void);
 void GameLoop (void);
-
-/*
-=============================================================================
-
-						 LOCAL VARIABLES
-
-=============================================================================
-*/
-
-
-
-//===========================================================================
-//===========================================================================
-
-
-/*
-==========================
-=
-= SetSoundLoc - Given the location of an object (in terms of global
-=	coordinates, held in globalsoundx and globalsoundy), munges the values
-=	for an approximate distance from the left and right ear, and puts
-=	those values into leftchannel and rightchannel.
-=
-= JAB
-=
-==========================
-*/
 
 	fixed	globalsoundx,globalsoundy;
 	int		leftchannel,rightchannel;
@@ -115,22 +75,13 @@ SetSoundLoc(fixed gx,fixed gy)
 	fixed	xt,yt;
 	int		x,y;
 
-//
-// translate point to view centered coordinates
-//
 	gx -= viewx;
 	gy -= viewy;
 
-//
-// calculate newx
-//
 	xt = FixedByFrac(gx,viewcos);
 	yt = FixedByFrac(gy,viewsin);
 	x = (xt - yt) >> TILESHIFT;
 
-//
-// calculate newy
-//
 	xt = FixedByFrac(gx,viewsin);
 	yt = FixedByFrac(gy,viewcos);
 	y = (yt + xt) >> TILESHIFT;
@@ -155,18 +106,6 @@ SetSoundLoc(fixed gx,fixed gy)
 #endif
 }
 
-/*
-==========================
-=
-= SetSoundLocGlobal - Sets up globalsoundx & globalsoundy and then calls
-=	UpdateSoundLoc() to transform that into relative channel volumes. Those
-=	values are then passed to the Sound Manager so that they'll be used for
-=	the next sound played (if possible).
-=
-= JAB
-=
-==========================
-*/
 void PlaySoundLocGlobal(word s,fixed gx,fixed gy)
 {
 	SetSoundLoc(gx,gy);
@@ -187,36 +126,12 @@ void UpdateSoundLoc(void)
 	}
 }
 
-/*
-**	JAB End
-*/
-
-
-/*
-==========================
-=
-= ClearMemory
-=
-==========================
-*/
-
 void ClearMemory (void)
 {
 	PM_UnlockMainMem();
 	SD_StopDigitized();
 	MM_SortMem ();
 }
-
-
-/*
-==========================
-=
-= ScanInfoPlane
-=
-= Spawn all actors and mark down special places
-=
-==========================
-*/
 
 void ScanInfoPlane (void)
 {
@@ -240,7 +155,20 @@ void ScanInfoPlane (void)
 			case 22:
 				SpawnPlayer(x,y,NORTH+tile-19);
 				break;
+			case 11:
+				break;
+			case 12:
+				warpex = x;
+				warpey = y;
+				break;
+			case 13:
+				break;
+			case 14:
+				warpwx = x;
+				warpwy = y;
+				break;
 
+		
 			case 23:
 			case 24:
 			case 25:
@@ -249,7 +177,6 @@ void ScanInfoPlane (void)
 			case 28:
 			case 29:
 			case 30:
-
 			case 31:
 			case 32:
 			case 33:
@@ -258,7 +185,6 @@ void ScanInfoPlane (void)
 			case 36:
 			case 37:
 			case 38:
-
 			case 39:
 			case 40:
 			case 41:
@@ -267,7 +193,6 @@ void ScanInfoPlane (void)
 			case 44:
 			case 45:
 			case 46:
-
 			case 47:
 			case 48:
 			case 49:
@@ -276,7 +201,6 @@ void ScanInfoPlane (void)
 			case 52:
 			case 53:
 			case 54:
-
 			case 55:
 			case 56:
 			case 57:
@@ -285,7 +209,6 @@ void ScanInfoPlane (void)
 			case 60:
 			case 61:
 			case 62:
-
 			case 63:
 			case 64:
 			case 65:
@@ -298,21 +221,46 @@ void ScanInfoPlane (void)
 			case 72:
 			case 73:						// TRUCK AND SPEAR!
 			case 74:
-
+			case 75:
+			case 76:
+			case 77:
+			case 78:
+			case 79:
+			case 80:
+			case 81:
+			case 82:
+			case 83:
+			case 84:
+			case 85:
+			case 86:
+			case 87:
+			case 88:
+			case 89:
+			case 90:
+			case 91:
+			case 92:
+			case 93:
+			case 94:
+			case 95:
+			case 96:
+			case 97:
+			case 98:
+			case 99:
+			case 100:
+			case 101:
+			case 102:
+			case 103:
+			case 104:
+			case 105:
 				SpawnStatic(x,y,tile-23);
 				break;
 
-//
-// P wall
-//
-			case 98:
-				if (!loadedgame)
-				  gamestate.secrettotal++;
+			case 107:
+				(unsigned)actorat[x][y] = 0xffff;
+				if(!loadedgame)
+					gamestate.secrettotal++;
 				break;
 
-//
-// guard
-//
 			case 180:
 			case 181:
 			case 182:
@@ -331,7 +279,7 @@ void ScanInfoPlane (void)
 			case 109:
 			case 110:
 			case 111:
-				SpawnStand(en_guard,x,y,tile-108);
+				SpawnStand(en_mutant,x,y,tile-108);
 				break;
 
 
@@ -353,15 +301,13 @@ void ScanInfoPlane (void)
 			case 113:
 			case 114:
 			case 115:
-				SpawnPatrol(en_guard,x,y,tile-112);
+				SpawnPatrol(en_mutant,x,y,tile-112);
 				break;
 
 			case 124:
 				SpawnDeadGuard (x,y);
 				break;
-//
-// officer
-//
+
 			case 188:
 			case 189:
 			case 190:
@@ -380,7 +326,7 @@ void ScanInfoPlane (void)
 			case 117:
 			case 118:
 			case 119:
-				SpawnStand(en_officer,x,y,tile-116);
+				SpawnStand(en_chaingunguy,x,y,tile-116);
 				break;
 
 
@@ -402,13 +348,9 @@ void ScanInfoPlane (void)
 			case 121:
 			case 122:
 			case 123:
-				SpawnPatrol(en_officer,x,y,tile-120);
+				SpawnPatrol(en_chaingunguy,x,y,tile-120);
 				break;
 
-
-//
-// ss
-//
 			case 198:
 			case 199:
 			case 200:
@@ -427,9 +369,8 @@ void ScanInfoPlane (void)
 			case 127:
 			case 128:
 			case 129:
-				SpawnStand(en_ss,x,y,tile-126);
+				SpawnStand(en_cacodemon,x,y,tile-126);
 				break;
-
 
 			case 202:
 			case 203:
@@ -449,12 +390,9 @@ void ScanInfoPlane (void)
 			case 131:
 			case 132:
 			case 133:
-				SpawnPatrol(en_ss,x,y,tile-130);
+				SpawnPatrol(en_cacodemon,x,y,tile-130);
 				break;
 
-//
-// dogs
-//
 			case 206:
 			case 207:
 			case 208:
@@ -473,7 +411,7 @@ void ScanInfoPlane (void)
 			case 135:
 			case 136:
 			case 137:
-				SpawnStand(en_dog,x,y,tile-134);
+				SpawnStand(en_demon,x,y,tile-134);
 				break;
 
 
@@ -495,59 +433,31 @@ void ScanInfoPlane (void)
 			case 139:
 			case 140:
 			case 141:
-				SpawnPatrol(en_dog,x,y,tile-138);
+				SpawnPatrol(en_demon,x,y,tile-138);
 				break;
 
-//
-// boss
-//
-#ifndef SPEAR
 			case 214:
+				SpawnCyber (x,y);
+				break;
+			case 215:
+				SpawnMancubus (x,y);
+				break;
+			case 332:
+				SpawnVile (x,y);
+				break;
+			case 196:
+				SpawnSpider (x,y);
+				break;
+			case 178:
+				SpawnRevenant (x,y);
+				break;
+			case 179:
 				SpawnBoss (x,y);
 				break;
 			case 197:
-				SpawnGretel (x,y);
-				break;
-			case 215:
-				SpawnGift (x,y);
-				break;
-			case 179:
-				SpawnFat (x,y);
-				break;
-			case 196:
-				SpawnSchabbs (x,y);
-				break;
-			case 160:
-				SpawnFakeHitler (x,y);
-				break;
-			case 178:
-				SpawnHitler (x,y);
-				break;
-#else
-			case 106:
-				SpawnSpectre (x,y);
-				break;
-			case 107:
-				SpawnAngel (x,y);
-				break;
-			case 125:
-				SpawnTrans (x,y);
-				break;
-			case 142:
-				SpawnUber (x,y);
-				break;
-			case 143:
-				SpawnWill (x,y);
-				break;
-			case 161:
-				SpawnDeath (x,y);
+				SpawnBoss2 (x,y);
 				break;
 
-#endif
-
-//
-// mutants
-//
 			case 252:
 			case 253:
 			case 254:
@@ -566,7 +476,7 @@ void ScanInfoPlane (void)
 			case 217:
 			case 218:
 			case 219:
-				SpawnStand(en_mutant,x,y,tile-216);
+				SpawnStand(en_shotgunguy,x,y,tile-216);
 				break;
 
 			case 256:
@@ -587,46 +497,171 @@ void ScanInfoPlane (void)
 			case 221:
 			case 222:
 			case 223:
-				SpawnPatrol(en_mutant,x,y,tile-220);
+				SpawnPatrol(en_shotgunguy,x,y,tile-220);
 				break;
 
-//
-// ghosts
-//
-#ifndef SPEAR
-			case 224:
-				SpawnGhosts (en_blinky,x,y);
+			case 276:
+			case 277:
+			case 278:
+			case 279:
+				if (gamestate.difficulty<gd_hard)
 				break;
-			case 225:
-				SpawnGhosts (en_clyde,x,y);
+				tile-=8;
+			case 268:
+			case 269:
+			case 270:
+			case 271:
+				if (gamestate.difficulty<gd_medium)
 				break;
-			case 226:
-				SpawnGhosts (en_pinky,x,y);
+				tile -= 8;
+			case 260:
+			case 261:
+			case 262:
+			case 263:
+				SpawnStand(en_imp,x,y,tile-260);
 				break;
-			case 227:
-				SpawnGhosts (en_inky,x,y);
+
+			case 280:
+			case 281:
+			case 282:
+			case 283:
+				if (gamestate.difficulty<gd_hard)
 				break;
-#endif
+				tile -= 8;
+			case 272:
+			case 273:
+			case 274:
+			case 275:
+				if (gamestate.difficulty<gd_medium)
+				break;
+				tile -= 8;
+			case 264:
+			case 265:
+			case 266:
+			case 267:
+				SpawnPatrol (en_imp,x,y,tile-264);
+				break;
+
+			case 300:
+			case 301:
+			case 302:
+			case 303:
+				if (gamestate.difficulty<gd_hard)
+				break;
+				tile -= 8;
+			case 292:
+			case 293:
+			case 294:
+			case 295:
+				if (gamestate.difficulty<gd_medium)
+				break;
+				tile -= 8;
+			case 284:
+			case 285:
+			case 286:
+			case 287:
+				SpawnStand(en_painelemental,x,y,tile-284);
+				break;
+
+			case 304:
+			case 305:
+			case 306:
+			case 307:
+				if (gamestate.difficulty<gd_hard)
+				break;
+				tile -= 8;
+			case 296:
+			case 297:
+			case 298:
+			case 299:
+				if (gamestate.difficulty<gd_medium)
+				break;
+				tile -= 8;
+			case 288:
+			case 289:
+			case 290:
+			case 291:
+				SpawnPatrol(en_painelemental,x,y,tile-288);
+				break;
+
+			case 324:
+			case 325:
+			case 326:
+			case 327:
+				if (gamestate.difficulty<gd_hard)
+				break;
+				tile -= 8;
+			case 316:
+			case 317:
+			case 318:
+			case 319:
+				if (gamestate.difficulty<gd_medium)
+				break;
+				tile -= 8;
+			case 308:
+			case 309:
+			case 310:
+			case 311:
+				SpawnStand (en_lostsoul,x,y,tile-308);
+				break;
+
+			case 328:
+			case 329:
+			case 330:
+			case 331:
+				if (gamestate.difficulty<gd_hard)
+				break;
+				tile -= 8;
+			case 320:
+			case 321:
+			case 322:
+			case 323:
+				if (gamestate.difficulty<gd_medium)
+				break;
+				tile -= 8;
+			case 312:
+			case 313:
+			case 314:
+			case 315:
+				SpawnPatrol (en_lostsoul,x,y,tile-312);
+				break;
+
+			case 15:
+				SpawnBarrel (x,y);
+				break;
+			case 704:
+			case 705:
+			case 706:
+			case 707:
+				pwx = x; pwy = y;
+				break;
+			case 712:
+			case 713:
+			case 714:
+			case 715:
+				pw2x = x; pw2y = y;
+				break;
+			case 720:
+			case 721:
+			case 722:
+			case 723:
+				pw3x = x; pw3y = y;
+				break;
+			case 728:
+			case 729:
+			case 730:
+			case 731:
+				pw4x = x; pw4y = y;
+				break;
 			}
 
 		}
 }
 
-//==========================================================================
-
-/*
-==================
-=
-= SetupGameLevel
-=
-==================
-*/
-
 void SetupGameLevel (void)
 {
 	int	x,y,i;
 	unsigned	far *map,tile,spot;
-
 
 	if (!loadedgame)
 	{
@@ -637,6 +672,15 @@ void SetupGameLevel (void)
 	 gamestate.secretcount=
 	 gamestate.killcount=
 	 gamestate.treasurecount=0;
+	 if (gamestate.mapon==10)
+	 {
+         	gamestate.bestweapon= 512;
+		gamestate.nextweapon = gamestate.weapon = gamestate.chosenweapon = wp_hellorb;
+		gamestate.ammo = gamestate.ammo2 =
+		gamestate.ammo3 = gamestate.ammo4 = 0;
+		DrawAmmo ();
+		DrawWeapon();
+	 }
 	}
 
 	if (demoplayback || demorecord)
@@ -644,9 +688,6 @@ void SetupGameLevel (void)
 	else
 		US_InitRndT (true);
 
-//
-// load the level
-//
 	CA_CacheMap (gamestate.mapon+10*gamestate.episode);
 	mapon-=gamestate.episode*10;
 
@@ -656,10 +697,6 @@ void SetupGameLevel (void)
 	if (mapwidth != 64 || mapheight != 64)
 		Quit ("Map not 64*64!");
 
-
-//
-// copy the wall data to a data segment array
-//
 	memset (tilemap,0,sizeof(tilemap));
 	memset (actorat,0,sizeof(actorat));
 	map = mapsegs[0];
@@ -669,22 +706,16 @@ void SetupGameLevel (void)
 			tile = *map++;
 			if (tile<AREATILE)
 			{
-			// solid wall
 				tilemap[x][y] = tile;
 				(unsigned)actorat[x][y] = tile;
 			}
 			else
 			{
-			// area floor
 				tilemap[x][y] = 0;
 				(unsigned)actorat[x][y] = 0;
 			}
 		}
-
-//
-// spawn doors
-//
-	InitActorList ();			// start spawning things with a clean slate
+	InitActorList ();
 	InitDoorList ();
 	InitStaticList ();
 
@@ -693,9 +724,8 @@ void SetupGameLevel (void)
 		for (x=0;x<mapwidth;x++)
 		{
 			tile = *map++;
-			if (tile >= 90 && tile <= 101)
+			if (tile >= 90 && tile <= 105)
 			{
-			// door
 				switch (tile)
 				{
 				case 90:
@@ -704,6 +734,8 @@ void SetupGameLevel (void)
 				case 96:
 				case 98:
 				case 100:
+				case 102:
+				case 104:
 					SpawnDoor (x,y,1,(tile-90)/2);
 					break;
 				case 91:
@@ -712,20 +744,15 @@ void SetupGameLevel (void)
 				case 97:
 				case 99:
 				case 101:
-					SpawnDoor (x,y,0,(tile-91)/2);
+				case 103:
+				case 105:
+					SpawnDoor (x,y,0,(tile-90)/2);
 					break;
 				}
 			}
 		}
-
-//
-// spawn actors
-//
 	ScanInfoPlane ();
 
-//
-// take out the ambush markers
-//
 	map = mapsegs[0];
 	for (y=0;y<mapheight;y++)
 		for (x=0;x<mapwidth;x++)
@@ -749,30 +776,8 @@ void SetupGameLevel (void)
 				*(map-1) = tile;
 			}
 		}
-
-
-
-//
-// have the caching manager load and purge stuff to make sure all marks
-// are in memory
-//
 	CA_LoadAllSounds ();
-
 }
-
-
-//==========================================================================
-
-
-/*
-===================
-=
-= DrawPlayBorderSides
-=
-= To fix window overwrites
-=
-===================
-*/
 
 void DrawPlayBorderSides (void)
 {
@@ -781,21 +786,12 @@ void DrawPlayBorderSides (void)
 	xl = 160-viewwidth/2;
 	yl = (200-STATUSLINES-viewheight)/2;
 
-	VWB_Bar (0,0,xl-1,200-STATUSLINES,127);
-	VWB_Bar (xl+viewwidth+1,0,xl-2,200-STATUSLINES,127);
+	VWB_Bar (0,0,xl-1,200-STATUSLINES,108);
+	VWB_Bar (xl+viewwidth+1,0,xl-2,200-STATUSLINES,108);
 
 	VWB_Vlin (yl-1,yl+viewheight,xl-1,0);
-	VWB_Vlin (yl-1,yl+viewheight,xl+viewwidth,125);
+	VWB_Vlin (yl-1,yl+viewheight,xl+viewwidth,106);
 }
-
-
-/*
-===================
-=
-= DrawAllPlayBorderSides
-=
-===================
-*/
 
 void DrawAllPlayBorderSides (void)
 {
@@ -810,13 +806,6 @@ void DrawAllPlayBorderSides (void)
 	bufferofs = temp;
 }
 
-/*
-===================
-=
-= DrawPlayBorder
-=
-===================
-*/
 void DrawAllPlayBorder (void)
 {
 	unsigned	i,temp;
@@ -830,41 +819,22 @@ void DrawAllPlayBorder (void)
 	bufferofs = temp;
 }
 
-/*
-===================
-=
-= DrawPlayBorder
-=
-===================
-*/
-
 void DrawPlayBorder (void)
 {
 	int	xl,yl;
 
-	VWB_Bar (0,0,320,200-STATUSLINES,127);
+	VWB_Bar (0,0,320,200-STATUSLINES,108);
 
 	xl = 160-viewwidth/2;
 	yl = (200-STATUSLINES-viewheight)/2;
 	VWB_Bar (xl,yl,viewwidth,viewheight,0);
 
 	VWB_Hlin (xl-1,xl+viewwidth,yl-1,0);
-	VWB_Hlin (xl-1,xl+viewwidth,yl+viewheight,125);
+	VWB_Hlin (xl-1,xl+viewwidth,yl+viewheight,106);
 	VWB_Vlin (yl-1,yl+viewheight,xl-1,0);
-	VWB_Vlin (yl-1,yl+viewheight,xl+viewwidth,125);
-	VWB_Plot (xl-1,yl+viewheight,124);
+	VWB_Vlin (yl-1,yl+viewheight,xl+viewwidth,106);
+	VWB_Plot (xl-1,yl+viewheight,105);
 }
-
-
-
-/*
-===================
-=
-= DrawPlayScreen
-=
-===================
-*/
-
 void DrawPlayScreen (void)
 {
 	int	i,j,p,m;
@@ -882,32 +852,17 @@ void DrawPlayScreen (void)
 		DrawPlayBorder ();
 		VWB_DrawPic (0,200-STATUSLINES,STATUSBARPIC);
 	}
-
 	bufferofs = temp;
 
 	UNCACHEGRCHUNK (STATUSBARPIC);
 
 	DrawFace ();
 	DrawHealth ();
-	DrawLives ();
-	DrawLevel ();
 	DrawAmmo ();
 	DrawKeys ();
 	DrawWeapon ();
-	DrawScore ();
+	DrawArmor ();
 }
-
-
-
-//==========================================================================
-
-/*
-==================
-=
-= StartDemoRecord
-=
-==================
-*/
 
 #define MAXDEMOSIZE	8192
 
@@ -919,18 +874,9 @@ void StartDemoRecord (int levelnumber)
 	lastdemoptr = demoptr+MAXDEMOSIZE;
 
 	*demoptr = levelnumber;
-	demoptr += 4;				// leave space for length
+	demoptr += 4;
 	demorecord = true;
 }
-
-
-/*
-==================
-=
-= FinishDemoRecord
-=
-==================
-*/
 
 char	demoname[13] = "DEMO?.";
 
@@ -959,22 +905,8 @@ void FinishDemoRecord (void)
 			CA_WriteFile (demoname,(void far *)demobuffer,length);
 		}
 	}
-
-
 	MM_FreePtr (&demobuffer);
 }
-
-//==========================================================================
-
-/*
-==================
-=
-= RecordDemo
-=
-= Fades the screen out, then starts a demo.  Exits with the screen faded
-=
-==================
-*/
 
 void RecordDemo (void)
 {
@@ -984,7 +916,7 @@ void RecordDemo (void)
 	PrintY+=6;
 	CA_CacheGrChunk(STARTFONT);
 	fontnumber=0;
-	US_Print("  Demo which level(1-10):");
+	US_Print("  Demo which level(1-40):");
 	VW_UpdateScreen();
 	VW_FadeIn ();
 	esc = !US_LineInput (px,py,str,NULL,true,2,0);
@@ -997,13 +929,8 @@ void RecordDemo (void)
 	SETFONTCOLOR(0,15);
 	VW_FadeOut ();
 
-#ifndef SPEAR
 	NewGame (gd_hard,level/10);
 	gamestate.mapon = level%10;
-#else
-	NewGame (gd_hard,0);
-	gamestate.mapon = level;
-#endif
 
 	StartDemoRecord (level);
 
@@ -1029,40 +956,14 @@ void RecordDemo (void)
 	FinishDemoRecord ();
 }
 
-//==========================================================================
-
-/*
-==================
-=
-= PlayDemo
-=
-= Fades the screen out, then starts a demo.  Exits with the screen faded
-=
-==================
-*/
-
 void PlayDemo (int demonumber)
 {
 	int length;
 
-#ifdef DEMOSEXTERN
-// debug: load chunk
-#ifndef SPEARDEMO
-	int dems[4]={T_DEMO0,T_DEMO1,T_DEMO2,T_DEMO3};
-#else
-	int dems[1]={T_DEMO0};
-#endif
-
-	CA_CacheGrChunk(dems[demonumber]);
-	demoptr = grsegs[dems[demonumber]];
-	MM_SetLock (&grsegs[dems[demonumber]],true);
-#else
 	demoname[4] = '0'+demonumber;
 	CA_LoadFile (demoname,&demobuffer);
 	MM_SetLock (&demobuffer,true);
 	demoptr = (char far *)demobuffer;
-#endif
-
 	NewGame (1,0);
 	gamestate.mapon = *demoptr++;
 	gamestate.difficulty = gd_hard;
@@ -1086,28 +987,13 @@ void PlayDemo (int demonumber)
 
 	PlayLoop ();
 
-#ifdef DEMOSEXTERN
-	UNCACHEGRCHUNK(dems[demonumber]);
-#else
 	MM_FreePtr (&demobuffer);
-#endif
-
 	demoplayback = false;
 
 	StopMusic ();
 	VW_FadeOut ();
 	ClearMemory ();
 }
-
-//==========================================================================
-
-/*
-==================
-=
-= Died
-=
-==================
-*/
 
 #define DEATHROTATE 2
 
@@ -1117,15 +1003,12 @@ void Died (void)
 	long	dx,dy;
 	int		iangle,curangle,clockwise,counter,change;
 
-	gamestate.weapon = -1;			// take away weapon
-	SD_PlaySound (PLAYERDEATHSND);
-//
-// swing around to face attacker
-//
+	gamestate.weapon = -1;
+
 	dx = killerobj->x - player->x;
 	dy = player->y - killerobj->y;
 
-	fangle = atan2(dy,dx);			// returns -pi to pi
+	fangle = atan2(dy,dx);
 	if (fangle<0)
 		fangle = M_PI*2+fangle;
 
@@ -1146,9 +1029,6 @@ void Died (void)
 
 	if (clockwise<counter)
 	{
-	//
-	// rotate clockwise
-	//
 		if (curangle>iangle)
 			curangle -= ANGLES;
 		do
@@ -1168,9 +1048,6 @@ void Died (void)
 	}
 	else
 	{
-	//
-	// rotate counterclockwise
-	//
 		if (curangle<iangle)
 			curangle += ANGLES;
 		do
@@ -1188,52 +1065,46 @@ void Died (void)
 			CalcTics ();
 		} while (curangle != iangle);
 	}
-
-//
-// fade to red
-//
+	SD_PlaySound (PLAYERDIESND);
 	FinishPaletteShifts ();
-
 	bufferofs += screenofs;
-	VW_Bar (0,0,viewwidth,viewheight,4);
+	VW_Bar (0,0,viewwidth,viewheight,108);
 	IN_ClearKeysDown ();
 	FizzleFade(bufferofs,displayofs+screenofs,viewwidth,viewheight,70,false);
 	bufferofs -= screenofs;
 	IN_UserInput(100);
 	SD_WaitSoundDone ();
-
-	if (tedlevel == false)	// SO'S YA DON'T GET KILLED WHILE LAUNCHING!
-	  gamestate.lives--;
-
+	gamestate.lives--;
 	if (gamestate.lives > -1)
 	{
 		gamestate.health = 100;
-		gamestate.weapon = gamestate.bestweapon
-			= gamestate.chosenweapon = wp_pistol;
-		gamestate.ammo = STARTAMMO;
+		gamestate.armor = 0;
+      gamestate.bestweapon = 3;
+      gamestate.nextweapon = gamestate.weapon = gamestate.chosenweapon = wp_pistol;
+		gamestate.ammo = 10;
+		gamestate.ammomax = 200;
+		gamestate.ammo2 = 0;
+		gamestate.ammo2max = 50;
+		gamestate.ammo3 = 0;
+		gamestate.ammo3max = 50;
+		gamestate.ammo4 = 0;
+		gamestate.ammo4max = 300;
 		gamestate.keys = 0;
 		gamestate.attackframe = gamestate.attackcount =
 		gamestate.weaponframe = 0;
+
+		if (!godflag)
+			godmode = gamestate.godmode = false;
+
 
 		DrawKeys ();
 		DrawWeapon ();
 		DrawAmmo ();
 		DrawHealth ();
 		DrawFace ();
-		DrawLives ();
-	}
-
+		DrawArmor ();
+      }
 }
-
-//==========================================================================
-
-/*
-===================
-=
-= GameLoop
-=
-===================
-*/
 
 void GameLoop (void)
 {
@@ -1254,7 +1125,20 @@ restart:
 	{
 		if (!loadedgame)
 		  gamestate.score = gamestate.oldscore;
-		DrawScore();
+
+		if (!godflag)
+		{
+			if (!gamestate.godmode)
+				godmode = gamestate.godmodecount = 0;
+		}
+			if (!gamestate.berserk)
+				gamestate.berserkcount = 0;
+			if (!gamestate.goggles)
+				gamestate.gogglescount = 0;
+			if (!gamestate.biosuit)
+				biosuit = gamestate.biosuitcount = 0;
+			if (!gamestate.invisibility)
+				invisibility = gamestate.invisibilitycount = 0;
 
 		startgame = false;
 		if (loadedgame)
@@ -1262,14 +1146,11 @@ restart:
 		else
 			SetupGameLevel ();
 
-#ifdef SPEAR
-		if (gamestate.mapon == 20)	// give them the key allways
+		if (gamestate.episode==3 && gamestate.mapon==10)
 		{
-			gamestate.keys |= 1;
+			gamestate.keys |= 6;
 			DrawKeys ();
 		}
-#endif
-
 		ingame = true;
 		StartMusic ();
 		PM_CheckMainMem ();
@@ -1277,32 +1158,27 @@ restart:
 			PreloadGraphics ();
 		else
 			died = false;
-
-		fizzlein = true;
-		DrawLevel ();
+			fizzlein = true;
 
 startplayloop:
 		PlayLoop ();
 
-#ifdef SPEAR
 		if (spearflag)
 		{
 			SD_StopSound();
-			SD_PlaySound(GETSPEARSND);
+			//SD_PlaySound (GETSPEARSND);
 			if (DigiMode != sds_Off)
 			{
 				long lasttimecount = TimeCount;
 
 				while(TimeCount < lasttimecount+150)
-				//while(DigiPlaying!=false)
-					SD_Poll();
+				SD_Poll();
 			}
 			else
 				SD_WaitSoundDone();
-
 			ClearMemory ();
 			gamestate.oldscore = gamestate.score;
-			gamestate.mapon = 20;
+			gamestate.mapon=10;
 			SetupGameLevel ();
 			StartMusic ();
 			PM_CheckMainMem ();
@@ -1313,7 +1189,6 @@ startplayloop:
 			Thrust (0,0);
 			goto startplayloop;
 		}
-#endif
 
 		StopMusic ();
 		ingame = false;
@@ -1334,151 +1209,60 @@ startplayloop:
 
 			ClearMemory ();
 
-			LevelCompleted ();		// do the intermission
-#ifdef SPEARDEMO
-			if (gamestate.mapon == 1)
-			{
-				died = true;			// don't "get psyched!"
-
-				VW_FadeOut ();
-
-				ClearMemory ();
-
-				CheckHighScore (gamestate.score,gamestate.mapon+1);
-
-				#pragma warn -sus
-				#ifndef JAPAN
-				_fstrcpy(MainMenu[viewscores].string,STR_VS);
-				#endif
-				MainMenu[viewscores].routine = CP_ViewScores;
-				#pragma warn +sus
-
-				return;
-			}
-#endif
-
-#ifdef JAPDEMO
-			if (gamestate.mapon == 3)
-			{
-				died = true;			// don't "get psyched!"
-
-				VW_FadeOut ();
-
-				ClearMemory ();
-
-				CheckHighScore (gamestate.score,gamestate.mapon+1);
-
-				#pragma warn -sus
-				#ifndef JAPAN
-				_fstrcpy(MainMenu[viewscores].string,STR_VS);
-				#endif
-				MainMenu[viewscores].routine = CP_ViewScores;
-				#pragma warn +sus
-
-				return;
-			}
-#endif
-
+			LevelCompleted ();
+			if (!godflag)
+				godmode = gamestate.godmodecount = 0;
+				berserk = gamestate.berserkcount = 0;
+				gamestate.gogglescount = 0;
+				biosuit = gamestate.biosuit = 0;
+				invisibility = gamestate.invisibilitycount=0;
 			gamestate.oldscore = gamestate.score;
 
-#ifndef SPEAR
-			//
-			// COMING BACK FROM SECRET LEVEL
-			//
 			if (gamestate.mapon == 9)
 				gamestate.mapon = ElevatorBackTo[gamestate.episode];	// back from secret
 			else
-			//
-			// GOING TO SECRET LEVEL
-			//
+
 			if (playstate == ex_secretlevel)
 				gamestate.mapon = 9;
-#else
 
-#define FROMSECRET1		3
-#define FROMSECRET2		11
-
-			//
-			// GOING TO SECRET LEVEL
-			//
-			if (playstate == ex_secretlevel)
-				switch(gamestate.mapon)
-				{
-				 case FROMSECRET1: gamestate.mapon = 18; break;
-				 case FROMSECRET2: gamestate.mapon = 19; break;
-				}
 			else
-			//
-			// COMING BACK FROM SECRET LEVEL
-			//
-			if (gamestate.mapon == 18 || gamestate.mapon == 19)
-				switch(gamestate.mapon)
-				{
-				 case 18: gamestate.mapon = FROMSECRET1+1; break;
-				 case 19: gamestate.mapon = FROMSECRET2+1; break;
-				}
-#endif
-			else
-			//
-			// GOING TO NEXT LEVEL
-			//
 				gamestate.mapon++;
-
 
 			break;
 
 		case ex_died:
 			Died ();
-			died = true;			// don't "get psyched!"
+			died = true;
 
 			if (gamestate.lives > -1)
-				break;				// more lives left
+				break;
 
 			VW_FadeOut ();
-
 			ClearMemory ();
-
 			CheckHighScore (gamestate.score,gamestate.mapon+1);
 
 			#pragma warn -sus
-			#ifndef JAPAN
-			_fstrcpy(MainMenu[viewscores].string,STR_VS);
-			#endif
 			MainMenu[viewscores].routine = CP_ViewScores;
 			#pragma warn +sus
 
 			return;
 
 		case ex_victorious:
-
-#ifndef SPEAR
-			VW_FadeOut ();
-#else
-			VL_FadeOut (0,255,0,17,17,300);
-#endif
+			VL_FadeOut (0,255,16,16,16,300);
 			ClearMemory ();
-
 			Victory ();
-
 			ClearMemory ();
-
+			DoAnimation();
 			CheckHighScore (gamestate.score,gamestate.mapon+1);
 
 			#pragma warn -sus
-			#ifndef JAPAN
-			_fstrcpy(MainMenu[viewscores].string,STR_VS);
-			#endif
 			MainMenu[viewscores].routine = CP_ViewScores;
 			#pragma warn +sus
-
 			return;
 
 		default:
 			ClearMemory ();
 			break;
 		}
-
 	} while (1);
-
 }
-

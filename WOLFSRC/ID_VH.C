@@ -175,7 +175,7 @@ void VL_MungePic (byte far *source, unsigned width, unsigned height)
 	size = width*height;
 
 	if (width&3)
-		MS_Quit ("VL_MungePic: Not divisable by 4!");
+		MS_Quit ("VL_MungePic: !");
 
 //
 // copy the pic to a temp buffer
@@ -215,13 +215,6 @@ void	VW_MeasurePropString (char far *string, word *width, word *height)
 {
 	VWL_MeasureString(string,width,height,(fontstruct _seg *)grsegs[STARTFONT+fontnumber]);
 }
-
-void	VW_MeasureMPropString  (char far *string, word *width, word *height)
-{
-	VWL_MeasureString(string,width,height,(fontstruct _seg *)grsegs[STARTFONTM+fontnumber]);
-}
-
-
 
 /*
 =============================================================================
@@ -293,13 +286,6 @@ void VWB_DrawTile8 (int x, int y, int tile)
 	if (VW_MarkUpdateBlock (x,y,x+7,y+7))
 		LatchDrawChar(x,y,tile);
 }
-
-void VWB_DrawTile8M (int x, int y, int tile)
-{
-	if (VW_MarkUpdateBlock (x,y,x+7,y+7))
-		VL_MemToScreen (((byte far *)grsegs[STARTTILE8M])+tile*64,8,8,x,y);
-}
-
 
 void VWB_DrawPic (int x, int y, int chunknum)
 {
@@ -380,7 +366,7 @@ void LatchDrawPic (unsigned x, unsigned y, unsigned picnum)
 	height = pictable[picnum-STARTPICS].height;
 	source = latchpics[2+picnum-LATCHPICS_LUMP_START];
 
-	VL_LatchToScreen (source,wide/4,height,x*8,y);
+	VL_LatchToScreen (source,wide/4,height,x,y);
 }
 
 
@@ -415,24 +401,6 @@ void LoadLatchMem (void)
 		destoff +=16;
 	}
 	UNCACHEGRCHUNK (STARTTILE8);
-
-#if 0	// ran out of latch space!
-//
-// tile 16s
-//
-	src = (byte _seg *)grsegs[STARTTILE16];
-	latchpics[1] = destoff;
-
-	for (i=0;i<NUMTILE16;i++)
-	{
-		CA_CacheGrChunk (STARTTILE16+i);
-		src = (byte _seg *)grsegs[STARTTILE16+i];
-		VL_MemToLatch (src,16,16,destoff);
-		destoff+=64;
-		if (src)
-			UNCACHEGRCHUNK (STARTTILE16+i);
-	}
-#endif
 
 //
 // pics
