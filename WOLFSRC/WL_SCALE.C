@@ -53,6 +53,7 @@ int			stepbytwo;
 
 void SetupScaling (int maxscaleheight)
 {
+	int i;
 	maxscaleheight/=2;			// one scaler every two pixels
 
 	maxscale = maxscaleheight-1;
@@ -138,8 +139,6 @@ void SetupScaling (int maxscaleheight)
 //
 // check for oversize wall drawing
 //
-	for (i=maxscaleheight;i<MAXSCALEHEIGHT;i++)
-		fullscalefarcall[i] = (long)BadScale;
 
 	insetupscaling = false;
 }

@@ -510,9 +510,6 @@ void FinishSignon (void)
 	PrintY = 190;
 	SETFONTCOLOR(0x7,0x7);
 	US_CPrint ("Press a key");
-	#endif
-
-	#endif
 
 	#ifndef WITH_VGA
 	VW_UpdateScreen();
@@ -524,19 +521,15 @@ void FinishSignon (void)
 	PrintY = 190;
 	SETFONTCOLOR(0x7,0x7);
 	US_CPrint ("Working...");
-	#endif
 
 	#ifndef WITH_VGA
 	VW_UpdateScreen();
 	#endif
 
-	#endif
 
 	SETFONTCOLOR(0,15);
-#else
 	if (!NoWait)
 		VW_WaitVBL(3*70);
-#endif
 }
 
 //===========================================================================
@@ -718,16 +711,16 @@ void InitGame (void)
 #else
 	if (mminfo.mainmem < 257000L && !MS_CheckParm("debugmode"))
 #endif
-	{
-		memptr screen;
+	// {
+	// 	memptr screen;
 
-		CA_CacheGrChunk (ERRORSCREEN);
-		screen = grsegs[ERRORSCREEN];
-		ShutdownId();
-		movedata ((unsigned)screen,7+7*160,0xb800,0,17*160);
-		gotoxy (1,23);
-		exit(1);
-	}
+	// 	CA_CacheGrChunk (ERRORSCREEN);
+	// 	screen = grsegs[ERRORSCREEN];
+	// 	ShutdownId();
+	// 	movedata ((unsigned)screen,7+7*160,0xb800,0,17*160);
+	// 	gotoxy (1,23);
+	// 	exit(1);
+	// }
 
 
 //

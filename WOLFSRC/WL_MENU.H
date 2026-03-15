@@ -1,28 +1,51 @@
 //
 // WL_MENU.H
 //
-#define BORDCOLOR	0x6a
-#define BORD2COLOR	0x6f
-#define DEACTIVE	0x6d
-#define BKGDCOLOR	0x6b
-
-#define MenuFadeOut()	VL_FadeOut(0,255,0,0,0,0)
-
+#ifdef WITH_VGA
 #define BORDCOLOR	0x29
 #define BORD2COLOR	0x23
 #define DEACTIVE	0x2b
 #define BKGDCOLOR	0x2d
 #define STRIPE		0x2c
-
-#define MenuFadeOut()	VL_FadeOut(0,255,43,0,0,10)
+#define VIEWPORTBORDER 127
+#define PG13BG		0x82
+#define BACKCOLOR		0x11
+#define VIEWPORTHIGHLIGHT 125
+#else
+#define BORDCOLOR	menucolors[cgamode].bordcolor
+#define BORD2COLOR	menucolors[cgamode].bordcolor2
+#define DEACTIVE	(0x33cc)
+#define BKGDCOLOR	menucolors[cgamode].bkgdcolor
+#define STRIPE		menucolors[cgamode].stripe
+#define VIEWPORTBORDER	menucolors[cgamode].viewportborder
+#define VIEWPORTHIGHLIGHT	menucolors[cgamode].viewporthighlight
+#define PG13BG	menucolors[cgamode].pg13bg
+#define BACKCOLOR		menucolors[cgamode].backcolor
 
 #endif
 
-#define READCOLOR	0x4a
-#define READHCOLOR	0x47
-#define VIEWCOLOR	0x7f
-#define TEXTCOLOR	0x17
-#define HIGHLIGHT	0x13
+#define MenuFadeOut()	VL_FadeOut(0,255,43,0,0,10)
+
+#ifdef WITH_VGA
+#define READCOLOR    0x4a
+#define READHCOLOR    0x47
+#define VIEWCOLOR    0x7f
+#define TEXTCOLOR    0x17
+#define HIGHLIGHT    0x13
+#else
+#define READCOLOR	menucolors[cgamode].readcolor
+#define READHCOLOR	menucolors[cgamode].readhcolor
+#define VIEWCOLOR	menucolors[cgamode].viewcolor
+#define TEXTCOLOR	menucolors[cgamode].textcolor
+#define HIGHLIGHT	menucolors[cgamode].highlight
+#define SIGNONFILL	menucolors[cgamode].signonfill
+#define _READCOLOR    0xffff
+#define _READHCOLOR    0xffff
+#define _VIEWCOLOR    0xffff
+#define _TEXTCOLOR    0xffff
+#define _HIGHLIGHT    0xffff
+#endif
+
 #define MenuFadeIn()	VL_FadeIn(0,255,&gamepal,10)
 
 typedef struct {

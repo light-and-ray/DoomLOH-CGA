@@ -43,7 +43,8 @@
 //	Internal variables
 #define	ConfigVersion	1
 
-static	char		*ParmStrings[] = {"NOWAIT"};
+static	char		*ParmStrings[] = {"NOWAIT"},
+					*ParmStrings2[] = {"COMP","NOCOMP"};
 
 static	boolean		US_Started;
 
@@ -178,6 +179,7 @@ US_Startup(void)
 
 	US_InitRndT(true);		// Initialize the random number generator
 
+	/*
 	for (i = 1;i < _argc;i++)
 	{
 		switch (US_CheckParm(_argv[i],ParmStrings2))

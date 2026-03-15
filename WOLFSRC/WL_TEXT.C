@@ -1,6 +1,6 @@
 #include "WL_DEF.H"
 #pragma	hdrstop
-#define BACKCOLOR		0x6c
+// #define BACKCOLOR		0x6c
 #define WORDLIMIT		80
 #define FONTHEIGHT		10
 #define	TOPMARGIN		16

@@ -26,7 +26,6 @@ extern	char		far signon;
 
 
 #include "GFXV_WL6.H"
-#endif
 #include "AUDIOWL6.H"
 
 //-----------------

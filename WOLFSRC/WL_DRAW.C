@@ -830,111 +830,111 @@ t_floorcolors floorcolors[] =
 =====================
 */
 
-void VGAClearScreen (void)
-{
- unsigned ceiling=vgaCeiling[gamestate.episode*10+mapon];
+// void VGAClearScreen (void)
+// {
+//  unsigned ceiling=vgaCeiling[gamestate.episode*10+mapon];
 
-  //
-  // clear the screen
-  //
-asm	mov	dx,SC_INDEX
-asm	mov	ax,SC_MAPMASK+15*256
-asm	out	dx,ax
+//   //
+//   // clear the screen
+//   //
+// asm	mov	dx,SC_INDEX
+// asm	mov	ax,SC_MAPMASK+15*256
+// asm	out	dx,ax
 
-asm	mov	dx,80
-asm	mov	ax,[viewwidth]
-asm	shr	ax,1
-asm	shr	ax,1
-asm	sub	dx,ax					// dx = 40-viewwidth/2
+// asm	mov	dx,80
+// asm	mov	ax,[viewwidth]
+// asm	shr	ax,1
+// asm	shr	ax,1
+// asm	sub	dx,ax					// dx = 40-viewwidth/2
 
-asm	mov	bx,[viewwidth]
-asm	shr	bx,1					// bl = viewwidth/8
-asm	shr	bx,1					//
-asm	shr	bx,1					//
-asm	mov	bh,BYTE PTR [viewheight]
-asm	shr	bh,1
+// asm	mov	bx,[viewwidth]
+// asm	shr	bx,1					// bl = viewwidth/8
+// asm	shr	bx,1					//
+// asm	shr	bx,1					//
+// asm	mov	bh,BYTE PTR [viewheight]
+// asm	shr	bh,1
 
-asm	mov	es,[screenseg]
-asm	mov	di,[bufferofs]
-asm	mov	ax,[ceiling]
+// asm	mov	es,[screenseg]
+// asm	mov	di,[bufferofs]
+// asm	mov	ax,[ceiling]
 
-toploop:
-asm	mov	cl,bl
-asm	rep	stosw
-asm	add	di,dx
-asm	dec	bh
-asm	jnz	toploop
+// toploop:
+// asm	mov	cl,bl
+// asm	rep	stosw
+// asm	add	di,dx
+// asm	dec	bh
+// asm	jnz	toploop
 
-asm	mov	bh,BYTE PTR [viewheight]
-asm	shr	bh,1
-asm	mov	ax,0x6d6d
+// asm	mov	bh,BYTE PTR [viewheight]
+// asm	shr	bh,1
+// asm	mov	ax,0x6d6d
 
-bottomloop:
-asm	mov	cl,bl
-asm	rep	stosw
-asm	add	di,dx
-asm	dec	bh
-asm	jnz	bottomloop
-}
-void DrawParallax(int startpage)
-{
-   word xtex,nextxtex,offs;
-   byte far *skytex;
-   byte far *destbuf=(byte far *)(0xa0000000L+bufferofs);
-   int i,x=0,x2,curtex,nextx=0,texoffs,t,tend;
-   byte mask;
-   int midangle=player->angle*(FINEANGLES/ANGLES);
-   int skyheight=viewheight>>1;
-   startpage+=15;
+// bottomloop:
+// asm	mov	cl,bl
+// asm	rep	stosw
+// asm	add	di,dx
+// asm	dec	bh
+// asm	jnz	bottomloop
+// }
+// void DrawParallax(int startpage)
+// {
+//    word xtex,nextxtex,offs;
+//    byte far *skytex;
+//    byte far *destbuf=(byte far *)(0xa0000000L+bufferofs);
+//    int i,x=0,x2,curtex,nextx=0,texoffs,t,tend;
+//    byte mask;
+//    int midangle=player->angle*(FINEANGLES/ANGLES);
+//    int skyheight=viewheight>>1;
+//    startpage+=15;
 
-   t=pixelangle[0]+midangle;
-   while(t<0) t+=FINEANGLES;
-   while(t>=FINEANGLES) t-=FINEANGLES;
-   xtex=(word)((((long)t)<<11)/FINEANGLES);
+//    t=pixelangle[0]+midangle;
+//    while(t<0) t+=FINEANGLES;
+//    while(t>=FINEANGLES) t-=FINEANGLES;
+//    xtex=(word)((((long)t)<<11)/FINEANGLES);
 
-   do
-   {
-      curtex=xtex>>7;
-      skytex=(byte far *)(((long)(unsigned) PM_GetPage(startpage-curtex))<<16);
-      nextx=0x7fff;
-      for(i=0;i<4;i++)
-      {
-	 mask=1<<((x+i)&3);
-	 VGAMAPMASK(mask);
-	 for(x2=x+i;x2<viewwidth;x2+=4)
-	 {
-	    t=pixelangle[x2]+midangle;
-	    while(t<0) t+=FINEANGLES;
-	    while(t>=FINEANGLES) t-=FINEANGLES;
-	    xtex=(word)((((long)t)<<11)/FINEANGLES);
+//    do
+//    {
+//       curtex=xtex>>7;
+//       skytex=(byte far *)(((long)(unsigned) PM_GetPage(startpage-curtex))<<16);
+//       nextx=0x7fff;
+//       for(i=0;i<4;i++)
+//       {
+// 	 mask=1<<((x+i)&3);
+// 	 VGAMAPMASK(mask);
+// 	 for(x2=x+i;x2<viewwidth;x2+=4)
+// 	 {
+// 	    t=pixelangle[x2]+midangle;
+// 	    while(t<0) t+=FINEANGLES;
+// 	    while(t>=FINEANGLES) t-=FINEANGLES;
+// 	    xtex=(word)((((long)t)<<11)/FINEANGLES);
 
-	    t=xtex>>7;
-	    if(t!=curtex)
-	    {
-	       if(x2<nextx) nextx=x2,nextxtex=xtex;
-	       break;
-	    }
+// 	    t=xtex>>7;
+// 	    if(t!=curtex)
+// 	    {
+// 	       if(x2<nextx) nextx=x2,nextxtex=xtex;
+// 	       break;
+// 	    }
 
-	    texoffs=0x3f80-((xtex&127)<<7);
-	    tend=skyheight-(wallheight[x2]>>3);
-	    if(tend<=0) continue;
-	    for(t=0,offs=x2>>2;t<tend;t++,offs+=80)
-	    {
-	    if (switches.paralaxsky)
-	      destbuf[offs]=skytex[texoffs+((t<<7)/skyheight)];
-              else
-	      destbuf[offs]=vgaCeiling2[gamestate.mapon+gamestate.episode*10];
-            }
-	 }
+// 	    texoffs=0x3f80-((xtex&127)<<7);
+// 	    tend=skyheight-(wallheight[x2]>>3);
+// 	    if(tend<=0) continue;
+// 	    for(t=0,offs=x2>>2;t<tend;t++,offs+=80)
+// 	    {
+// 	    if (switches.paralaxsky)
+// 	      destbuf[offs]=skytex[texoffs+((t<<7)/skyheight)];
+//               else
+// 	      destbuf[offs]=vgaCeiling2[gamestate.mapon+gamestate.episode*10];
+//             }
+// 	 }
 
-	 if(x2>=viewwidth+3) nextx=viewwidth;
+// 	 if(x2>=viewwidth+3) nextx=viewwidth;
 
-      }
-      x=nextx;
-      xtex=nextxtex;
-   }
-   while(x<viewwidth);
-}
+//       }
+//       x=nextx;
+//       xtex=nextxtex;
+//    }
+//    while(x<viewwidth);
+// }
 int	CalcRotate (objtype *ob)
 {
 	int	angle,viewangle;
@@ -1755,8 +1755,7 @@ void DeathWarning (void)
 	fontnumber = 0;
 	SETFONTCOLOR(0,184);
 	PrintX=9; PrintY=27;
-	US_Print("Liv
-		es: ");
+	US_Print("Lives: ");
 	US_PrintUnsigned(gamestate.lives);
 	SETFONTCOLOR(184,0);
 	PrintX=8; PrintY=26;
